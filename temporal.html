@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de Series Temporales</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+    }
+
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+    }
+
+    /* Gemini Modal Styles */
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #f97316;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-black text-gray-200">
+  <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span class="text-white font-bold text-xl">Predicciones<span class="text-orange-500">.AI</span></span>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            <a href="index.html#laboratorios"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+            <a href="index.html#nosotros"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+            <a href="index.html#contacto"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          <button type="button" id="mobile-menu-button"
+            class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+            aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Abrir menú</span>
+            <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="index.html#laboratorios"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+        <a href="index.html#nosotros"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+        <a href="index.html#contacto"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4 md:p-8">
+    <header class="text-center my-12">
+      <h1 class="text-4xl md:text-6xl font-black text-white">
+        Laboratorio de <span class="text-orange-500">Series Temporales</span>
+      </h1>
+      <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+        Acá nos metemos con los adivinos del tiempo. Jugá con las perillas y
+        descubrí cómo estos modelos leen el pasado para predecir el futuro.
+      </p>
+    </header>
+
+    <main class="space-y-16">
+      <!-- Sección 1: ARIMA -->
+      <section id="arima">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            📈 1. ARIMA (El Clásico)
+          </h2>
+          <button
+            class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+            data-model="Modelo ARIMA">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="card rounded-lg p-6">
+          <h3 class="text-2xl font-bold text-orange-400 mb-4">
+            El Metéorologo 🍦
+          </h3>
+          <p class="text-gray-400 mb-6">
+            ARIMA es el meteorólogo de tus datos. Desarma la predicción en 3
+            partes: la **Memoria** del pasado (AR), la **Tendencia** a largo
+            plazo (I), y la corrección por **Sorpresas** (MA).
+          </p>
+
+          <div class="bg-gray-900 p-4 rounded-lg mb-6">
+            <p class="font-mono text-center text-lg text-orange-400">
+              Y'<sub>t</sub> = c + φ₁Y'<sub>t-1</sub> + θ₁ε<sub>t-1</sub> +
+              ε<sub>t</sub>
+            </p>
+            <p class="text-sm text-center text-gray-400 mt-2">
+              La fórmula para ARIMA(1,1,1). Intenta predecir el **cambio** de
+              hoy basándose en el **cambio** y el **error** de ayer.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div>
+              <label for="pSlider" class="block font-medium">p (Memoria 🧠):
+                <span id="pValue" class="font-bold text-orange-400">2</span></label>
+              <input id="pSlider" type="range" min="0" max="5" value="2"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                Cuántos días para atrás mira. p=2 mira el valor de ayer Y el
+                de anteayer.
+              </p>
+            </div>
+            <div>
+              <label for="dSlider" class="block font-medium">d (Tendencia 📈):
+                <span id="dValue" class="font-bold text-orange-400">1</span></label>
+              <input id="dSlider" type="range" min="0" max="2" value="1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                Cómo estabiliza los datos. d=1 mira la "velocidad" (cambio).
+                d=2 mira la "aceleración" (cambio del cambio).
+              </p>
+            </div>
+            <div>
+              <label for="qSlider" class="block font-medium">q (Sorpresa ⚡):
+                <span id="qValue" class="font-bold text-orange-400">1</span></label>
+              <input id="qSlider" type="range" min="0" max="5" value="1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                Cuántos pifies pasados usa para corregirse. q=2 usa el error
+                de ayer Y el de anteayer.
+              </p>
+            </div>
+          </div>
+          <div class="text-center mb-8">
+            <button id="simularArima"
+              class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">
+              🔮 Simular Predicción ARIMA
+            </button>
+          </div>
+          <div class="chart-container">
+            <canvas id="arimaChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección 2: SARIMA -->
+      <section id="sarima">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            🐘 2. SARIMA (El que tiene Memoria de Elefante)
+          </h2>
+          <button
+            class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+            data-model="Modelo SARIMA">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="card rounded-lg p-6">
+          <h3 class="text-2xl font-bold text-orange-400 mb-4">
+            El Hotel de Mar del Plata 🏖️
+          </h3>
+          <p class="text-gray-400 mb-6">
+            SARIMA es un ARIMA con un superpoder: entiende la
+            **estacionalidad**. No solo mira el mes pasado, sino también el
+            **mismo mes del año pasado**.
+          </p>
+
+          <div class="bg-gray-900 p-4 rounded-lg mb-6">
+            <p class="font-mono text-center text-lg text-orange-400">
+              SARIMA(p,d,q)(P,D,Q)m
+            </p>
+            <p class="text-sm text-center text-gray-400 mt-2">
+              La receta completa. Agrega los parámetros estacionales (P,D,Q) y
+              el período del ciclo (m).
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div>
+              <label for="sarimaPSlider" class="block font-medium">P (AR Estacional):
+                <span id="sarimaPValue" class="font-bold text-orange-400">1</span></label>
+              <input id="sarimaPSlider" type="range" min="0" max="2" value="1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                La memoria de los veranos pasados. ¿Cómo estuvo la ocupación
+                el mismo mes del año pasado?
+              </p>
+            </div>
+            <div>
+              <label for="sarimaDSlider" class="block font-medium">D (I Estacional):
+                <span id="sarimaDValue" class="font-bold text-orange-400">1</span></label>
+              <input id="sarimaDSlider" type="range" min="0" max="2" value="1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                La tendencia de un año para el otro. ¿El hotel viene creciendo
+                o decayendo en general?
+              </p>
+            </div>
+            <div>
+              <label for="sarimaQSlider" class="block font-medium">Q (MA Estacional):
+                <span id="sarimaQValue" class="font-bold text-orange-400">1</span></label>
+              <input id="sarimaQSlider" type="range" min="0" max="2" value="1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                La sorpresa del mismo mes del año pasado. ¿Hubo un finde largo
+                inesperado?
+              </p>
+            </div>
+            <div>
+              <label for="mSlider" class="block font-medium">m (Período):
+                <span id="mValue" class="font-bold text-orange-400">12</span></label>
+              <input id="mSlider" type="range" min="2" max="12" value="12"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                Cada cuánto se repite el ciclo. Para un ciclo anual con datos
+                mensuales, m=12.
+              </p>
+            </div>
+          </div>
+          <div class="text-center mb-8">
+            <button id="simularSarima"
+              class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">
+              🔮 Simular Predicción SARIMA
+            </button>
+          </div>
+          <div class="chart-container">
+            <canvas id="sarimaChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección 3: GARCH -->
+      <section id="garch">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            💥 3. ARCH y GARCH (El Medidor de Quilombo)
+          </h2>
+          <button
+            class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+            data-model="Modelos ARCH y GARCH">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="card rounded-lg p-6">
+          <h3 class="text-2xl font-bold text-orange-400 mb-4">
+            El Dólar Blue 💸
+          </h3>
+          <p class="text-gray-400 mb-6">
+            Estos bichos son distintos. No les importa predecir el precio,
+            sino el **tamaño del bardo (la volatilidad)**. GARCH es el rey de
+            los mercados financieros porque entiende que los días de calma y
+            los días de quilombo tienden a venir en rachas.
+          </p>
+          <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div>
+              <label for="alphaSlider" class="block font-medium">α (Reacción al Shock - ARCH):
+                <span id="alphaValue" class="font-bold text-orange-400">0.4</span></label>
+              <input id="alphaSlider" type="range" min="0" max="1" value="0.4" step="0.1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                Es el **cagazo inicial**. Mide qué tan nervioso se pone el
+                mercado por el tamaño del palo que se pegó ayer.
+              </p>
+            </div>
+            <div>
+              <label for="betaSlider" class="block font-medium">β (Persistencia del Bardo - GARCH):
+                <span id="betaValue" class="font-bold text-orange-400">0.5</span></label>
+              <input id="betaSlider" type="range" min="0" max="1" value="0.5" step="0.1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400 mt-1">
+                Es la **inercia del quilombo**. Mide si el bardo de ayer se
+                arrastra para hoy, sin importar qué pasó exactamente.
+              </p>
+            </div>
+          </div>
+          <div class="text-center mb-8">
+            <button id="simularGarch"
+              class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">
+              💥 Simular Volatilidad
+            </button>
+          </div>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 class="font-bold text-center mb-2">Simulación de Precio</h4>
+              <div class="chart-container">
+                <canvas id="garchPriceChart"></canvas>
+              </div>
+            </div>
+            <div>
+              <h4 class="font-bold text-center mb-2">
+                Predicción de Volatilidad
+              </h4>
+              <div class="chart-container">
+                <canvas id="garchVolatilityChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center mt-16 text-gray-500">
+      <p>
+        Hecho con 🧉 y ciencia de datos. Laboratorio de Series Temporales.
+      </p>
+    </footer>
+  </div>
+
+  <!-- Gemini Modal -->
+  <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10">
+              ✨
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                Explicación de Gemini
+              </h3>
+              <div class="mt-4 border-b border-gray-700 pb-4">
+                <label for="gemini-api-key-input" class="block text-sm font-medium text-gray-400">Tu Clave de API de
+                  Gemini</label>
+                <input type="password" id="gemini-api-key-input"
+                  class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  placeholder="Pegá tu clave acá..." />
+                <p class="mt-1 text-xs text-gray-500">
+                  Conseguí una clave gratis en
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                    class="text-orange-400 hover:underline">Google AI Studio</a>.
+                </p>
+              </div>
+              <p class="text-sm text-gray-400 my-4" id="modal-subtitle">
+                Pídele a la IA que te explique este modelo.
+              </p>
+
+              <div class="my-4 space-x-2">
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="simple">
+                  Explicación Simple
+                </button>
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="analogy">
+                  Analogía Creativa
+                </button>
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="business">
+                  Para Negocios
+                </button>
+              </div>
+
+              <div id="gemini-response-container"
+                class="mt-4 p-3 bg-black/50 rounded-md min-h-[150px] max-h-[300px] overflow-y-auto">
+                <div id="gemini-loader" class="hidden flex justify-center items-center h-full">
+                  <div class="loader"></div>
+                </div>
+                <p id="gemini-response" class="text-gray-300"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button id="close-modal-btn" type="button"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- LÓGICA PARA EL MENÚ RESPONSIVO ---
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const hamburgerIcon = document.getElementById("hamburger-icon");
+    const closeIcon = document.getElementById("close-icon");
+
+    mobileMenuButton.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+      hamburgerIcon.classList.toggle("hidden");
+      closeIcon.classList.toggle("hidden");
+    });
+
+    // --- CHART DEFAULTS ---
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#9ca3af" },
+        },
+        y: {
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#9ca3af" },
+        },
+      },
+      plugins: { legend: { labels: { color: "#9ca3af" } } },
+    };
+
+    // --- LÓGICA PARA ARIMA ---
+    const pSlider = document.getElementById("pSlider");
+    const dSlider = document.getElementById("dSlider");
+    const qSlider = document.getElementById("qSlider");
+    const pValue = document.getElementById("pValue");
+    const dValue = document.getElementById("dValue");
+    const qValue = document.getElementById("qValue");
+    const simularArimaBtn = document.getElementById("simularArima");
+    const arimaChartCtx = document
+      .getElementById("arimaChart")
+      .getContext("2d");
+    let arimaChart;
+    function updateArimaValues() {
+      pValue.textContent = pSlider.value;
+      dValue.textContent = dSlider.value;
+      qValue.textContent = qSlider.value;
+    }
+    function generateArimaData() {
+      const data = [];
+      let value = 100;
+      for (let i = 0; i < 50; i++) {
+        value += 2 + (Math.random() - 0.5) * 5;
+        data.push(value);
+      }
+      return data;
+    }
+    function simulateArima() {
+      updateArimaValues();
+      if (arimaChart) arimaChart.destroy();
+      const p = parseInt(pSlider.value);
+      const d = parseInt(dSlider.value);
+      const q = parseInt(qSlider.value);
+      const realData = generateArimaData();
+      const predictedData = [];
+      const errors = [];
+      for (let i = 0; i < realData.length; i++) {
+        if (i < p || i < q || i < d) {
+          predictedData.push(null);
+          errors.push(0);
+          continue;
+        }
+        let ar_part = 0;
+        for (let j = 1; j <= p; j++) {
+          ar_part += (realData[i - j] - realData[i - j - 1] || 0) * (0.8 / j);
+        }
+        let ma_part = 0;
+        for (let j = 1; j <= q; j++) {
+          ma_part += errors[i - j] * (0.5 / j);
+        }
+        let prediction =
+          realData[i - 1] + ar_part + ma_part + (d > 0 ? 2 : 0);
+        predictedData.push(prediction);
+        errors.push(realData[i] - prediction);
+      }
+      arimaChart = new Chart(arimaChartCtx, {
+        type: "line",
+        data: {
+          labels: Array.from({ length: 50 }, (_, i) => `Día ${i + 1}`),
+          datasets: [
+            {
+              label: "Ventas Reales",
+              data: realData,
+              borderColor: "rgba(255,255,255,0.7)",
+              tension: 0.1,
+              pointRadius: 2,
+            },
+            {
+              label: `Predicción ARIMA(${p},${d},${q})`,
+              data: predictedData,
+              borderColor: "#f97316",
+              borderWidth: 2,
+              tension: 0.1,
+              pointRadius: 2,
+              borderDash: [5, 5],
+            },
+          ],
+        },
+        options: chartOptions,
+      });
+    }
+    [pSlider, dSlider, qSlider].forEach((s) =>
+      s.addEventListener("input", updateArimaValues)
+    );
+    simularArimaBtn.addEventListener("click", simulateArima);
+
+    // --- LÓGICA PARA SARIMA ---
+    const sarimaPSlider = document.getElementById("sarimaPSlider");
+    const sarimaDSlider = document.getElementById("sarimaDSlider");
+    const sarimaQSlider = document.getElementById("sarimaQSlider");
+    const mSlider = document.getElementById("mSlider");
+    const sarimaPValue = document.getElementById("sarimaPValue");
+    const sarimaDValue = document.getElementById("sarimaDValue");
+    const sarimaQValue = document.getElementById("sarimaQValue");
+    const mValue = document.getElementById("mValue");
+    const simularSarimaBtn = document.getElementById("simularSarima");
+    const sarimaChartCtx = document
+      .getElementById("sarimaChart")
+      .getContext("2d");
+    let sarimaChart;
+    function updateSarimaValues() {
+      sarimaPValue.textContent = sarimaPSlider.value;
+      sarimaDValue.textContent = sarimaDSlider.value;
+      sarimaQValue.textContent = sarimaQSlider.value;
+      mValue.textContent = mSlider.value;
+    }
+    function generateSarimaData(m) {
+      const data = [];
+      for (let i = 0; i < 60; i++) {
+        const seasonal_component = Math.sin(((i % m) / m) * 2 * Math.PI) * 50;
+        const trend_component = i * 1.5;
+        const noise = (Math.random() - 0.5) * 20;
+        data.push(100 + seasonal_component + trend_component + noise);
+      }
+      return data;
+    }
+    function simulateSarima() {
+      updateSarimaValues();
+      if (sarimaChart) sarimaChart.destroy();
+      const m = parseInt(mSlider.value);
+      const P = parseInt(sarimaPSlider.value);
+      const realData = generateSarimaData(m);
+      const predictedData = [];
+      for (let i = 0; i < realData.length; i++) {
+        if (i < m * P) {
+          predictedData.push(null);
+          continue;
+        }
+        let seasonal_part = 0;
+        for (let j = 1; j <= P; j++) {
+          seasonal_part +=
+            (realData[i - j * m] || realData[i - 1]) * (0.8 / j);
+        }
+        let simple_trend = realData[i - 1] - realData[i - 2] || 0;
+        let final_pred =
+          (seasonal_part / P) * 0.7 + (realData[i - 1] + simple_trend) * 0.3;
+        predictedData.push(final_pred);
+      }
+      sarimaChart = new Chart(sarimaChartCtx, {
+        type: "line",
+        data: {
+          labels: Array.from({ length: 60 }, (_, i) => `Mes ${i + 1}`),
+          datasets: [
+            {
+              label: "Ocupación Real",
+              data: realData,
+              borderColor: "rgba(255,255,255,0.7)",
+              tension: 0.1,
+              pointRadius: 2,
+            },
+            {
+              label: `Predicción SARIMA`,
+              data: predictedData,
+              borderColor: "#34d399",
+              borderWidth: 2,
+              tension: 0.1,
+              pointRadius: 2,
+              borderDash: [5, 5],
+            },
+          ],
+        },
+        options: chartOptions,
+      });
+    }
+    [sarimaPSlider, sarimaDSlider, sarimaQSlider, mSlider].forEach((s) =>
+      s.addEventListener("input", updateSarimaValues)
+    );
+    simularSarimaBtn.addEventListener("click", simulateSarima);
+
+    // --- LÓGICA PARA GARCH ---
+    const alphaSlider = document.getElementById("alphaSlider");
+    const betaSlider = document.getElementById("betaSlider");
+    const alphaValue = document.getElementById("alphaValue");
+    const betaValue = document.getElementById("betaValue");
+    const simularGarchBtn = document.getElementById("simularGarch");
+    const garchPriceChartCtx = document
+      .getElementById("garchPriceChart")
+      .getContext("2d");
+    const garchVolatilityChartCtx = document
+      .getElementById("garchVolatilityChart")
+      .getContext("2d");
+    let garchPriceChart, garchVolatilityChart;
+    function updateGarchValues() {
+      alphaValue.textContent = alphaSlider.value;
+      betaValue.textContent = betaSlider.value;
+    }
+    function simulateGarch() {
+      updateGarchValues();
+      if (garchPriceChart) garchPriceChart.destroy();
+      if (garchVolatilityChart) garchVolatilityChart.destroy();
+      const alpha = parseFloat(alphaSlider.value);
+      const beta = parseFloat(betaSlider.value);
+      const omega = 0.1;
+      const prices = [100];
+      const volatilities = [1];
+      const returns = [0];
+      for (let i = 1; i < 100; i++) {
+        const last_vol = volatilities[i - 1];
+        const last_ret_sq = Math.pow(returns[i - 1], 2);
+        const new_vol = Math.sqrt(
+          omega + alpha * last_ret_sq + beta * last_vol
+        );
+        volatilities.push(new_vol);
+        const shock =
+          (Math.random() > 0.5 ? 1 : -1) * Math.random() * new_vol;
+        returns.push(shock);
+        prices.push(prices[i - 1] + shock);
+      }
+      garchPriceChart = new Chart(garchPriceChartCtx, {
+        type: "line",
+        data: {
+          labels: Array.from({ length: 100 }, (_, i) => i + 1),
+          datasets: [
+            {
+              label: "Precio del Dólar",
+              data: prices,
+              borderColor: "#60a5fa",
+              tension: 0.1,
+              pointRadius: 1,
+            },
+          ],
+        },
+        options: chartOptions,
+      });
+      garchVolatilityChart = new Chart(garchVolatilityChartCtx, {
+        type: "line",
+        data: {
+          labels: Array.from({ length: 100 }, (_, i) => i + 1),
+          datasets: [
+            {
+              label: "Volatilidad (Bardo)",
+              data: volatilities,
+              borderColor: "#ef4444",
+              tension: 0.1,
+              pointRadius: 1,
+              backgroundColor: "rgba(239, 68, 68, 0.2)",
+              fill: true,
+            },
+          ],
+        },
+        options: chartOptions,
+      });
+    }
+    [alphaSlider, betaSlider].forEach((s) =>
+      s.addEventListener("input", updateGarchValues)
+    );
+    simularGarchBtn.addEventListener("click", simulateGarch);
+
+    // --- GEMINI API LOGIC ---
+    const geminiModal = document.getElementById("gemini-modal");
+    const closeModalBtn = document.getElementById("close-modal-btn");
+    const geminiResponseEl = document.getElementById("gemini-response");
+    const geminiLoader = document.getElementById("gemini-loader");
+    const modalTitle = document.getElementById("modal-title");
+    const apiKeyInput = document.getElementById("gemini-api-key-input");
+    let currentModel = "";
+
+    document.querySelectorAll(".gemini-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        currentModel = e.target.dataset.model;
+        modalTitle.textContent = `Explicación de ${currentModel}`;
+        geminiResponseEl.innerHTML = "Seleccioná un estilo de explicación...";
+        geminiModal.classList.remove("hidden");
+      });
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+      geminiModal.classList.add("hidden");
+    });
+
+    document.querySelectorAll(".prompt-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const style = e.target.dataset.style;
+        await callGemini(currentModel, style);
+      });
+    });
+
+    async function callGemini(modelName, style) {
+      const apiKey = apiKeyInput.value.trim() || "";
+      if (!apiKey) {
+        geminiResponseEl.innerHTML =
+          '<span class="text-red-400">¡Che, campeón! Necesitás poner tu clave de API de Gemini para que esto funcione.</span>';
+        apiKeyInput.focus();
+        apiKeyInput.classList.add("border-red-500");
+        return;
+      }
+      apiKeyInput.classList.remove("border-red-500");
+
+      geminiLoader.classList.remove("hidden");
+      geminiResponseEl.innerHTML = "";
+
+      const prompts = {
+        simple: `Explica qué es y para qué sirve el ${modelName} como si se lo contaras a un amigo en un bar. Usa un lenguaje simple, directo y con tonada argentina.`,
+        analogy: `Explica el ${modelName} usando una analogía creativa y fácil de entender para alguien que no sabe nada de series de tiempo, con un toque de humor argentino.`,
+        business: `Explica cómo una empresa podría usar el ${modelName} para ganar plata o mejorar su negocio. Dame un caso de uso práctico y concreto, bien argento.`,
+      };
+
+      const userQuery = prompts[style];
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+      const payload = { contents: [{ parts: [{ text: userQuery }] }] };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok)
+          throw new Error(`Error de la API: ${response.status}`);
+        const result = await response.json();
+        const text = result.candidates[0].content.parts[0].text;
+        geminiResponseEl.innerHTML = text
+          .replace(
+            /\*\*(.*?)\*\*/g,
+            '<strong class="text-orange-400">$1</strong>'
+          )
+          .replace(/\n/g, "<br>");
+      } catch (error) {
+        console.error("Error llamando a Gemini:", error);
+        geminiResponseEl.innerHTML =
+          '<span class="text-red-400">Hubo un problema al conectar con la IA. Verificá tu clave de API y la consola.</span>';
+      } finally {
+        geminiLoader.classList.add("hidden");
+      }
+    }
+
+    // Carga inicial
+    window.addEventListener("load", () => {
+      updateArimaValues();
+      simulateArima();
+      updateSarimaValues();
+      simulateSarima();
+      updateGarchValues();
+      simulateGarch();
+    });
+  </script>
+</body>
+
+</html>

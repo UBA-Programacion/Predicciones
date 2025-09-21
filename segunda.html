@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Modelos Supervisados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .btn {
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+    </style>
+</head>
+<body class="bg-black text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-white">Laboratorio de Modelos <span class="text-orange-500">Supervisados</span></h1>
+            <p class="text-gray-400 mt-4 max-w-3xl mx-auto">Acá vas a ver cómo los diferentes "cerebros" del Machine Learning intentan predecir. Movete por las secciones, jugá con los parámetros y descubrí el poder de cada modelo, de cero a ninja.</p>
+        </header>
+
+        <main class="space-y-16">
+            <!-- Sección 1: Modelos Lineales -->
+            <section id="lineales">
+                <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">📏 1. Modelos Lineales (El "Tira Líneas")</h2>
+                <div class="card rounded-lg p-6">
+                    <h3 class="text-2xl font-bold text-orange-400 mb-2">Regresión Lineal, Ridge y Lasso</h3>
+                    <p class="text-gray-400 mb-6">Estos son los más básicos. Su laburo es encontrar la **mejor línea recta** (o plano) que pase por el medio de los datos. **Ridge y Lasso** son versiones con "correctores" que evitan que el modelo se la crea demasiado y se sobreajuste.</p>
+                    <div class="chart-container">
+                        <canvas id="linearChart"></canvas>
+                    </div>
+                    <div class="mt-6 grid md:grid-cols-3 gap-6">
+                        <div>
+                           <h4 class="font-bold">Regresión Lineal Simple</h4>
+                           <p class="text-sm text-gray-400">El modelo base. Busca la línea que minimiza el error. A veces, es demasiado simple.</p>
+                        </div>
+                        <div>
+                           <h4 class="font-bold">Regresión Ridge (L2)</h4>
+                           <p class="text-sm text-gray-400">Le pone una "correa" al modelo para que no se aleje mucho de cero. Penaliza los pesos grandes, resultando en un modelo más estable.</p>
+                        </div>
+                        <div>
+                           <h4 class="font-bold">Regresión Lasso (L1)</h4>
+                           <p class="text-sm text-gray-400">Similar a Ridge, pero más estricto. Si una variable no sirve para nada, le da un peso de cero y la elimina. ¡Hace limpieza por vos!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 2: Árboles de Decisión -->
+            <section id="arboles">
+                <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">🌳 2. Árboles de Decisión y Random Forest</h2>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="card rounded-lg p-6">
+                        <h3 class="text-2xl font-bold text-orange-400 mb-2">Árbol de Decisión</h3>
+                        <p class="text-gray-400 mb-6">Este modelo es como un **juego de las 20 preguntas**. Va dividiendo los datos con preguntas simples ("¿es mayor que X?"). El resultado es una predicción escalonada. ¡Ojo que si lo dejás, se aprende los datos de memoria (sobreajuste)!</p>
+                        <div class="space-y-4 mb-6">
+                            <label for="treeDepthSlider" class="block font-medium">Profundidad del Árbol: <span id="treeDepthValue" class="font-bold text-orange-400">3</span></label>
+                            <input id="treeDepthSlider" type="range" min="1" max="10" value="3" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="treeChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card rounded-lg p-6">
+                        <h3 class="text-2xl font-bold text-orange-400 mb-2">Random Forest (El Bosque Sabio)</h3>
+                        <p class="text-gray-400 mb-6">Si un árbol se puede equivocar, ¿por qué no le preguntamos a 100? Random Forest crea **un montón de árboles de decisión**, cada uno un poco distinto, y después hace un **promedio** de sus predicciones. El resultado es mucho más suave y preciso.</p>
+                         <div class="space-y-4 mb-6">
+                            <label for="forestTreesSlider" class="block font-medium">Cantidad de Árboles: <span id="forestTreesValue" class="font-bold text-orange-400">10</span></label>
+                            <input id="forestTreesSlider" type="range" min="1" max="100" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="forestChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sección 3: Gradient Boosting -->
+            <section id="boosting">
+                <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">🚀 3. Gradient Boosting (Los Monstruos de la Competición)</h2>
+                 <div class="card rounded-lg p-6">
+                    <h3 class="text-2xl font-bold text-orange-400 mb-2">XGBoost y LightGBM</h3>
+                    <p class="text-gray-400 mb-6">Estos son los campeones del mundo en datos tabulares. Son como un equipo de especialistas: el primer árbol hace una predicción media floja. El segundo árbol **aprende del error del primero** y lo corrige. El tercero aprende del error del segundo, y así sucesivamente. Cada árbol se enfoca en la parte que más le costó a los anteriores.</p>
+                     <div class="grid md:grid-cols-2 gap-6 mb-6">
+                           <div>
+                                <label for="boostingTreesSlider" class="block font-medium">Cantidad de Especialistas (Árboles): <span id="boostingTreesValue" class="font-bold text-orange-400">50</span></label>
+                                <input id="boostingTreesSlider" type="range" min="1" max="200" value="50" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                           <div>
+                                <label for="learningRateSlider" class="block font-medium">Ritmo de Aprendizaje: <span id="learningRateValue" class="font-bold text-orange-400">0.1</span></label>
+                                <input id="learningRateSlider" type="range" min="0.01" max="1" value="0.1" step="0.01" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                        </div>
+                    <div class="chart-container">
+                        <canvas id="boostingChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Sección 4: Redes Neuronales -->
+            <section id="neural">
+                <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">🧠 4. Redes Neuronales (El Cerebro Artificial)</h2>
+                <div class="card rounded-lg p-6">
+                    <h3 class="text-2xl font-bold text-orange-400 mb-2">MLP / ANN</h3>
+                    <p class="text-gray-400 mb-6">Acá entramos en otro nivel. Las Redes Neuronales (Perceptrón Multicapa o Red Neuronal Artificial) son como un **cerebro de verdad**, con "neuronas" y "conexiones". Son los bichos más flexibles y pueden aprender patrones súper complejos y no lineales que los otros modelos ni ven. El resultado es una predicción suave y muy precisa.</p>
+                     <div class="grid md:grid-cols-2 gap-6 mb-6">
+                           <div>
+                                <label for="layersSlider" class="block font-medium">Capas Ocultas: <span id="layersValue" class="font-bold text-orange-400">2</span></label>
+                                <input id="layersSlider" type="range" min="1" max="5" value="2" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                           <div>
+                                <label for="neuronsSlider" class="block font-medium">Neuronas por Capa: <span id="neuronsValue" class="font-bold text-orange-400">16</span></label>
+                                <input id="neuronsSlider" type="range" min="4" max="64" value="16" step="4" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                        </div>
+                    <div class="chart-container">
+                        <canvas id="neuralChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+        <footer class="text-center mt-16 text-gray-500">
+            <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Modelos Supervisados.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- DATASET GLOBAL ---
+        function generateData() {
+            const data = [];
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * 10;
+                const y = Math.sin(x) * 3 + (Math.random() - 0.5) * 2; // Sine wave with noise
+                data.push({ x, y });
+            }
+            return data.sort((a, b) => a.x - b.x);
+        }
+        const dataset = generateData();
+        const fullRange = Array.from({length: 101}, (_, i) => i * 0.1);
+
+        // --- CHART DEFAULTS ---
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { 
+                    type: 'linear',
+                    position: 'bottom',
+                    title: { display: true, text: 'Variable de Entrada (X)', color: '#9ca3af' },
+                    grid: { color: 'rgba(255,255,255,0.1)' },
+                    ticks: { color: '#9ca3af'}
+                },
+                y: { 
+                    title: { display: true, text: 'Variable a Predecir (Y)', color: '#9ca3af' },
+                    grid: { color: 'rgba(255,255,255,0.1)' },
+                    ticks: { color: '#9ca3af'}
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#9ca3af' } }
+            }
+        };
+
+        const baseDataset = {
+            label: 'Datos Reales',
+            data: dataset,
+            type: 'scatter',
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        };
+
+        // --- 1. MODELOS LINEALES ---
+        const linearChartCtx = document.getElementById('linearChart').getContext('2d');
+        
+        // Simple linear regression calculation
+        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        dataset.forEach(({x, y}) => {
+            sumX += x;
+            sumY += y;
+            sumXY += x * y;
+            sumX2 += x * x;
+        });
+        const dataN = dataset.length;
+        const m = (dataN * sumXY - sumX * sumY) / (dataN * sumX2 - sumX * sumX);
+        const b = (sumY - m * sumX) / dataN;
+
+        const linearPrediction = x => m * x + b;
+        
+        const linearChart = new Chart(linearChartCtx, {
+            data: {
+                datasets: [
+                    baseDataset,
+                    {
+                        label: 'Regresión Lineal',
+                        data: fullRange.map(x => ({x, y: linearPrediction(x)})),
+                        type: 'line',
+                        borderColor: '#f97316',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        tension: 0.1,
+                    },
+                     {
+                        label: 'Ridge (L2)',
+                        data: fullRange.map(x => ({x, y: (m*0.95) * x + (b*0.98)})), // Simulación
+                        type: 'line',
+                        borderColor: '#34d399',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        borderDash: [5, 5],
+                    },
+                    {
+                        label: 'Lasso (L1)',
+                        data: fullRange.map(x => ({x, y: (m*0.9) * x + (b*0.95)})), // Simulación
+                        type: 'line',
+                        borderColor: '#60a5fa',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        borderDash: [10, 5],
+                    }
+                ]
+            },
+            options: chartOptions,
+        });
+
+        // --- 2. ÁRBOLES DE DECISIÓN ---
+        const treeDepthSlider = document.getElementById('treeDepthSlider');
+        const treeDepthValue = document.getElementById('treeDepthValue');
+        const treeChartCtx = document.getElementById('treeChart').getContext('2d');
+        let treeChart;
+
+        function simulateDecisionTree(data, depth) {
+            const splits = Math.pow(2, depth);
+            const segmentSize = data.length / splits;
+            const predictions = [];
+            let currentX = 0;
+
+            for(let i = 0; i < splits; i++) {
+                const start = Math.floor(i * segmentSize);
+                const end = Math.floor((i + 1) * segmentSize);
+                const segment = data.slice(start, end);
+                if(segment.length === 0) continue;
+                
+                const avgY = segment.reduce((sum, p) => sum + p.y, 0) / segment.length;
+                const endX = segment[segment.length-1].x;
+                
+                predictions.push({x: currentX, y: avgY}, {x: endX, y: avgY});
+                currentX = endX;
+            }
+            return predictions;
+        }
+
+        function updateTreeChart() {
+            const depth = parseInt(treeDepthSlider.value);
+            treeDepthValue.textContent = depth;
+            
+            if(treeChart) treeChart.destroy();
+
+            treeChart = new Chart(treeChartCtx, {
+                 data: {
+                    datasets: [
+                        baseDataset,
+                        {
+                            label: `Árbol (Profundidad ${depth})`,
+                            data: simulateDecisionTree(dataset, depth),
+                            type: 'line',
+                            borderColor: '#f97316',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            stepped: true,
+                        }
+                    ]
+                },
+                options: chartOptions
+            });
+        }
+        treeDepthSlider.addEventListener('input', updateTreeChart);
+        updateTreeChart();
+
+        // --- 3. RANDOM FOREST ---
+        const forestTreesSlider = document.getElementById('forestTreesSlider');
+        const forestTreesValue = document.getElementById('forestTreesValue');
+        const forestChartCtx = document.getElementById('forestChart').getContext('2d');
+        let forestChart;
+
+        function simulateRandomForest(data, numTrees) {
+            const finalPrediction = new Array(101).fill(0);
+            for(let i=0; i < numTrees; i++) {
+                // Bootstrap sample
+                const sample = [];
+                for(let j=0; j < data.length; j++) {
+                    sample.push(data[Math.floor(Math.random() * data.length)]);
+                }
+                sample.sort((a,b) => a.x - b.x);
+
+                const treePred = simulateDecisionTree(sample, 5); // Fixed depth
+                let currentTreeY = 0;
+                let treeIdx = 0;
+                for(let k=0; k < 101; k++){
+                    const x = k*0.1;
+                    if(treeIdx < treePred.length - 1 && x > treePred[treeIdx+1].x) {
+                       treeIdx += 2;
+                    }
+                     if(treePred[treeIdx]){
+                       currentTreeY = treePred[treeIdx].y;
+                     }
+                    finalPrediction[k] += currentTreeY;
+                }
+            }
+            return finalPrediction.map((y, i) => ({x: i*0.1, y: y / numTrees}));
+        }
+
+        function updateForestChart() {
+            const trees = parseInt(forestTreesSlider.value);
+            forestTreesValue.textContent = trees;
+            if (forestChart) forestChart.destroy();
+            forestChart = new Chart(forestChartCtx, {
+                data: {
+                    datasets: [
+                        baseDataset,
+                        {
+                            label: `Random Forest (${trees} árboles)`,
+                            data: simulateRandomForest(dataset, trees),
+                            type: 'line',
+                            borderColor: '#34d399',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            tension: 0.1,
+                        }
+                    ]
+                },
+                options: chartOptions,
+            });
+        }
+        forestTreesSlider.addEventListener('input', updateForestChart);
+        updateForestChart();
+
+        // --- 4. GRADIENT BOOSTING ---
+        const boostingTreesSlider = document.getElementById('boostingTreesSlider');
+        const boostingTreesValue = document.getElementById('boostingTreesValue');
+        const learningRateSlider = document.getElementById('learningRateSlider');
+        const learningRateValue = document.getElementById('learningRateValue');
+        const boostingChartCtx = document.getElementById('boostingChart').getContext('2d');
+        let boostingChart;
+
+        function simulateBoosting(data, numTrees, lr) {
+             const predictions = new Array(data.length).fill(data.reduce((sum, p) => sum + p.y, 0) / data.length);
+             let residuals = data.map((p, i) => p.y - predictions[i]);
+             
+             for(let i=0; i < numTrees; i++) {
+                const treeData = data.map((p, j) => ({x: p.x, y: residuals[j]}));
+                const treePredPoints = simulateDecisionTree(treeData, 2); // Shallow trees
+                
+                let currentTreeY = 0;
+                let treeIdx = 0;
+                for(let j=0; j < data.length; j++) {
+                    const x = data[j].x;
+                    if (treeIdx < treePredPoints.length - 1 && x > treePredPoints[treeIdx+1].x) {
+                        treeIdx += 2;
+                    }
+                    if(treePredPoints[treeIdx]){
+                      currentTreeY = treePredPoints[treeIdx].y;
+                    }
+                    predictions[j] += lr * currentTreeY;
+                    residuals[j] = data[j].y - predictions[j];
+                }
+             }
+             return data.map((p, i) => ({x: p.x, y: predictions[i]}));
+        }
+
+        function updateBoostingChart() {
+            const trees = parseInt(boostingTreesSlider.value);
+            const lr = parseFloat(learningRateSlider.value);
+            boostingTreesValue.textContent = trees;
+            learningRateValue.textContent = lr;
+
+            if (boostingChart) boostingChart.destroy();
+            
+            boostingChart = new Chart(boostingChartCtx, {
+                 data: {
+                    datasets: [
+                        baseDataset,
+                        {
+                            label: `Gradient Boosting`,
+                            data: simulateBoosting(dataset, trees, lr),
+                            type: 'line',
+                            borderColor: '#60a5fa',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            tension: 0.2,
+                        }
+                    ]
+                },
+                options: chartOptions,
+            });
+        }
+        boostingTreesSlider.addEventListener('input', updateBoostingChart);
+        learningRateSlider.addEventListener('input', updateBoostingChart);
+        updateBoostingChart();
+        
+        // --- 5. NEURAL NETWORKS ---
+        const layersSlider = document.getElementById('layersSlider');
+        const layersValue = document.getElementById('layersValue');
+        const neuronsSlider = document.getElementById('neuronsSlider');
+        const neuronsValue = document.getElementById('neuronsValue');
+        const neuralChartCtx = document.getElementById('neuralChart').getContext('2d');
+        let neuralChart;
+
+        function simulateNeuralNetwork(x_values, layers, neurons) {
+            // This is a gross oversimplification for visualization purposes
+            // It combines multiple sine waves to simulate a complex function
+            let y_values = new Array(x_values.length).fill(0);
+            
+            for(let i=0; i<layers; i++) {
+                for(let j=0; j<neurons; j++) {
+                    const freq = 1 + Math.random() * 3;
+                    const phase = Math.random() * Math.PI * 2;
+                    const amp = (5 / (i+1)) / neurons;
+                    y_values = y_values.map((y, k) => y + Math.sin(x_values[k] * freq + phase) * amp);
+                }
+            }
+            return y_values;
+        }
+
+        function updateNeuralChart() {
+            const layers = parseInt(layersSlider.value);
+            const neurons = parseInt(neuronsSlider.value);
+            layersValue.textContent = layers;
+            neuronsValue.textContent = neurons;
+
+            if (neuralChart) neuralChart.destroy();
+
+            const predictionData = simulateNeuralNetwork(fullRange, layers, neurons);
+
+            neuralChart = new Chart(neuralChartCtx, {
+                data: {
+                    datasets: [
+                        baseDataset,
+                        {
+                            label: `Red Neuronal`,
+                            data: fullRange.map((x, i) => ({x, y: predictionData[i]})),
+                            type: 'line',
+                            borderColor: '#f472b6',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            tension: 0.4,
+                        }
+                    ]
+                },
+                options: chartOptions,
+            });
+        }
+        layersSlider.addEventListener('input', updateNeuralChart);
+        neuronsSlider.addEventListener('input', updateNeuralChart);
+        updateNeuralChart();
+
+    </script>
+</body>
+</html>
+

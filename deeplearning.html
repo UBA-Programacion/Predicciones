@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de Deep Learning Avanzado</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+    }
+
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+    }
+
+    /* Gemini Modal Styles */
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #f97316;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-black text-gray-200">
+  <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span class="text-white font-bold text-xl">Predicciones<span class="text-orange-500">.AI</span></span>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            <a href="index.html#laboratorios"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+            <a href="index.html#nosotros"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+            <a href="index.html#contacto"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          <button type="button" id="mobile-menu-button"
+            class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+            aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Abrir menú</span>
+            <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="index.html#laboratorios"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+        <a href="index.html#nosotros"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+        <a href="index.html#contacto"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4 md:p-8">
+    <header class="text-center my-12">
+      <h1 class="text-4xl md:text-6xl font-black text-white">
+        Laboratorio de
+        <span class="text-orange-500">Deep Learning Avanzado</span>
+      </h1>
+      <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+        Acá nos metemos con los cerebros del futuro. Jugá con las perillas y
+        descubrí cómo estos modelos predicen, crean y detectan anomalías.
+      </p>
+    </header>
+
+    <main class="space-y-16">
+      <!-- Sección: Deep Learning y Redes Avanzadas -->
+      <section id="avanzados">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            🧠 1. Deep Learning y Redes Avanzadas
+          </h2>
+          <button class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg"
+            data-model="Modelos de Deep Learning Avanzados (Transformers, GANs, Autoencoders)">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="space-y-8">
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              Transformers (El Ojo que Todo lo Ve)
+            </h3>
+            <p class="text-gray-400 mb-6">
+              A diferencia de las RNN que leen la historia paso a paso, el
+              Transformer es como un águila: se eleva y mira **toda la
+              secuencia de una**. Usa un mecanismo de "atención" para
+              encontrar relaciones entre puntos lejanos del pasado. Por eso es
+              un monstruo para las predicciones a largo plazo.
+            </p>
+            <div class="bg-gray-900 p-4 rounded-lg mb-6">
+              <p class="font-mono text-center text-lg text-orange-400">
+                `$$ \text{Attention}(Q, K, V) =
+                \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V $$`
+              </p>
+              <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                <li>
+                  <span class="font-bold text-white">Q, K, V:</span> Son tres
+                  versiones de tus datos (Query, Key, Value).
+                </li>
+                <li>
+                  <span class="font-bold text-white">Softmax(...):</span>
+                  Calcula dónde tiene que "prestar atención".
+                </li>
+                <li>
+                  <span class="font-bold text-white">En criollo:</span> El
+                  modelo le pregunta (`Q`) a toda la historia (`K`) qué partes
+                  son más importantes para el momento actual, y usa esas
+                  partes (`V`) para hacer la predicción.
+                </li>
+              </ul>
+            </div>
+            <div class="space-y-4 mb-6">
+              <label for="transformerHorizonSlider" class="block font-medium">Horizonte de Predicción:
+                <span id="transformerHorizonValue" class="font-bold text-orange-400">30</span>
+                días</label>
+              <input id="transformerHorizonSlider" type="range" min="10" max="50" value="30"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+            </div>
+            <div class="chart-container">
+              <canvas id="transformerChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              GANs (El Falsificador vs. el Detective)
+            </h3>
+            <p class="text-gray-400 mb-6">
+              Una Red Generativa Antagónica son dos redes peleando. El
+              **Falsificador** (Generador) intenta crear simulaciones de
+              precios tan reales que parezcan de verdad. El **Detective**
+              (Discriminador) intenta descubrir cuáles son las falsas. En esa
+              pelea, el Falsificador se vuelve un artista en crear datos
+              sintéticos.
+            </p>
+            <div class="bg-gray-900 p-4 rounded-lg mb-6">
+              <p class="font-mono text-center text-lg text-orange-400">
+                `$$ \min_G \max_D V(D, G) $$`
+              </p>
+              <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                <li>
+                  <span class="font-bold text-white">min G max D:</span> El
+                  Generador (`G`) intenta minimizar el error que el
+                  Discriminador (`D`) intenta maximizar.
+                </li>
+                <li>
+                  <span class="font-bold text-white">V(D,G):</span> Mide qué
+                  tan bien el Detective distingue lo real de lo falso.
+                </li>
+                <li>
+                  <span class="font-bold text-white">En criollo:</span> Un
+                  juego del gato y el ratón. El Detective se vuelve mejor
+                  encontrando pifies, y el Falsificador se vuelve mejor
+                  escondiéndolos, hasta que sus creaciones son casi perfectas.
+                </li>
+              </ul>
+            </div>
+            <div class="text-center mb-6">
+              <button id="ganBtn"
+                class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg whitespace-nowrap">
+                🎨 Generar Simulación de Precio
+              </button>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div>
+                <h4 class="text-xl font-bold text-center mb-2">
+                  Serie de Precios Real
+                </h4>
+                <div class="chart-container">
+                  <canvas id="ganRealChart"></canvas>
+                </div>
+              </div>
+              <div>
+                <h4 class="text-xl font-bold text-center mb-2">
+                  Serie de Precios Falsa (GAN)
+                </h4>
+                <div class="chart-container">
+                  <canvas id="ganFakeChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              Autoencoder (El Detector de Bichos Raros)
+            </h3>
+            <p class="text-gray-400 mb-6">
+              Este bicho es un artista de la compresión. Aprende a tomar una
+              serie de datos, la comprime a su mínima expresión y después
+              intenta **reconstruirla** idéntica. Si la serie es "normal", la
+              reconstruye perfecto (error bajo). Si de repente aparece un
+              **bicho raro (una anomalía)**, no sabe cómo reconstruirlo y el
+              error se dispara por las nubes.
+            </p>
+            <div class="bg-gray-900 p-4 rounded-lg mb-6">
+              <p class="font-mono text-center text-lg text-orange-400">
+                `$$ z = e(x) \quad ; \quad x' = d(z) $$`
+              </p>
+              <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                <li>
+                  <span class="font-bold text-white">e(x):</span> El Encoder,
+                  que comprime los datos de entrada `x` a un resumen `z`.
+                </li>
+                <li>
+                  <span class="font-bold text-white">d(z):</span> El Decoder,
+                  que intenta reconstruir la entrada original `x'` a partir
+                  del resumen.
+                </li>
+                <li>
+                  <span class="font-bold text-white">Objetivo:</span> Que `x'`
+                  sea lo más parecido posible a `x`.
+                </li>
+                <li>
+                  <span class="font-bold text-white">En criollo:</span> Es
+                  como un traductor que aprende a traducir del español al
+                  japonés y de vuelta al español. Si le das una frase normal,
+                  la traduce casi perfecta. Si le metés una palabra en arameo,
+                  la reconstrucción va a ser un desastre.
+                </li>
+              </ul>
+            </div>
+            <div class="text-center mb-6">
+              <button id="anomalyBtn"
+                class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg whitespace-nowrap">
+                💣 Introducir Anomalía
+              </button>
+            </div>
+            <div class="grid lg:grid-cols-1 gap-8">
+              <div>
+                <h4 class="text-xl font-bold text-center mb-2">
+                  Serie de Datos y su Reconstrucción
+                </h4>
+                <div class="chart-container">
+                  <canvas id="autoencoderMainChart"></canvas>
+                </div>
+              </div>
+              <div>
+                <h4 class="text-xl font-bold text-center mb-2">
+                  Error de Reconstrucción (Detector)
+                </h4>
+                <div class="chart-container" style="height: 200px">
+                  <canvas id="autoencoderErrorChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center mt-16 text-gray-500">
+      <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Deep Learning.</p>
+    </footer>
+  </div>
+
+  <!-- Gemini Modal -->
+  <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <!-- ...código del modal de Gemini... -->
+  </div>
+
+  <script>
+    // --- LÓGICA PARA EL MENÚ RESPONSIVO ---
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const hamburgerIcon = document.getElementById("hamburger-icon");
+    const closeIcon = document.getElementById("close-icon");
+    mobileMenuButton.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+      hamburgerIcon.classList.toggle("hidden");
+      closeIcon.classList.toggle("hidden");
+    });
+
+    // --- CHART DEFAULTS ---
+    const chartOptions = (xlabel, ylabel) => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: "linear",
+          position: "bottom",
+          title: { display: true, text: xlabel, color: "#9ca3af" },
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#9ca3af" },
+        },
+        y: {
+          title: { display: true, text: ylabel, color: "#9ca3af" },
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#9ca3af" },
+        },
+      },
+      plugins: { legend: { labels: { color: "#9ca3af" } } },
+    });
+    const colors = [
+      "#f97316",
+      "#34d399",
+      "#60a5fa",
+      "#f472b6",
+      "#fbbf24",
+      "#a78bfa",
+      "#ef4444",
+      "#22d3ee",
+    ];
+
+    // --- DEEP LEARNING MODELS ---
+    const sequenceLabels = Array.from({ length: 100 }, (_, i) => i + 1);
+    function generateSequence(len = 100) {
+      const data = [];
+      for (let i = 0; i < len; i++) {
+        const trend = i * 0.05;
+        const seasonal = Math.sin(i * 0.2) + Math.sin(i * 0.5) * 0.5;
+        data.push(trend + seasonal);
+      }
+      return data;
+    }
+    const sequenceData = generateSequence();
+
+    // TRANSFORMER
+    const transformerHorizonSlider = document.getElementById(
+      "transformerHorizonSlider"
+    );
+    const transformerHorizonValue = document.getElementById(
+      "transformerHorizonValue"
+    );
+    const transformerChartCtx = document
+      .getElementById("transformerChart")
+      .getContext("2d");
+    let transformerChart;
+
+    function simulateTransformer(data, horizon) {
+      const prediction = [];
+      const history = data.slice(0, data.length - horizon);
+      const longTermTrend =
+        (history[history.length - 1] - history[0]) / history.length;
+      for (let i = 0; i < data.length; i++) {
+        if (i < data.length - horizon) {
+          prediction.push(null);
+        } else {
+          const lastValue =
+            prediction[i - 1] || data[data.length - horizon - 1];
+          prediction.push(
+            lastValue + longTermTrend + (Math.random() - 0.5) * 0.1
+          );
+        }
+      }
+      return prediction;
+    }
+
+    function updateTransformerChart() {
+      const horizon = parseInt(transformerHorizonSlider.value);
+      transformerHorizonValue.textContent = horizon;
+      if (transformerChart) transformerChart.destroy();
+      const transformerPrediction = simulateTransformer(
+        sequenceData,
+        horizon
+      );
+      transformerChart = new Chart(transformerChartCtx, {
+        type: "line",
+        data: {
+          labels: sequenceLabels,
+          datasets: [
+            {
+              label: "Serie Real",
+              data: sequenceData,
+              borderColor: "rgba(255,255,255,0.4)",
+              tension: 0.1,
+              pointRadius: 0,
+            },
+            {
+              label: "Predicción Transformer",
+              data: transformerPrediction,
+              borderColor: colors[2],
+              borderWidth: 3,
+              pointRadius: 0,
+              tension: 0.1,
+            },
+          ],
+        },
+        options: chartOptions("Tiempo", "Valor"),
+      });
+    }
+    transformerHorizonSlider.addEventListener(
+      "input",
+      updateTransformerChart
+    );
+
+    // GANS
+    const ganBtn = document.getElementById("ganBtn");
+    const ganRealChartCtx = document
+      .getElementById("ganRealChart")
+      .getContext("2d");
+    const ganFakeChartCtx = document
+      .getElementById("ganFakeChart")
+      .getContext("2d");
+    let ganRealChart, ganFakeChart;
+
+    function generatePriceSeries(len = 100) {
+      const data = [];
+      let price = 100;
+      for (let i = 0; i < len; i++) {
+        price += (Math.random() - 0.49) * 5;
+        price = Math.max(price, 50);
+        data.push(price);
+      }
+      return data;
+    }
+
+    function drawGanCharts() {
+      const realData = generatePriceSeries();
+      if (ganRealChart) ganRealChart.destroy();
+      ganRealChart = new Chart(ganRealChartCtx, {
+        type: "line",
+        data: {
+          labels: sequenceLabels,
+          datasets: [
+            {
+              label: "Precio Real",
+              data: realData,
+              borderColor: "rgba(255,255,255,0.4)",
+              pointRadius: 0,
+              tension: 0.2,
+            },
+          ],
+        },
+        options: chartOptions("Tiempo", "Precio"),
+      });
+      if (ganFakeChart) ganFakeChart.destroy();
+    }
+
+    ganBtn.addEventListener("click", () => {
+      const fakeData = generatePriceSeries();
+      if (ganFakeChart) ganFakeChart.destroy();
+      ganFakeChart = new Chart(ganFakeChartCtx, {
+        type: "line",
+        data: {
+          labels: sequenceLabels,
+          datasets: [
+            {
+              label: "Precio Falso (GAN)",
+              data: fakeData,
+              borderColor: colors[3],
+              pointRadius: 0,
+              tension: 0.2,
+            },
+          ],
+        },
+        options: chartOptions("Tiempo", "Precio"),
+      });
+    });
+
+    // AUTOENCODER
+    const anomalyBtn = document.getElementById("anomalyBtn");
+    const autoencoderMainChartCtx = document
+      .getElementById("autoencoderMainChart")
+      .getContext("2d");
+    const autoencoderErrorChartCtx = document
+      .getElementById("autoencoderErrorChart")
+      .getContext("2d");
+    let autoencoderMainChart, autoencoderErrorChart;
+
+    function generateNormalSequence(len = 100) {
+      const data = [];
+      for (let i = 0; i < len; i++) {
+        data.push(Math.sin(i * 0.2) * 2);
+      }
+      return data;
+    }
+    function simulateReconstruction(data) {
+      return data.map((y) => y + (Math.random() - 0.5) * 0.2);
+    }
+    function calculateError(original, reconstruction) {
+      return original.map((y, i) => Math.abs(y - reconstruction[i]));
+    }
+
+    function drawAutoencoderCharts(introduceAnomaly = false) {
+      const anomalyData = generateNormalSequence();
+      if (introduceAnomaly) {
+        const anomalyPoint = 70;
+        anomalyData[anomalyPoint] = 5;
+        anomalyData[anomalyPoint + 1] = 5.2;
+      }
+      const reconstructedData = simulateReconstruction(anomalyData);
+      const errorData = calculateError(anomalyData, reconstructedData);
+
+      if (autoencoderMainChart) autoencoderMainChart.destroy();
+      autoencoderMainChart = new Chart(autoencoderMainChartCtx, {
+        type: "line",
+        data: {
+          labels: sequenceLabels,
+          datasets: [
+            {
+              label: "Serie Original",
+              data: anomalyData,
+              borderColor: "rgba(255,255,255,0.4)",
+              pointRadius: 0,
+              tension: 0.2,
+            },
+            {
+              label: "Reconstrucción",
+              data: reconstructedData,
+              borderColor: colors[4],
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.2,
+              borderDash: [5, 5],
+            },
+          ],
+        },
+        options: chartOptions("Tiempo", "Valor"),
+      });
+
+      if (autoencoderErrorChart) autoencoderErrorChart.destroy();
+      autoencoderErrorChart = new Chart(autoencoderErrorChartCtx, {
+        type: "bar",
+        data: {
+          labels: sequenceLabels,
+          datasets: [
+            {
+              label: "Error",
+              data: errorData,
+              backgroundColor: (ctx) =>
+                ctx.raw > 1.5 ? colors[6] : colors[5] + "80",
+            },
+          ],
+        },
+        options: chartOptions("Tiempo", "Error de Reconstrucción"),
+      });
+    }
+    anomalyBtn.addEventListener("click", () => drawAutoencoderCharts(true));
+
+    // --- GEMINI API LOGIC ---
+    // ... (Se mantiene el código del modal y la llamada a la API)
+
+    // Carga inicial
+    window.addEventListener("load", () => {
+      updateTransformerChart();
+      drawGanCharts();
+      drawAutoencoderCharts();
+      if (window.MathJax) {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      }
+    });
+  </script>
+</body>
+
+</html>

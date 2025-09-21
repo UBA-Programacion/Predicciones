@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Predicciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .btn {
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-black text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-white">Laboratorio de <span class="text-orange-500">Predicciones</span></h1>
+            <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Jugá con los modelos, mové las perillas y descubrí cómo la ciencia de datos adivina el futuro. ¡De cero a ninja!</p>
+        </header>
+
+        <main class="space-y-16">
+            <!-- Sección 1: Modelos Cuantitativos -->
+            <section id="cuantitativos">
+                <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">🔢 1. Modelos Cuantitativos (La Recta Mágica)</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Regresión Lineal Simple -->
+                    <div class="card rounded-lg p-6">
+                        <h3 class="text-2xl font-bold text-orange-400 mb-4">Regresión Lineal: La Fiesta con Pizza 🍕</h3>
+                        <p class="text-gray-400 mb-6">Predecimos cuánta pizza comprar basándonos en cuántos amigos vienen. Una sola cosa para predecir otra. Simple y al pie.</p>
+                        
+                        <div class="space-y-4 mb-6">
+                            <label for="amigosSlider" class="block font-medium">Cantidad de Amigos: <span id="amigosValue" class="font-bold text-orange-400">5</span></label>
+                            <input id="amigosSlider" type="range" min="1" max="20" value="5" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+
+                        <div class="bg-gray-900 p-4 rounded-lg text-center">
+                            <p class="text-lg">Predicción:</p>
+                            <p class="text-4xl font-black text-white"><span id="pizzaPrediction">15</span> Porciones</p>
+                        </div>
+
+                        <div class="mt-6">
+                             <canvas id="pizzaChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Regresión Múltiple -->
+                    <div class="card rounded-lg p-6">
+                        <h3 class="text-2xl font-bold text-orange-400 mb-4">Regresión Múltiple: El Precio de una Casa 🏡</h3>
+                        <p class="text-gray-400 mb-6">La cosa se pone seria. Ahora usamos varias cosas a la vez para que la predicción sea más zarpada y realista.</p>
+
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label for="metrosSlider" class="block font-medium">Metros Cuadrados: <span id="metrosValue" class="font-bold text-orange-400">100</span> m²</label>
+                                <input id="metrosSlider" type="range" min="20" max="300" value="100" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label for="ambientesSlider" class="block font-medium">Cantidad de Ambientes: <span id="ambientesValue" class="font-bold text-orange-400">3</span></label>
+                                <input id="ambientesSlider" type="range" min="1" max="8" value="3" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label for="antiguedadSlider" class="block font-medium">Antigüedad: <span id="antiguedadValue" class="font-bold text-orange-400">10</span> años</label>
+                                <input id="antiguedadSlider" type="range" min="0" max="50" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 p-4 rounded-lg text-center">
+                            <p class="text-lg">Predicción de Precio:</p>
+                            <p class="text-4xl font-black text-white">USD <span id="casaPrediction">225,000</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 2: Series Temporales -->
+            <section id="series-temporales">
+                <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">📈 2. Series Temporales (El Oráculo del Tiempo)</h2>
+                <div class="space-y-8">
+                    <!-- ARIMA -->
+                    <div class="card rounded-lg p-6">
+                        <h3 class="text-2xl font-bold text-orange-400 mb-4">ARIMA: La Heladería "El Pingüino Porteño" 🍦</h3>
+                        <p class="text-gray-400 mb-6">El clásico. ARIMA desarma el problema en 3 partes: la "Memoria" (AR), la "Tendencia" (I) y la "Sorpresa" (MA). Ideal para datos que crecen o bajan con el tiempo.</p>
+                        <div class="grid md:grid-cols-3 gap-6 mb-8">
+                            <div>
+                                <label for="pSlider" class="block font-medium">p (Memoria 🧠): <span id="pValue" class="font-bold text-orange-400">2</span></label>
+                                <input id="pSlider" type="range" min="0" max="5" value="2" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label for="dSlider" class="block font-medium">d (Tendencia 📈): <span id="dValue" class="font-bold text-orange-400">1</span></label>
+                                <input id="dSlider" type="range" min="0" max="2" value="1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label for="qSlider" class="block font-medium">q (Sorpresa ⚡): <span id="qValue" class="font-bold text-orange-400">1</span></label>
+                                <input id="qSlider" type="range" min="0" max="5" value="1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+                        <div class="text-center mb-8">
+                            <button id="simularArima" class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">🔮 Simular Predicción ARIMA</button>
+                        </div>
+                        <div><canvas id="arimaChart"></canvas></div>
+                    </div>
+                    <!-- SARIMA -->
+                    <div class="card rounded-lg p-6">
+                        <h3 class="text-2xl font-bold text-orange-400 mb-4">SARIMA: El Verano y el Invierno ☀️❄️</h3>
+                        <p class="text-gray-400 mb-6">ARIMA con esteroides. SARIMA le agrega el factor "Estacionalidad". Es el mismo bicho pero con memoria de largo plazo, ideal para la heladería que vende más en verano y menos en invierno, todos los años.</p>
+                        <div class="grid md:grid-cols-4 gap-6 mb-8">
+                             <div>
+                                <label for="sarimaPSlider" class="block font-medium">P (AR Estacional): <span id="sarimaPValue" class="font-bold text-orange-400">1</span></label>
+                                <input id="sarimaPSlider" type="range" min="0" max="2" value="1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                             <div>
+                                <label for="sarimaDSlider" class="block font-medium">D (I Estacional): <span id="sarimaDValue" class="font-bold text-orange-400">1</span></label>
+                                <input id="sarimaDSlider" type="range" min="0" max="2" value="1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                             <div>
+                                <label for="sarimaQSlider" class="block font-medium">Q (MA Estacional): <span id="sarimaQValue" class="font-bold text-orange-400">1</span></label>
+                                <input id="sarimaQSlider" type="range" min="0" max="2" value="1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label for="mSlider" class="block font-medium">m (Período): <span id="mValue" class="font-bold text-orange-400">12</span></label>
+                                <input id="mSlider" type="range" min="2" max="12" value="12" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+                        <div class="text-center mb-8">
+                            <button id="simularSarima" class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">🔮 Simular Predicción SARIMA</button>
+                        </div>
+                        <div><canvas id="sarimaChart"></canvas></div>
+                    </div>
+                     <!-- GARCH -->
+                    <div class="card rounded-lg p-6">
+                        <h3 class="text-2xl font-bold text-orange-400 mb-4">GARCH: El Quilombo del Bitcoin 💥</h3>
+                        <p class="text-gray-400 mb-6">Este modelo es distinto. No predice el precio, predice la **volatilidad** (el tamaño del bardo). Si ayer hubo un subidón o un bajón zarpado, ¿mañana va a estar tranquilo o va a seguir el quilombo? GARCH es el rey para los mercados financieros.</p>
+                        <div class="grid md:grid-cols-2 gap-6 mb-8">
+                             <div>
+                                <label for="alphaSlider" class="block font-medium">α (Reacción al Shock): <span id="alphaValue" class="font-bold text-orange-400">0.4</span></label>
+                                <input id="alphaSlider" type="range" min="0" max="1" value="0.4" step="0.1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                             <div>
+                                <label for="betaSlider" class="block font-medium">β (Persistencia del Bardo): <span id="betaValue" class="font-bold text-orange-400">0.5</span></label>
+                                <input id="betaSlider" type="range" min="0" max="1" value="0.5" step="0.1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+                        <div class="text-center mb-8">
+                            <button id="simularGarch" class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">💥 Simular Volatilidad</button>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-bold text-center mb-2">Simulación de Precio</h4>
+                                <canvas id="garchPriceChart"></canvas>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-center mb-2">Predicción de Volatilidad</h4>
+                                <canvas id="garchVolatilityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sección 3: Modelos Técnicos -->
+            <section id="tecnicos">
+                <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">📊 3. Modelos Técnicos (El Arsenal del Trader)</h2>
+                <div class="card rounded-lg p-6">
+                    <h3 class="text-2xl font-bold text-orange-400 mb-4">Indicadores en Acción: Leyendo el Mercado</h3>
+                    <p class="text-gray-400 mb-6">Acá dejamos de predecir un solo número y nos metemos en el mundo del trading. Estos indicadores te ayudan a "leer" el humor del mercado para tomar decisiones. Mové los parámetros y mirá cómo reaccionan los indicadores al precio del Bitcoin simulado.</p>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 mb-8 text-sm">
+                        <!-- Controles -->
+                        <div class="space-y-3">
+                           <h4 class="font-bold text-orange-400">Medias Móviles</h4>
+                           <div>
+                                <label for="smaSlider" class="block">SMA (Simple): <span id="smaValue">20</span></label>
+                                <input id="smaSlider" type="range" min="5" max="50" value="20" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                           <div>
+                                <label for="emaSlider" class="block">EMA (Exponencial): <span id="emaValue">12</span></label>
+                                <input id="emaSlider" type="range" min="5" max="50" value="12" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                        </div>
+                         <div class="space-y-3">
+                           <h4 class="font-bold text-orange-400">Bandas de Bollinger</h4>
+                           <div>
+                                <label for="bbPeriodSlider" class="block">Período: <span id="bbPeriodValue">20</span></label>
+                                <input id="bbPeriodSlider" type="range" min="10" max="50" value="20" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                           <div>
+                                <label for="bbStdDevSlider" class="block">Desv. Estándar: <span id="bbStdDevValue">2</span></label>
+                                <input id="bbStdDevSlider" type="range" min="1" max="4" value="2" step="0.5" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                        </div>
+                        <div class="space-y-3">
+                           <h4 class="font-bold text-orange-400">Osciladores</h4>
+                           <div>
+                                <label for="rsiSlider" class="block">RSI (Período): <span id="rsiValue">14</span></label>
+                                <input id="rsiSlider" type="range" min="7" max="21" value="14" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                           </div>
+                           <div>
+                                <label for="macdSlowSlider" class="block">MACD Lenta/Rápida: <span id="macdSlowValue">26</span>/<span id="macdFastValue">12</span></label>
+                                <input id="macdSlowSlider" type="range" min="15" max="40" value="26" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                <input id="macdFastSlider" type="range" min="5" max="20" value="12" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer mt-1">
+                           </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-8">
+                         <button id="simularTecnicos" class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">
+                            📈 Simular Indicadores
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-center">Precio, Medias Móviles y Bandas de Bollinger</h4>
+                        <canvas id="tecnicosPriceChart"></canvas>
+                        <h4 class="font-bold text-center mt-6">RSI (Índice de Fuerza Relativa)</h4>
+                        <canvas id="rsiChart"></canvas>
+                         <h4 class="font-bold text-center mt-6">MACD</h4>
+                        <canvas id="macdChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+
+             <!-- Sección 4: Comparativa -->
+            <section id="comparativa">
+                <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">🤖 4. Otros Bichos (Machine Learning y más)</h2>
+                <div class="card rounded-lg p-6">
+                    <h3 class="text-2xl font-bold text-orange-400 mb-4">Comparando los Monstruos</h3>
+                    <p class="text-gray-400 mb-6">Los modelos estadísticos son un caño, pero hay jugadores más modernos. Modelos como **Random Forest** o redes neuronales como **LSTM** pueden capturar patrones mucho más complejos. Acá podés ver una simulación de cómo predecirían el precio de Bitcoin distintos modelos.</p>
+                    
+                    <div class="text-center mb-8">
+                         <button id="compararModelos" class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">
+                            📊 Comparar Modelos
+                        </button>
+                    </div>
+
+                    <div>
+                        <canvas id="comparativaChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+        <footer class="text-center mt-16 text-gray-500">
+            <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Predicciones.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- LÓGICA PARA REGRESIÓN LINEAL ---
+        const amigosSlider = document.getElementById('amigosSlider');
+        const amigosValue = document.getElementById('amigosValue');
+        const pizzaPrediction = document.getElementById('pizzaPrediction');
+        const pizzaChartCtx = document.getElementById('pizzaChart').getContext('2d');
+        let pizzaChart;
+
+        function updatePizzaPrediction() {
+            const amigos = parseInt(amigosSlider.value);
+            const porciones = amigos * 3;
+            amigosValue.textContent = amigos;
+            pizzaPrediction.textContent = porciones;
+            updatePizzaChart(amigos, porciones);
+        }
+        
+        function generatePizzaData() {
+            const data = [];
+            for (let i = 1; i <= 20; i++) {
+                // Agregar un poco de ruido para que no sea una línea perfecta
+                const noise = (Math.random() - 0.5) * 4;
+                data.push({ x: i, y: i * 3 + noise });
+            }
+            return data;
+        }
+
+        const pizzaData = generatePizzaData();
+
+        function updatePizzaChart(highlightX, highlightY) {
+            if (pizzaChart) {
+                pizzaChart.destroy();
+            }
+            pizzaChart = new Chart(pizzaChartCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Fiestas Anteriores',
+                        data: pizzaData,
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                    }, {
+                        label: 'Línea de Regresión',
+                        data: [{x: 1, y: 3}, {x: 20, y: 60}],
+                        type: 'line',
+                        fill: false,
+                        borderColor: '#f97316',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                    }, {
+                        label: 'Tu Predicción',
+                        data: [{x: highlightX, y: highlightY}],
+                        backgroundColor: '#fbbf24',
+                        borderColor: '#f59e0b',
+                        pointRadius: 8,
+                        pointHoverRadius: 10,
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'Cantidad de Amigos', color: '#9ca3af' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#9ca3af'}
+                        },
+                        y: { 
+                            title: { display: true, text: 'Porciones de Pizza', color: '#9ca3af' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#9ca3af'}
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af' } }
+                    }
+                }
+            });
+        }
+        
+        amigosSlider.addEventListener('input', updatePizzaPrediction);
+        updatePizzaPrediction();
+
+
+        // --- LÓGICA PARA REGRESIÓN MÚLTIPLE ---
+        const metrosSlider = document.getElementById('metrosSlider');
+        const ambientesSlider = document.getElementById('ambientesSlider');
+        const antiguedadSlider = document.getElementById('antiguedadSlider');
+        const metrosValue = document.getElementById('metrosValue');
+        const ambientesValue = document.getElementById('ambientesValue');
+        const antiguedadValue = document.getElementById('antiguedadValue');
+        const casaPrediction = document.getElementById('casaPrediction');
+
+        function updateCasaPrediction() {
+            const metros = parseInt(metrosSlider.value);
+            const ambientes = parseInt(ambientesSlider.value);
+            const antiguedad = parseInt(antiguedadSlider.value);
+            
+            metrosValue.textContent = metros;
+            ambientesValue.textContent = ambientes;
+            antiguedadValue.textContent = antiguedad;
+            
+            // Formula Mágica: Y = b + m1*X1 + m2*X2 + m3*X3
+            const b = 50000; // Valor base
+            const m1 = 1500;  // Precio por m²
+            const m2 = 10000; // Precio por ambiente
+            const m3 = -1000; // Depreciación por año
+            
+            const prediction = b + (m1 * metros) + (m2 * ambientes) + (m3 * antiguedad);
+            casaPrediction.textContent = prediction.toLocaleString('es-AR');
+        }
+
+        metrosSlider.addEventListener('input', updateCasaPrediction);
+        ambientesSlider.addEventListener('input', updateCasaPrediction);
+        antiguedadSlider.addEventListener('input', updateCasaPrediction);
+        updateCasaPrediction();
+
+        // --- LÓGICA PARA ARIMA ---
+        const pSlider = document.getElementById('pSlider');
+        const dSlider = document.getElementById('dSlider');
+        const qSlider = document.getElementById('qSlider');
+        const pValue = document.getElementById('pValue');
+        const dValue = document.getElementById('dValue');
+        const qValue = document.getElementById('qValue');
+        const simularArimaBtn = document.getElementById('simularArima');
+        const arimaChartCtx = document.getElementById('arimaChart').getContext('2d');
+        let arimaChart;
+
+        function updateArimaValues() {
+            pValue.textContent = pSlider.value;
+            dValue.textContent = dSlider.value;
+            qValue.textContent = qSlider.value;
+        }
+
+        function generateArimaData() {
+            const data = [];
+            let value = 700;
+            const trend = 5;
+            for (let i = 0; i < 36; i++) {
+                const season = Math.sin(i * Math.PI / 6) * 300; // Ciclo anual
+                value += trend;
+                const noise = (Math.random() - 0.5) * 100;
+                data.push(Math.max(200, value + season + noise));
+            }
+            return data;
+        }
+
+        const arimaBaseData = generateArimaData();
+        const arimaLabels = Array.from({length: 37}, (_, i) => `Mes ${i+1}`);
+
+        function simulateArima() {
+            const p = parseInt(pSlider.value);
+            const d = parseInt(dSlider.value);
+            const q = parseInt(qSlider.value);
+            
+            let lastValue = arimaBaseData[arimaBaseData.length - 1];
+            let trendFactor = d * 50;
+            let memoryFactor = (arimaBaseData[arimaBaseData.length-1] - arimaBaseData[arimaBaseData.length - 1 - p]) || 0;
+            memoryFactor = memoryFactor / (p || 1) * 0.5;
+            let surpriseFactor = q * (Math.random() - 0.5) * 100;
+
+            let prediction = lastValue + trendFactor + memoryFactor + surpriseFactor;
+            prediction = Math.max(200, prediction);
+
+            if (arimaChart) arimaChart.destroy();
+            
+            const predictionLine = Array(arimaBaseData.length-1).fill(null);
+            predictionLine.push(arimaBaseData[arimaBaseData.length-1], prediction);
+
+            arimaChart = new Chart(arimaChartCtx, {
+                type: 'line',
+                data: {
+                    labels: arimaLabels,
+                    datasets: [{
+                        label: 'Ventas Históricas (kg)',
+                        data: [...arimaBaseData, null],
+                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        fill: true,
+                        tension: 0.1,
+                    },{
+                        label: `Predicción ARIMA(${p},${d},${q})`,
+                        data: predictionLine,
+                        borderColor: '#f97316',
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#f97316',
+                    }]
+                },
+                options: { scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}}, plugins: { legend: { labels: { color: '#9ca3af' } } } }
+            });
+        }
+        
+        pSlider.addEventListener('input', updateArimaValues);
+        dSlider.addEventListener('input', updateArimaValues);
+        qSlider.addEventListener('input', updateArimaValues);
+        simularArimaBtn.addEventListener('click', simulateArima);
+        updateArimaValues();
+        
+        // --- LÓGICA PARA SARIMA ---
+        const sarimaPSlider = document.getElementById('sarimaPSlider');
+        const sarimaDSlider = document.getElementById('sarimaDSlider');
+        const sarimaQSlider = document.getElementById('sarimaQSlider');
+        const mSlider = document.getElementById('mSlider');
+        const sarimaPValue = document.getElementById('sarimaPValue');
+        const sarimaDValue = document.getElementById('sarimaDValue');
+        const sarimaQValue = document.getElementById('sarimaQValue');
+        const mValue = document.getElementById('mValue');
+        const simularSarimaBtn = document.getElementById('simularSarima');
+        const sarimaChartCtx = document.getElementById('sarimaChart').getContext('2d');
+        let sarimaChart;
+
+        function updateSarimaValues() {
+            sarimaPValue.textContent = sarimaPSlider.value;
+            sarimaDValue.textContent = sarimaDSlider.value;
+            sarimaQValue.textContent = sarimaQSlider.value;
+            mValue.textContent = mSlider.value;
+        }
+
+        function simulateSarima() {
+            const P = parseInt(sarimaPSlider.value);
+            const D = parseInt(sarimaDSlider.value);
+            const Q = parseInt(sarimaQSlider.value);
+            const m = parseInt(mSlider.value);
+            
+            let lastValue = arimaBaseData[arimaBaseData.length - 1];
+            let seasonalMemory = (arimaBaseData[arimaBaseData.length - m] || lastValue);
+            
+            // Simulación simplificada
+            let seasonalFactor = (seasonalMemory - arimaBaseData[arimaBaseData.length-m-1] || 0) * 0.5 * P;
+            let seasonalTrend = (lastValue - seasonalMemory) / m * D;
+            let seasonalSurprise = Q * (Math.random() - 0.5) * 50;
+            
+            let prediction = lastValue + seasonalFactor + seasonalTrend + seasonalSurprise;
+            prediction = Math.max(200, prediction);
+
+            if (sarimaChart) sarimaChart.destroy();
+            
+            const predictionLine = Array(arimaBaseData.length-1).fill(null);
+            predictionLine.push(arimaBaseData[arimaBaseData.length-1], prediction);
+
+            sarimaChart = new Chart(sarimaChartCtx, {
+                type: 'line',
+                data: {
+                    labels: arimaLabels,
+                    datasets: [{
+                        label: 'Ventas Históricas (kg)',
+                        data: [...arimaBaseData, null],
+                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        fill: true,
+                        tension: 0.1,
+                    },{
+                        label: `Predicción SARIMA`,
+                        data: predictionLine,
+                        borderColor: '#fbbf24',
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#fbbf24',
+                    }]
+                },
+                options: { scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}}, plugins: { legend: { labels: { color: '#9ca3af' } } } }
+            });
+        }
+
+        sarimaPSlider.addEventListener('input', updateSarimaValues);
+        sarimaDSlider.addEventListener('input', updateSarimaValues);
+        sarimaQSlider.addEventListener('input', updateSarimaValues);
+        mSlider.addEventListener('input', updateSarimaValues);
+        simularSarimaBtn.addEventListener('click', simulateSarima);
+        updateSarimaValues();
+
+        // --- LÓGICA PARA GARCH ---
+        const alphaSlider = document.getElementById('alphaSlider');
+        const betaSlider = document.getElementById('betaSlider');
+        const alphaValue = document.getElementById('alphaValue');
+        const betaValue = document.getElementById('betaValue');
+        const simularGarchBtn = document.getElementById('simularGarch');
+        const garchPriceChartCtx = document.getElementById('garchPriceChart').getContext('2d');
+        const garchVolatilityChartCtx = document.getElementById('garchVolatilityChart').getContext('2d');
+        let garchPriceChart, garchVolatilityChart;
+
+        function updateGarchValues() {
+            alphaValue.textContent = alphaSlider.value;
+            betaValue.textContent = betaSlider.value;
+        }
+
+        function simulateGarch() {
+            const alpha = parseFloat(alphaSlider.value);
+            const beta = parseFloat(betaSlider.value);
+            const omega = 0.1; // Base volatility
+
+            let price = 40000;
+            let volatility = 1.0;
+
+            const prices = [];
+            const volatilities = [];
+            const labels = [];
+
+            for (let i = 0; i < 100; i++) {
+                labels.push(`Día ${i+1}`);
+                prices.push(price);
+                volatilities.push(volatility * 1000); // Scale for visibility
+
+                const shock = (Math.random() - 0.5) * 2; // Random shock
+                price += shock * volatility * 500;
+                price = Math.max(10000, price);
+
+                // GARCH(1,1) formula
+                const lastShockSquared = shock * shock;
+                volatility = Math.sqrt(omega + alpha * lastShockSquared + beta * (volatility * volatility));
+            }
+            
+            if (garchPriceChart) garchPriceChart.destroy();
+            if (garchVolatilityChart) garchVolatilityChart.destroy();
+
+            garchPriceChart = new Chart(garchPriceChartCtx, {
+                type: 'line',
+                data: { labels, datasets: [{ label: 'Precio Simulado BTC', data: prices, borderColor: '#f97316' }] },
+                options: { scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}}, plugins: { legend: { labels: { color: '#9ca3af' } } } }
+            });
+            
+            garchVolatilityChart = new Chart(garchVolatilityChartCtx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Volatilidad (Bardo)', data: volatilities, backgroundColor: '#f97316' }] },
+                options: { scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}}, plugins: { legend: { labels: { color: '#9ca3af' } } } }
+            });
+        }
+        
+        alphaSlider.addEventListener('input', updateGarchValues);
+        betaSlider.addEventListener('input', updateGarchValues);
+        simularGarchBtn.addEventListener('click', simulateGarch);
+        updateGarchValues();
+
+        // --- LÓGICA PARA MODELOS TÉCNICOS ---
+        const smaSlider = document.getElementById('smaSlider');
+        const emaSlider = document.getElementById('emaSlider');
+        const bbPeriodSlider = document.getElementById('bbPeriodSlider');
+        const bbStdDevSlider = document.getElementById('bbStdDevSlider');
+        const rsiSlider = document.getElementById('rsiSlider');
+        const macdSlowSlider = document.getElementById('macdSlowSlider');
+        const macdFastSlider = document.getElementById('macdFastSlider');
+        const simularTecnicosBtn = document.getElementById('simularTecnicos');
+
+        const smaValue = document.getElementById('smaValue');
+        const emaValue = document.getElementById('emaValue');
+        const bbPeriodValue = document.getElementById('bbPeriodValue');
+        const bbStdDevValue = document.getElementById('bbStdDevValue');
+        const rsiValue = document.getElementById('rsiValue');
+        const macdSlowValue = document.getElementById('macdSlowValue');
+        const macdFastValue = document.getElementById('macdFastValue');
+        
+        const tecnicosPriceChartCtx = document.getElementById('tecnicosPriceChart').getContext('2d');
+        const rsiChartCtx = document.getElementById('rsiChart').getContext('2d');
+        const macdChartCtx = document.getElementById('macdChart').getContext('2d');
+        let tecnicosPriceChart, rsiChart, macdChart;
+        let priceData = generateBitcoinData(100);
+
+        function updateTecnicosValues() {
+            smaValue.textContent = smaSlider.value;
+            emaValue.textContent = emaSlider.value;
+            bbPeriodValue.textContent = bbPeriodSlider.value;
+            bbStdDevValue.textContent = bbStdDevSlider.value;
+            rsiValue.textContent = rsiSlider.value;
+            macdSlowValue.textContent = macdSlowSlider.value;
+            macdFastValue.textContent = macdFastSlider.value;
+        }
+
+        const technicalSliders = [smaSlider, emaSlider, bbPeriodSlider, bbStdDevSlider, rsiSlider, macdSlowSlider, macdFastSlider];
+        technicalSliders.forEach(slider => slider.addEventListener('input', updateTecnicosValues));
+        simularTecnicosBtn.addEventListener('click', simulateTecnicos);
+        
+        // Calculation Functions
+        function calculateSMA(data, period) {
+            let sma = [];
+            for (let i = period - 1; i < data.length; i++) {
+                let sum = 0;
+                for (let j = 0; j < period; j++) {
+                    sum += data[i - j];
+                }
+                sma.push(sum / period);
+            }
+            return Array(period - 1).fill(null).concat(sma);
+        }
+
+        function calculateEMA(data, period) {
+            let ema = [];
+            let multiplier = 2 / (period + 1);
+            ema.push(data[0]);
+            for (let i = 1; i < data.length; i++) {
+                let newEma = (data[i] - ema[i-1]) * multiplier + ema[i-1];
+                ema.push(newEma);
+            }
+            return ema;
+        }
+        
+        function calculateBollingerBands(data, period, stdDev) {
+            let sma = calculateSMA(data, period);
+            let upper = [];
+            let lower = [];
+            for (let i = period - 1; i < data.length; i++) {
+                let slice = data.slice(i - period + 1, i + 1);
+                let std = Math.sqrt(slice.map(x => Math.pow(x - sma[i], 2)).reduce((a, b) => a + b) / period);
+                upper.push(sma[i] + (std * stdDev));
+                lower.push(sma[i] - (std * stdDev));
+            }
+            return { middle: sma, upper: Array(period-1).fill(null).concat(upper), lower: Array(period-1).fill(null).concat(lower) };
+        }
+
+        function calculateRSI(data, period) {
+            let rsi = [];
+            let gains = 0, losses = 0;
+            for (let i = 1; i < data.length; i++) {
+                let change = data[i] - data[i-1];
+                if (change > 0) gains += change;
+                else losses -= change;
+
+                if (i >= period) {
+                   let avgGain = gains / period;
+                   let avgLoss = losses / period;
+                   if (avgLoss === 0) {
+                       rsi.push(100);
+                   } else {
+                       let rs = avgGain / avgLoss;
+                       rsi.push(100 - (100 / (1 + rs)));
+                   }
+                   let oldChange = data[i - period + 1] - data[i - period];
+                   if (oldChange > 0) gains -= oldChange;
+                   else losses += oldChange;
+                }
+            }
+            return Array(period).fill(null).concat(rsi);
+        }
+
+        function calculateMACD(data, fast, slow, signal) {
+            let emaFast = calculateEMA(data, fast);
+            let emaSlow = calculateEMA(data, slow);
+            let macdLine = emaFast.map((val, i) => val - emaSlow[i]);
+            let signalLine = calculateEMA(macdLine, signal);
+            let histogram = macdLine.map((val, i) => val - signalLine[i]);
+            return { macd: macdLine, signal: signalLine, histogram };
+        }
+
+        function simulateTecnicos() {
+            priceData = generateBitcoinData(100);
+            const labels = Array.from({length: 100}, (_, i) => `Día ${i+1}`);
+
+            // Get values from sliders
+            const smaPeriod = parseInt(smaSlider.value);
+            const emaPeriod = parseInt(emaSlider.value);
+            const bbPeriod = parseInt(bbPeriodSlider.value);
+            const bbStdDev = parseFloat(bbStdDevSlider.value);
+            const rsiPeriod = parseInt(rsiSlider.value);
+            const macdFast = parseInt(macdFastSlider.value);
+            const macdSlow = parseInt(macdSlowSlider.value);
+            const macdSignal = 9; // Typically fixed at 9
+
+            // Calculate indicators
+            const sma = calculateSMA(priceData, smaPeriod);
+            const ema = calculateEMA(priceData, emaPeriod);
+            const bb = calculateBollingerBands(priceData, bbPeriod, bbStdDev);
+            const rsi = calculateRSI(priceData, rsiPeriod);
+            const macd = calculateMACD(priceData, macdFast, macdSlow, macdSignal);
+
+            // Destroy old charts
+            if(tecnicosPriceChart) tecnicosPriceChart.destroy();
+            if(rsiChart) rsiChart.destroy();
+            if(macdChart) macdChart.destroy();
+
+            // Create Price Chart
+            tecnicosPriceChart = new Chart(tecnicosPriceChartCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Precio Bitcoin', data: priceData, borderColor: '#FFFFFF', borderWidth: 2.5, pointRadius: 0 },
+                        { label: `SMA(${smaPeriod})`, data: sma, borderColor: '#60a5fa', borderWidth: 1.5, pointRadius: 0 },
+                        { label: `EMA(${emaPeriod})`, data: ema, borderColor: '#f472b6', borderWidth: 1.5, pointRadius: 0 },
+                        { label: `BB Superior`, data: bb.upper, borderColor: '#34d399', borderWidth: 1, pointRadius: 0, fill: '+1' },
+                        { label: `BB Inferior`, data: bb.lower, borderColor: '#34d399', borderWidth: 1, pointRadius: 0, backgroundColor: 'rgba(52, 211, 153, 0.1)' }
+                    ]
+                },
+                options: { scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}}, plugins: { legend: { labels: { color: '#9ca3af' } } } }
+            });
+
+            // Create RSI Chart
+            rsiChart = new Chart(rsiChartCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{ label: `RSI(${rsiPeriod})`, data: rsi, borderColor: '#fbbf24', borderWidth: 2, pointRadius: 0 }]
+                },
+                options: {
+                     scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}, y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}}, 
+                     plugins: { 
+                         legend: { display: false },
+                         annotation: { // Custom plugin needed for lines, simulating with grid lines
+                            
+                         }
+                    } 
+                }
+            });
+
+             // Create MACD Chart
+            macdChart = new Chart(macdChartCtx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Histograma', data: macd.histogram, backgroundColor: (ctx) => ctx.raw > 0 ? 'rgba(52, 211, 153, 0.5)' : 'rgba(248, 113, 113, 0.5)' },
+                        { label: 'MACD', data: macd.macd, type: 'line', borderColor: '#60a5fa', borderWidth: 2, pointRadius: 0 },
+                        { label: 'Señal', data: macd.signal, type: 'line', borderColor: '#f472b6', borderWidth: 2, pointRadius: 0 }
+                    ]
+                },
+                options: { scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af'}}}, plugins: { legend: { labels: { color: '#9ca3af' } } } }
+            });
+        }
+        
+        updateTecnicosValues();
+
+        // --- LÓGICA PARA COMPARATIVA ---
+        const compararModelosBtn = document.getElementById('compararModelos');
+        const comparativaChartCtx = document.getElementById('comparativaChart').getContext('2d');
+        let comparativaChart;
+
+        function generateBitcoinData(points = 50) {
+            const data = [];
+            let price = 20000;
+            for (let i = 0; i < points; i++) {
+                price += (Math.random() - 0.48) * (price * 0.05); // Percentage change
+                price = Math.max(10000, price);
+                data.push(price);
+            }
+            return data;
+        }
+
+        function generatePredictions(baseData) {
+            const arima = [];
+            const randomForest = [];
+            const lstm = [];
+
+            baseData.forEach((val, i) => {
+                if(i < 10) { // No predecir al principio
+                    arima.push(null);
+                    randomForest.push(null);
+                    lstm.push(null);
+                    return;
+                }
+                // Simular comportamiento de modelos
+                arima.push(baseData[i-1] + (Math.random()-0.5)*500); // Sigue la tendencia
+                randomForest.push(val + (Math.random()-0.5)*2000); // Puede ser más ruidoso
+                lstm.push(val + (Math.random()-0.4)*1500); // Captura mejor la tendencia
+            });
+            
+            return {arima, randomForest, lstm};
+        }
+
+        function showComparativa() {
+            if (comparativaChart) comparativaChart.destroy();
+            
+            const btcData = generateBitcoinData();
+            const predictions = generatePredictions(btcData);
+            const labels = Array.from({length: 50}, (_, i) => `Día ${i+1}`);
+
+            comparativaChart = new Chart(comparativaChartCtx, {
+                 type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                    {
+                        label: 'Precio Real Bitcoin',
+                        data: btcData,
+                        borderColor: '#FFFFFF',
+                        borderWidth: 4,
+                        tension: 0.1,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Predicción ARIMA',
+                        data: predictions.arima,
+                        borderColor: '#34d399', // Verde
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.2,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Predicción Random Forest',
+                        data: predictions.randomForest,
+                        borderColor: '#60a5fa', // Azul
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        pointRadius: 0
+                    },
+                     {
+                        label: 'Predicción LSTM (Red Neuronal)',
+                        data: predictions.lstm,
+                        borderColor: '#f472b6', // Rosa
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'Tiempo', color: '#9ca3af' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#9ca3af'}
+                        },
+                        y: { 
+                            title: { display: true, text: 'Precio (USD)', color: '#9ca3af' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#9ca3af'}
+                        }
+                    },
+                    plugins: { legend: { labels: { color: '#9ca3af' } } }
+                }
+            });
+        }
+        
+        compararModelosBtn.addEventListener('click', showComparativa);
+        
+        // Initial load
+        window.addEventListener('load', () => {
+            simulateArima();
+            simulateSarima();
+            simulateGarch();
+            simulateTecnicos();
+            showComparativa();
+        });
+
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de Machine Learning Supervisado</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+    }
+
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+    }
+
+    /* Gemini Modal Styles */
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #f97316;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-black text-gray-200">
+  <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span class="text-white font-bold text-xl">Predicciones<span class="text-orange-500">.AI</span></span>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            <a href="index.html#laboratorios"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+            <a href="index.html#nosotros"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+            <a href="index.html#contacto"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          <button type="button" id="mobile-menu-button"
+            class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+            aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Abrir menú</span>
+            <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="index.html#laboratorios"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+        <a href="index.html#nosotros"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+        <a href="index.html#contacto"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4 md:p-8">
+    <header class="text-center my-12">
+      <h1 class="text-4xl md:text-6xl font-black text-white">
+        Laboratorio de
+        <span class="text-orange-500">Machine Learning Supervisado</span>
+      </h1>
+      <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+        Acá nos metemos con los cerebros artificiales. Jugá con las perillas y
+        descubrí cómo estos modelos aprenden a partir de datos para hacer
+        predicciones.
+      </p>
+    </header>
+
+    <main class="space-y-16">
+      <!-- Sección: Modelos Lineales -->
+      <section id="lineal">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            📏 1. Modelos Lineales (El "Tira Líneas")
+          </h2>
+          <button class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg"
+            data-model="Modelos Lineales (Regresión, Ridge, Lasso)">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="space-y-8">
+          <!-- Regresión Lineal -->
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              Regresión Lineal Simple
+            </h3>
+            <p class="text-gray-400 mb-6">
+              El modelo base. Busca la línea que minimiza el error. A veces,
+              si los datos son muy locos, se la cree demasiado y se ajusta al
+              ruido (overfitting).
+            </p>
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div class="bg-gray-900 p-4 rounded-lg flex flex-col justify-center">
+                <p class="font-mono text-center text-lg text-orange-400">
+                  `$$ Y = b_0 + b_1X + \epsilon $$`
+                </p>
+                <ul class="text-xs mt-4 space-y-1 text-gray-300">
+                  <li>
+                    <span class="font-bold text-white">Y:</span> Lo que querés
+                    adivinar (ej: ventas).
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">X:</span> El dato que
+                    tenés (ej: inversión en publicidad).
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">b₀:</span> El punto de
+                    partida, donde corta la línea.
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">b₁:</span> El peso o la
+                    importancia de X.
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">ε:</span> El error, lo
+                    que la línea no puede explicar.
+                  </li>
+                </ul>
+              </div>
+              <div class="chart-container">
+                <canvas id="linearChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <!-- Regresión Ridge -->
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              Regresión Ridge (L2)
+            </h3>
+            <p class="text-gray-400 mb-6">
+              Le pone una "correa" al modelo para que no se aleje mucho.
+              Penaliza los "pesos" muy grandes, resultando en un modelo más
+              estable y general.
+            </p>
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div class="bg-gray-900 p-4 rounded-lg flex flex-col justify-center">
+                <p class="font-mono text-center text-lg text-orange-400">
+                  Minimiza: `$$ Error + \lambda \sum_{i=1}^{p} b_i^2 $$`
+                </p>
+                <ul class="text-xs mt-4 space-y-1 text-gray-300">
+                  <li>
+                    <span class="font-bold text-white">Error:</span> El error
+                    de la línea recta de siempre.
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">λ (lambda):</span> El
+                    **largo de la correa**. Es la variable que controlás. Un λ
+                    alto significa más penalización (correa más corta).
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">Σbᵢ²:</span> Suma de
+                    los **pesos al cuadrado**. Penaliza más fuerte a los pesos
+                    grandes.
+                  </li>
+                </ul>
+                <div class="mt-4">
+                  <label for="ridgeLambdaSlider" class="block font-medium">Penalización (λ):
+                    <span id="ridgeLambdaValue" class="font-bold text-orange-400">0.5</span></label>
+                  <input id="ridgeLambdaSlider" type="range" min="0" max="10" value="0.5" step="0.1"
+                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="ridgeChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <!-- Regresión Lasso -->
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              Regresión Lasso (L1)
+            </h3>
+            <p class="text-gray-400 mb-6">
+              Similar a Ridge, pero más estricto. Si una variable no sirve
+              para nada, le da un peso de cero y **la elimina**. ¡Hace
+              limpieza de variables por vos!
+            </p>
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div class="bg-gray-900 p-4 rounded-lg flex flex-col justify-center">
+                <p class="font-mono text-center text-lg text-orange-400">
+                  Minimiza: `$$ Error + \alpha \sum_{i=1}^{p} |b_i| $$`
+                </p>
+                <ul class="text-xs mt-4 space-y-1 text-gray-300">
+                  <li>
+                    <span class="font-bold text-white">Error:</span> El mismo
+                    error de siempre.
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">α (alpha):</span> El
+                    **nivel de exigencia del DT**. Un α alto significa que es
+                    más estricto y raja a más "jugadores" (variables).
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">Σ|bᵢ|:</span> Suma del
+                    **valor absoluto de los pesos**. Esto permite que algunos
+                    pesos lleguen a cero.
+                  </li>
+                </ul>
+                <div class="mt-4">
+                  <label for="lassoAlphaSlider" class="block font-medium">Penalización (α):
+                    <span id="lassoAlphaValue" class="font-bold text-orange-400">0.1</span></label>
+                  <input id="lassoAlphaSlider" type="range" min="0" max="1" value="0.1" step="0.01"
+                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="lassoChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Árboles -->
+      <section id="arboles">
+        <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+          🌳 2. Familia de Árboles de Decisión
+        </h2>
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div class="card rounded-lg p-6">
+            <div class="flex justify-between items-start">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                Árbol de Decisión
+              </h3>
+              <button class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg"
+                data-model="Árbol de Decisión">
+                ✨ Gemini
+              </button>
+            </div>
+            <p class="text-gray-400 mb-6">
+              Como un **juego de las 20 preguntas**. Va dividiendo los datos
+              con preguntas simples ("¿es mayor que X?"). ¡Ojo que si lo
+              dejás, se aprende los datos de memoria!
+            </p>
+            <div class="bg-gray-900 p-4 rounded-lg mb-6">
+              <p class="font-mono text-center text-lg text-orange-400">
+                `$$ \hat{y} = \frac{1}{|R_m|} \sum_{x_i \in R_m} y_i $$`
+              </p>
+              <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                <li>
+                  <span class="font-bold text-white">ŷ:</span> La predicción
+                  para una nueva observación.
+                </li>
+                <li>
+                  <span class="font-bold text-white">Rₘ:</span> La "hoja"
+                  final del árbol donde cae la observación.
+                </li>
+                <li>
+                  <span class="font-bold text-white">|Rₘ|:</span> Cuántos
+                  datos de entrenamiento cayeron en esa misma hoja.
+                </li>
+                <li>
+                  <span class="font-bold text-white">En criollo:</span> La
+                  predicción es el **promedio** de todos los datos que
+                  terminaron en la misma caja final.
+                </li>
+              </ul>
+            </div>
+            <div class="space-y-4 mb-6">
+              <label for="treeDepthSlider" class="block font-medium">Profundidad del Árbol (Max Depth):
+                <span id="treeDepthValue" class="font-bold text-orange-400">3</span></label>
+              <input id="treeDepthSlider" type="range" min="1" max="10" value="3"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400">
+                Es la cantidad máxima de "preguntas" que puede hacer. A más
+                profundidad, más se "memoriza" los datos (overfitting). Menos
+                profundidad, más generaliza.
+              </p>
+            </div>
+            <div class="chart-container">
+              <canvas id="treeChart"></canvas>
+            </div>
+          </div>
+          <div class="card rounded-lg p-6">
+            <div class="flex justify-between items-start">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                Random Forest
+              </h3>
+              <button class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg"
+                data-model="Random Forest">
+                ✨ Gemini
+              </button>
+            </div>
+            <p class="text-gray-400 mb-6">
+              Si un árbol se puede equivocar, ¿por qué no le preguntamos a
+              100? Random Forest crea **muchos árboles** y hace un
+              **promedio** de sus predicciones. Es mucho más estable.
+            </p>
+            <div class="bg-gray-900 p-4 rounded-lg mb-6">
+              <p class="font-mono text-center text-lg text-orange-400">
+                `$$ \hat{y}_{RF} = \frac{1}{B} \sum_{b=1}^{B} T_b(x) $$`
+              </p>
+              <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                <li>
+                  <span class="font-bold text-white">ŷᵣꜰ:</span> La predicción
+                  final del bosque.
+                </li>
+                <li>
+                  <span class="font-bold text-white">B:</span> El número total
+                  de árboles en el bosque.
+                </li>
+                <li>
+                  <span class="font-bold text-white">Tₙ(x):</span> La
+                  predicción del árbol individual número 'b'.
+                </li>
+                <li>
+                  <span class="font-bold text-white">En criollo:</span> La
+                  predicción es el **promedio de lo que opinan todos los
+                  árboles** del comité.
+                </li>
+              </ul>
+            </div>
+            <div class="space-y-4 mb-6">
+              <label for="forestTreesSlider" class="block font-medium">Cantidad de Árboles (n_estimators):
+                <span id="forestTreesValue" class="font-bold text-orange-400">10</span></label>
+              <input id="forestTreesSlider" type="range" min="1" max="100" value="10"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400">
+                Cuántos expertos hay en el comité. Más árboles, más sabio y
+                suave es el bosque, y la predicción se estabiliza.
+              </p>
+            </div>
+            <div class="chart-container">
+              <canvas id="forestChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Boosting -->
+      <section id="boosting">
+        <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+          🚀 3. Gradient Boosting (Los Monstruos de la Competición)
+        </h2>
+        <div class="card rounded-lg p-6">
+          <div class="flex justify-between items-start">
+            <p class="text-gray-400 mb-6 max-w-4xl">
+              Los campeones del mundo en datos tabulares (como XGBoost y
+              LightGBM). Son como un equipo de especialistas: el primer árbol
+              hace una predicción media floja. El segundo **aprende del error
+              del primero** y lo corrige. El tercero aprende del error del
+              segundo, y así sucesivamente.
+            </p>
+            <button class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg"
+              data-model="Gradient Boosting (XGBoost, LightGBM)">
+              ✨ Gemini
+            </button>
+          </div>
+          <div class="bg-gray-900 p-4 rounded-lg mb-6">
+            <p class="font-mono text-center text-lg text-orange-400">
+              `$$ F_m(x) = F_{m-1}(x) + \eta \cdot h_m(x) $$`
+            </p>
+            <ul class="text-xs mt-2 space-y-1 text-gray-300">
+              <li>
+                <span class="font-bold text-white">Fₘ(x):</span> El modelo
+                completo después de 'm' rondas de corrección.
+              </li>
+              <li>
+                <span class="font-bold text-white">Fₘ₋₁(x):</span> Cómo venía
+                el modelo en la ronda anterior.
+              </li>
+              <li>
+                <span class="font-bold text-white">hₘ(x):</span> El nuevo
+                arbolito especialista que se enfoca en corregir los errores
+                del anterior.
+              </li>
+              <li>
+                <span class="font-bold text-white">η (eta):</span> El ritmo de
+                aprendizaje.
+              </li>
+              <li>
+                <span class="font-bold text-white">En criollo:</span> La
+                predicción final es la suma de la predicción inicial más todas
+                las pequeñas correcciones de cada especialista.
+              </li>
+            </ul>
+          </div>
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label for="boostingTreesSlider" class="block font-medium">Cantidad de Especialistas (n_estimators):
+                <span id="boostingTreesValue" class="font-bold text-orange-400">50</span></label>
+              <input id="boostingTreesSlider" type="range" min="1" max="200" value="50"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400">
+                Cuántos expertos van a corregir el laburo del anterior.
+              </p>
+            </div>
+            <div>
+              <label for="learningRateSlider" class="block font-medium">Ritmo de Aprendizaje (learning_rate):
+                <span id="learningRateValue" class="font-bold text-orange-400">0.1</span></label>
+              <input id="learningRateSlider" type="range" min="0.01" max="1" value="0.1" step="0.01"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400">
+                Qué tan a lo bestia corrige cada especialista. Un ritmo bajo
+                es más cuidadoso y preciso, pero tarda más en aprender.
+              </p>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="boostingChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Redes Neuronales -->
+      <section id="neural">
+        <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+          🧠 4. Redes Neuronales (MLP / ANN)
+        </h2>
+        <div class="card rounded-lg p-6">
+          <div class="flex justify-between items-start">
+            <p class="text-gray-400 mb-6 max-w-4xl">
+              Acá entramos en otro nivel. Son como un **cerebro de verdad**,
+              con "neuronas" y "conexiones". Son los bichos más flexibles y
+              pueden aprender patrones súper complejos y no lineales que los
+              otros modelos ni ven.
+            </p>
+            <button class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg"
+              data-model="Redes Neuronales (MLP, ANN)">
+              ✨ Gemini
+            </button>
+          </div>
+          <div class="bg-gray-900 p-4 rounded-lg mb-6">
+            <p class="font-mono text-center text-lg text-orange-400">
+              `$$ \text{salida} = f(\sum_{i=1}^{n} (w_i x_i) + b) $$`
+            </p>
+            <ul class="text-xs mt-2 space-y-1 text-gray-300">
+              <li>
+                <span class="font-bold text-white">salida:</span> Lo que
+                escupe una neurona.
+              </li>
+              <li>
+                <span class="font-bold text-white">f(...):</span> La "función
+                de activación" que decide si la neurona se "prende" o no.
+              </li>
+              <li>
+                <span class="font-bold text-white">wᵢxᵢ:</span> Cada dato de
+                entrada (`xᵢ`) multiplicado por su importancia (`wᵢ`, el
+                "peso").
+              </li>
+              <li>
+                <span class="font-bold text-white">b:</span> Un "sesgo" o
+                punto de partida.
+              </li>
+              <li>
+                <span class="font-bold text-white">En criollo:</span> Cada
+                neurona suma todas sus entradas con su importancia, le agrega
+                un empujoncito y decide si "dispara" o no. Una red es un bardo
+                de miles de estas neuronas conectadas.
+              </li>
+            </ul>
+          </div>
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label for="layersSlider" class="block font-medium">Capas Ocultas (hidden_layer_sizes):
+                <span id="layersValue" class="font-bold text-orange-400">2</span></label>
+              <input id="layersSlider" type="range" min="1" max="5" value="2"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400">
+                Cuántos niveles de "pensamiento" tiene el cerebro. Más capas
+                le permiten aprender ideas más abstractas y complejas.
+              </p>
+            </div>
+            <div>
+              <label for="neuronsSlider" class="block font-medium">Neuronas por Capa:
+                <span id="neuronsValue" class="font-bold text-orange-400">16</span></label>
+              <input id="neuronsSlider" type="range" min="4" max="64" value="16" step="4"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400">
+                Cuántas "ideas" puede manejar en cada nivel. Más neuronas, más
+                detalles y patrones complejos puede aprender.
+              </p>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="neuralChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center mt-16 text-gray-500">
+      <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Predicciones.</p>
+    </footer>
+  </div>
+
+  <!-- Gemini Modal -->
+  <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10">
+              ✨
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                Explicación de Gemini
+              </h3>
+              <div class="mt-4 border-b border-gray-700 pb-4">
+                <label for="gemini-api-key-input" class="block text-sm font-medium text-gray-400">Tu Clave de API de
+                  Gemini</label>
+                <input type="password" id="gemini-api-key-input"
+                  class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  placeholder="Pegá tu clave acá..." />
+                <p class="mt-1 text-xs text-gray-500">
+                  Conseguí una clave gratis en
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                    class="text-orange-400 hover:underline">Google AI Studio</a>.
+                </p>
+              </div>
+              <p class="text-sm text-gray-400 my-4" id="modal-subtitle">
+                Pídele a la IA que te explique este modelo.
+              </p>
+
+              <div class="my-4 space-x-2">
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="simple">
+                  Explicación Simple
+                </button>
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="analogy">
+                  Analogía Creativa
+                </button>
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="business">
+                  Para Negocios
+                </button>
+              </div>
+
+              <div id="gemini-response-container"
+                class="mt-4 p-3 bg-black/50 rounded-md min-h-[150px] max-h-[300px] overflow-y-auto">
+                <div id="gemini-loader" class="hidden flex justify-center items-center h-full">
+                  <div class="loader"></div>
+                </div>
+                <p id="gemini-response" class="text-gray-300"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button id="close-modal-btn" type="button"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- LÓGICA PARA EL MENÚ RESPONSIVO ---
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const hamburgerIcon = document.getElementById("hamburger-icon");
+    const closeIcon = document.getElementById("close-icon");
+    mobileMenuButton.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+      hamburgerIcon.classList.toggle("hidden");
+      closeIcon.classList.toggle("hidden");
+    });
+
+    // --- LÓGICA PARA MACHINE LEARNING (GRÁFICOS) ---
+    // --- CHART DEFAULTS ---
+    const mlChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: "linear",
+          position: "bottom",
+          title: {
+            display: true,
+            text: "Variable de Entrada (X)",
+            color: "#9ca3af",
+          },
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#9ca3af" },
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Variable a Predecir (Y)",
+            color: "#9ca3af",
+          },
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#9ca3af" },
+        },
+      },
+      plugins: { legend: { labels: { color: "#9ca3af" } } },
+    };
+
+    function generateMLData() {
+      const data = [];
+      for (let i = 0; i < 50; i++) {
+        const x = Math.random() * 10;
+        const y = Math.sin(x * 1.2) * 3 + (Math.random() - 0.5) * 2.5;
+        data.push({ x, y });
+      }
+      return data.sort((a, b) => a.x - b.x);
+    }
+    const mlDataset = generateMLData();
+    const fullRange = Array.from({ length: 101 }, (_, i) => i * 0.1);
+    const baseMlDataset = {
+      label: "Datos Reales",
+      data: mlDataset,
+      type: "scatter",
+      backgroundColor: "rgba(255, 255, 255, 0.4)",
+    };
+
+    // --- Modelos Lineales ---
+    const linearChartCtx = document
+      .getElementById("linearChart")
+      .getContext("2d");
+    const ridgeChartCtx = document
+      .getElementById("ridgeChart")
+      .getContext("2d");
+    const lassoChartCtx = document
+      .getElementById("lassoChart")
+      .getContext("2d");
+    const ridgeLambdaSlider = document.getElementById("ridgeLambdaSlider");
+    const ridgeLambdaValue = document.getElementById("ridgeLambdaValue");
+    const lassoAlphaSlider = document.getElementById("lassoAlphaSlider");
+    const lassoAlphaValue = document.getElementById("lassoAlphaValue");
+    let ridgeChart, lassoChart;
+
+    // Base Linear Regression Calculation
+    let sumX = 0,
+      sumY = 0,
+      sumXY = 0,
+      sumX2 = 0;
+    mlDataset.forEach(({ x, y }) => {
+      sumX += x;
+      sumY += y;
+      sumXY += x * y;
+      sumX2 += x * x;
+    });
+    const dataN = mlDataset.length;
+    const m_base =
+      (dataN * sumXY - sumX * sumY) / (dataN * sumX2 - sumX * sumX);
+    const b_base = (sumY - m_base * sumX) / dataN;
+    const linearPrediction = (x) => m_base * x + b_base;
+
+    new Chart(linearChartCtx, {
+      data: {
+        datasets: [
+          baseMlDataset,
+          {
+            label: "Regresión Lineal",
+            data: fullRange.map((x) => ({ x, y: linearPrediction(x) })),
+            type: "line",
+            borderColor: "#f97316",
+            borderWidth: 3,
+          },
+        ],
+      },
+      options: mlChartOptions,
+    });
+
+    function updateRidgeChart() {
+      const lambda = parseFloat(ridgeLambdaSlider.value);
+      ridgeLambdaValue.textContent = lambda.toFixed(1);
+      if (ridgeChart) ridgeChart.destroy();
+
+      const m_ridge = m_base * (1 / (1 + lambda));
+      const b_ridge = b_base;
+      const ridgePrediction = (x) => m_ridge * x + b_ridge;
+
+      ridgeChart = new Chart(ridgeChartCtx, {
+        data: {
+          datasets: [
+            baseMlDataset,
+            {
+              label: "Regresión Lineal Simple",
+              data: fullRange.map((x) => ({ x, y: linearPrediction(x) })),
+              type: "line",
+              borderColor: "rgba(249, 115, 22, 0.3)",
+              borderWidth: 2,
+              borderDash: [5, 5],
+            },
+            {
+              label: "Regresión Ridge",
+              data: fullRange.map((x) => ({ x, y: ridgePrediction(x) })),
+              type: "line",
+              borderColor: "#34d399",
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: mlChartOptions,
+      });
+    }
+    ridgeLambdaSlider.addEventListener("input", updateRidgeChart);
+
+    function updateLassoChart() {
+      const alpha = parseFloat(lassoAlphaSlider.value);
+      lassoAlphaValue.textContent = alpha.toFixed(2);
+      if (lassoChart) lassoChart.destroy();
+
+      const m_lasso =
+        Math.sign(m_base) * Math.max(0, Math.abs(m_base) - alpha * 2);
+      const b_lasso = b_base;
+      const lassoPrediction = (x) => m_lasso * x + b_lasso;
+
+      lassoChart = new Chart(lassoChartCtx, {
+        data: {
+          datasets: [
+            baseMlDataset,
+            {
+              label: "Regresión Lineal Simple",
+              data: fullRange.map((x) => ({ x, y: linearPrediction(x) })),
+              type: "line",
+              borderColor: "rgba(249, 115, 22, 0.3)",
+              borderWidth: 2,
+              borderDash: [5, 5],
+            },
+            {
+              label: "Regresión Lasso",
+              data: fullRange.map((x) => ({ x, y: lassoPrediction(x) })),
+              type: "line",
+              borderColor: "#60a5fa",
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: mlChartOptions,
+      });
+    }
+    lassoAlphaSlider.addEventListener("input", updateLassoChart);
+
+    // --- Árboles ---
+    const treeDepthSlider = document.getElementById("treeDepthSlider");
+    const treeDepthValue = document.getElementById("treeDepthValue");
+    const treeChartCtx = document
+      .getElementById("treeChart")
+      .getContext("2d");
+    let treeChart;
+    function simulateDecisionTree(data, depth) {
+      const splits = Math.pow(2, depth);
+      const segmentSize = Math.max(1, Math.floor(data.length / splits));
+      const predictions = [];
+      let currentX = 0;
+      for (let i = 0; i < splits; i++) {
+        const start = i * segmentSize;
+        const end = (i + 1) * segmentSize;
+        const segment = data.slice(start, end);
+        if (segment.length === 0) continue;
+        const avgY =
+          segment.reduce((sum, p) => sum + p.y, 0) / segment.length;
+        const startX = segment[0]?.x || currentX;
+        const endX = segment[segment.length - 1]?.x || 10;
+        predictions.push({ x: startX, y: avgY }, { x: endX, y: avgY });
+        currentX = endX;
+      }
+      return predictions;
+    }
+    function updateTreeChart() {
+      const depth = parseInt(treeDepthSlider.value);
+      treeDepthValue.textContent = depth;
+      if (treeChart) treeChart.destroy();
+      treeChart = new Chart(treeChartCtx, {
+        data: {
+          datasets: [
+            baseMlDataset,
+            {
+              label: `Árbol (Profundidad ${depth})`,
+              data: simulateDecisionTree(mlDataset, depth),
+              type: "line",
+              borderColor: "#f97316",
+              stepped: true,
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: mlChartOptions,
+      });
+    }
+    treeDepthSlider.addEventListener("input", updateTreeChart);
+
+    // --- Random Forest ---
+    const forestTreesSlider = document.getElementById("forestTreesSlider");
+    const forestTreesValue = document.getElementById("forestTreesValue");
+    const forestChartCtx = document
+      .getElementById("forestChart")
+      .getContext("2d");
+    let forestChart;
+    function simulateRandomForest(data, numTrees) {
+      const finalPrediction = new Array(101).fill(0);
+      for (let i = 0; i < numTrees; i++) {
+        const sample = [];
+        for (let j = 0; j < data.length; j++) {
+          sample.push(data[Math.floor(Math.random() * data.length)]);
+        }
+        sample.sort((a, b) => a.x - b.x);
+        const treePred = simulateDecisionTree(sample, 5);
+        let currentTreeY = 0;
+        let treeIdx = 0;
+        for (let k = 0; k < 101; k++) {
+          const x = k * 0.1;
+          if (treeIdx < treePred.length - 1 && x > treePred[treeIdx + 1].x) {
+            treeIdx += 1;
+          }
+          if (treePred[treeIdx]) {
+            currentTreeY = treePred[treeIdx].y;
+          }
+          finalPrediction[k] += currentTreeY;
+        }
+      }
+      return finalPrediction.map((y, i) => ({ x: i * 0.1, y: y / numTrees }));
+    }
+    function updateForestChart() {
+      const trees = parseInt(forestTreesSlider.value);
+      forestTreesValue.textContent = trees;
+      if (forestChart) forestChart.destroy();
+      forestChart = new Chart(forestChartCtx, {
+        data: {
+          datasets: [
+            baseMlDataset,
+            {
+              label: `Random Forest (${trees} árboles)`,
+              data: simulateRandomForest(mlDataset, trees),
+              type: "line",
+              borderColor: "#34d399",
+              tension: 0.2,
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: mlChartOptions,
+      });
+    }
+    forestTreesSlider.addEventListener("input", updateForestChart);
+
+    // --- Boosting ---
+    const boostingTreesSlider = document.getElementById(
+      "boostingTreesSlider"
+    );
+    const boostingTreesValue = document.getElementById("boostingTreesValue");
+    const learningRateSlider = document.getElementById("learningRateSlider");
+    const learningRateValue = document.getElementById("learningRateValue");
+    const boostingChartCtx = document
+      .getElementById("boostingChart")
+      .getContext("2d");
+    let boostingChart;
+    function simulateBoosting(data, numTrees, lr) {
+      const predictions = new Array(data.length).fill(
+        data.reduce((sum, p) => sum + p.y, 0) / data.length
+      );
+      let residuals = data.map((p, i) => p.y - predictions[i]);
+      for (let i = 0; i < numTrees; i++) {
+        const treeData = data.map((p, j) => ({ x: p.x, y: residuals[j] }));
+        const treePredPoints = simulateDecisionTree(treeData, 2);
+        let currentTreeY = 0;
+        let treeIdx = 0;
+        for (let j = 0; j < data.length; j++) {
+          const x = data[j].x;
+          if (
+            treeIdx < treePredPoints.length - 1 &&
+            x > treePredPoints[treeIdx + 1].x
+          ) {
+            treeIdx += 1;
+          }
+          if (treePredPoints[treeIdx]) {
+            currentTreeY = treePredPoints[treeIdx].y;
+          }
+          predictions[j] += lr * currentTreeY;
+          residuals[j] = data[j].y - predictions[j];
+        }
+      }
+      return data.map((p, i) => ({ x: p.x, y: predictions[i] }));
+    }
+    function updateBoostingChart() {
+      const trees = parseInt(boostingTreesSlider.value);
+      const lr = parseFloat(learningRateSlider.value);
+      boostingTreesValue.textContent = trees;
+      learningRateValue.textContent = lr;
+      if (boostingChart) boostingChart.destroy();
+      boostingChart = new Chart(boostingChartCtx, {
+        data: {
+          datasets: [
+            baseMlDataset,
+            {
+              label: `Gradient Boosting`,
+              data: simulateBoosting(mlDataset, trees, lr),
+              type: "line",
+              borderColor: "#60a5fa",
+              tension: 0.3,
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: mlChartOptions,
+      });
+    }
+    boostingTreesSlider.addEventListener("input", updateBoostingChart);
+    learningRateSlider.addEventListener("input", updateBoostingChart);
+
+    // --- Redes Neuronales ---
+    const layersSlider = document.getElementById("layersSlider");
+    const layersValue = document.getElementById("layersValue");
+    const neuronsSlider = document.getElementById("neuronsSlider");
+    const neuronsValue = document.getElementById("neuronsValue");
+    const neuralChartCtx = document
+      .getElementById("neuralChart")
+      .getContext("2d");
+    let neuralChart;
+    function simulateNeuralNetwork(x_values, layers, neurons) {
+      let y_values = new Array(x_values.length).fill(0);
+      for (let i = 0; i < layers; i++) {
+        for (let j = 0; j < neurons; j++) {
+          const freq = 0.5 + Math.random() * 2;
+          const phase = Math.random() * Math.PI * 2;
+          const amp = 6 / (i + 1) / neurons;
+          y_values = y_values.map(
+            (y, k) => y + Math.sin(x_values[k] * freq + phase) * amp
+          );
+        }
+      }
+      return y_values;
+    }
+    function updateNeuralChart() {
+      const layers = parseInt(layersSlider.value);
+      const neurons = parseInt(neuronsSlider.value);
+      layersValue.textContent = layers;
+      neuronsValue.textContent = neurons;
+      if (neuralChart) neuralChart.destroy();
+      const predictionData = simulateNeuralNetwork(
+        fullRange,
+        layers,
+        neurons
+      );
+      neuralChart = new Chart(neuralChartCtx, {
+        data: {
+          datasets: [
+            baseMlDataset,
+            {
+              label: `Red Neuronal`,
+              data: fullRange.map((x, i) => ({ x, y: predictionData[i] })),
+              type: "line",
+              borderColor: "#f472b6",
+              tension: 0.4,
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: mlChartOptions,
+      });
+    }
+    layersSlider.addEventListener("input", updateNeuralChart);
+    neuronsSlider.addEventListener("input", updateNeuralChart);
+
+    // --- GEMINI API LOGIC ---
+    const geminiModal = document.getElementById("gemini-modal");
+    const closeModalBtn = document.getElementById("close-modal-btn");
+    const geminiResponseEl = document.getElementById("gemini-response");
+    const geminiLoader = document.getElementById("gemini-loader");
+    const modalTitle = document.getElementById("modal-title");
+    const apiKeyInput = document.getElementById("gemini-api-key-input");
+    let currentModel = "";
+
+    document.querySelectorAll(".gemini-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        currentModel = e.target.dataset.model;
+        modalTitle.textContent = `Explicación de ${currentModel}`;
+        geminiResponseEl.innerHTML = "Seleccioná un estilo de explicación...";
+        geminiModal.classList.remove("hidden");
+      });
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+      geminiModal.classList.add("hidden");
+    });
+
+    document.querySelectorAll(".prompt-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const style = e.target.dataset.style;
+        await callGemini(currentModel, style);
+      });
+    });
+
+    async function callGemini(modelName, style) {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) {
+        geminiResponseEl.innerHTML =
+          '<span class="text-red-400">¡Che, campeón! Necesitás poner tu clave de API de Gemini para que esto funcione. Conseguila gratis en Google AI Studio.</span>';
+        apiKeyInput.focus();
+        apiKeyInput.classList.add("border-red-500");
+        return;
+      }
+      apiKeyInput.classList.remove("border-red-500", "border-2");
+
+      geminiLoader.classList.remove("hidden");
+      geminiResponseEl.innerHTML = "";
+
+      const prompts = {
+        simple: `Explica qué son y para qué sirven los modelos de ${modelName} como si se lo contaras a un amigo en un bar. Usa un lenguaje simple, directo y con tonada argentina.`,
+        analogy: `Explica los modelos de ${modelName} usando una analogía creativa y fácil de entender para alguien que no sabe nada de machine learning, con un toque de humor argentino.`,
+        business: `Explica cómo una empresa podría usar los modelos de ${modelName} para ganar plata o mejorar su negocio. Dame un caso de uso práctico y concreto, bien argento.`,
+      };
+
+      const userQuery = prompts[style];
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+      const systemInstruction = {
+        parts: [
+          {
+            text: "Respondé en español, con tonada argentina (estilo porteño), de forma clara y concisa. Mantené un tono amigable y cercano, como si estuvieras charlando con un amigo.",
+          },
+        ],
+      };
+
+      const payload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        systemInstruction: systemInstruction,
+      };
+
+      let retries = 3;
+      let delay = 1000;
+
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (response.status === 429 || response.status >= 500) {
+            if (i === retries - 1)
+              throw new Error(
+                `Error de API (${response.status}) después de ${retries} intentos. El servidor parece estar ocupado.`
+              );
+            await new Promise((res) => setTimeout(res, delay));
+            delay *= 2;
+            continue;
+          }
+
+          if (!response.ok) {
+            const errorBody = await response
+              .json()
+              .catch(() => response.text());
+            const errorMessage =
+              errorBody.error?.message ||
+              JSON.stringify(errorBody) ||
+              "Error desconocido";
+            throw new Error(
+              `Error de la API (${response.status}): ${errorMessage}`
+            );
+          }
+
+          const result = await response.json();
+          const candidate = result.candidates?.[0];
+
+          if (candidate && candidate.content?.parts?.[0]?.text) {
+            let text = candidate.content.parts[0].text;
+            text = text.replace(
+              /\*\*(.*?)\*\*/g,
+              '<strong class="text-orange-400">$1</strong>'
+            );
+            text = text.replace(/\*/g, "");
+            text = text.replace(/\n/g, "<br>");
+            geminiResponseEl.innerHTML = text;
+            geminiLoader.classList.add("hidden");
+            return;
+          } else {
+            if (candidate?.finishReason === "SAFETY") {
+              throw new Error(
+                "La respuesta fue bloqueada por motivos de seguridad. Probá con otra pregunta."
+              );
+            }
+            console.error("Respuesta inesperada de Gemini:", result);
+            throw new Error("La IA no devolvió una respuesta válida.");
+          }
+        } catch (error) {
+          if (i === retries - 1) {
+            console.error("Error final llamando a Gemini:", error);
+            let userMessage = "Hubo un problema al conectar con la IA. ";
+            if (
+              error.message.includes("API key") ||
+              error.message.includes("API_KEY")
+            ) {
+              userMessage +=
+                "Parece ser un problema con la clave de la API. ";
+            } else if (error.message.includes("Failed to fetch")) {
+              userMessage +=
+                "No se pudo conectar al servidor. Verificá tu conexión a internet. ";
+            } else if (
+              error.message.includes("bloqueada por motivos de seguridad")
+            ) {
+              userMessage = error.message;
+            }
+            userMessage += "Revisá la consola (F12) para más detalles.";
+            geminiResponseEl.innerHTML = `<span class="text-red-400">${userMessage}</span>`;
+            geminiLoader.classList.add("hidden");
+            return;
+          }
+          await new Promise((res) => setTimeout(res, delay));
+          delay *= 2;
+        }
+      }
+    }
+
+    // Carga inicial
+    window.addEventListener("load", () => {
+      updateRidgeChart();
+      updateLassoChart();
+      updateTreeChart();
+      updateForestChart();
+      updateBoostingChart();
+      updateNeuralChart();
+      if (window.MathJax) {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de Modelos Fundamentales</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+    }
+
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+    }
+
+    /* Gemini Modal Styles */
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #f97316;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-black text-gray-200">
+  <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span class="text-white font-bold text-xl">Predicciones<span class="text-orange-500">.AI</span></span>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            <a href="index.html#laboratorios"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+            <a href="index.html#nosotros"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+            <a href="index.html#contacto"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          <button type="button" id="mobile-menu-button"
+            class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+            aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Abrir menú</span>
+            <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="index.html#laboratorios"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+        <a href="index.html#nosotros"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+        <a href="index.html#contacto"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4 md:p-8">
+    <header class="text-center my-12">
+      <h1 class="text-4xl md:text-6xl font-black text-white">
+        Laboratorio de Modelos
+        <span class="text-orange-500">Fundamentales</span>
+      </h1>
+      <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+        Acá dejamos de mirar el gráfico y nos ponemos el traje de contador.
+        Jugá con los supuestos y descubrí cómo los profesionales intentan
+        calcular el "valor real" de una empresa.
+      </p>
+    </header>
+
+    <main class="space-y-16">
+      <!-- Sección 1: Flujo de Caja Descontado (DCF) -->
+      <section id="dcf">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            💰 1. Flujo de Caja Descontado (DCF)
+          </h2>
+          <button
+            class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+            data-model="Flujo de Caja Descontado (DCF)">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="card rounded-lg p-6">
+          <div class="grid lg:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                Adivinando la Guita del Futuro
+              </h3>
+              <p class="text-gray-400 mb-4"><b>Analogía:</b> Imaginate que querés comprar un árbol de manzanas. El DCF
+                es como calcular cuántas manzanas va a dar el árbol en los próximos años, venderlas y "descontar" esa
+                guita a hoy para saber cuánto pagar por el árbol. Si te da más de lo que te piden, es negocio.</p>
+              <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                <p class="font-mono text-center text-sm text-orange-400">`$$ \text{Valor} = \sum_{t=1}^{n}
+                  \frac{CF_t}{(1+r)^t} + \frac{\text{Valor Terminal}}{(1+r)^n} $$`</p>
+                <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                  <li><span class="font-bold text-white">CFt:</span> El "flujo de caja" (la guita que entra menos la que
+                    sale) en el año 't'. Se mueve con el <b>Crecimiento</b> y el <b>Margen</b>.</li>
+                  <li><span class="font-bold text-white">r:</span> La "tasa de descuento". Es el riesgo que asumís. A
+                    más riesgo, más descontás la guita del futuro.</li>
+                  <li><span class="font-bold text-white">Valor Terminal:</span> Una estimación de cuánto valdrá la
+                    empresa para siempre después de los primeros años.</li>
+                </ul>
+              </div>
+              <div class="space-y-4 mb-6">
+                <div>
+                  <label for="growthSlider" class="block font-medium">Crecimiento de Ingresos Anual (Afecta CFt):
+                    <span id="growthValue" class="font-bold text-orange-400">5</span>%</label>
+                  <input id="growthSlider" type="range" min="-5" max="20" value="5" step="1"
+                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                </div>
+                <div>
+                  <label for="marginSlider" class="block font-medium">Margen de Ganancia (Afecta CFt):
+                    <span id="marginValue" class="font-bold text-orange-400">15</span>%</label>
+                  <input id="marginSlider" type="range" min="5" max="40" value="15" step="1"
+                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                </div>
+                <div>
+                  <label for="discountSlider" class="block font-medium">Tasa de Descuento (r):
+                    <span id="discountValue" class="font-bold text-orange-400">8</span>%</label>
+                  <input id="discountSlider" type="range" min="5" max="15" value="8" step="0.5"
+                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                </div>
+              </div>
+
+              <div class="bg-gray-900 p-4 rounded-lg text-center">
+                <p class="text-lg">Precio Actual de la Acción:</p>
+                <p class="text-4xl font-black text-white">
+                  $<span id="dcfCurrentPrice">150.00</span>
+                </p>
+              </div>
+            </div>
+            <div>
+              <div class="bg-gray-900 p-4 rounded-lg text-center mb-6">
+                <p class="text-lg">Valor Intrínseco Calculado (DCF):</p>
+                <p class="text-4xl font-black text-white">
+                  $<span id="dcfIntrinsicValue">165.78</span>
+                </p>
+                <p id="dcfVerdict" class="mt-2 text-xl font-bold text-green-400">
+                  📉 Barata (Subvaluada)
+                </p>
+              </div>
+              <div class="chart-container" style="height: 300px">
+                <canvas id="dcfChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección 2: Ratios Financieros -->
+      <section id="ratios">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            ⚖️ 2. Ratios Financieros (Comparando Figuritas)
+          </h2>
+          <button
+            class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+            data-model="Ratios Financieros (P/E, P/B, Dividend Yield)">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="card rounded-lg p-6">
+          <h3 class="text-2xl font-bold text-orange-400 mb-2">
+            ¿Caro o Barato? La Clave es Comparar
+          </h3>
+          <p class="text-gray-400 mb-6">
+            <b>Analogía:</b> Un ratio es como una sola figurita. No te dice si es buena o mala hasta que la comparás con
+            el resto del mazo (el promedio del sector) o con otras que ya tenés (su historial).
+          </p>
+
+          <div class="space-y-4 mb-8">
+            <label for="priceSlider" class="block font-medium text-xl">Precio Simulado de la Acción: $<span
+                id="priceValue" class="font-bold text-orange-400">100.00</span></label>
+            <input id="priceSlider" type="range" min="50" max="300" value="100" step="1"
+              class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-8">
+            <!-- P/E Ratio -->
+            <div class="bg-gray-900 p-4 rounded-lg">
+              <h4 class="text-xl font-bold text-center mb-2">Ratio P/E</h4>
+              <p class="font-mono text-center text-xs text-orange-400 mb-2">`$$ \text{P/E} = \frac{\text{Precio por
+                Acción}}{\text{Ganancias por Acción}} $$`</p>
+              <p class="text-sm text-gray-400 text-center mb-4">
+                Mide cuántos años tardaría la empresa en ganar lo que vale hoy. Un P/E alto significa que el mercado
+                espera un crecimiento zarpado.
+              </p>
+              <div class="chart-container" style="height: 250px">
+                <canvas id="peChart"></canvas>
+              </div>
+              <p class="text-center mt-2 text-lg font-bold">
+                P/E Calculado:
+                <span id="peValue" class="text-orange-400">20.0</span>
+              </p>
+            </div>
+            <!-- P/B Ratio -->
+            <div class="bg-gray-900 p-4 rounded-lg">
+              <h4 class="text-xl font-bold text-center mb-2">Ratio P/B</h4>
+              <p class="font-mono text-center text-xs text-orange-400 mb-2">`$$ \text{P/B} = \frac{\text{Precio por
+                Acción}}{\text{Valor Contable por Acción}} $$`</p>
+              <p class="text-sm text-gray-400 text-center mb-4">
+                Compara el precio de mercado con el valor "contable" de la empresa. Un P/B bajo puede ser una señal de
+                que está barata.
+              </p>
+              <div class="chart-container" style="height: 250px">
+                <canvas id="pbChart"></canvas>
+              </div>
+              <p class="text-center mt-2 text-lg font-bold">
+                P/B Calculado:
+                <span id="pbValue" class="text-orange-400">2.0</span>
+              </p>
+            </div>
+            <!-- Dividend Yield -->
+            <div class="bg-gray-900 p-4 rounded-lg">
+              <h4 class="text-xl font-bold text-center mb-2">Dividend Yield</h4>
+              <p class="font-mono text-center text-xs text-orange-400 mb-2">`$$ \text{Yield} = \frac{\text{Dividendo
+                Anual por Acción}}{\text{Precio por Acción}} \cdot 100 $$`</p>
+              <p class="text-sm text-gray-400 text-center mb-4">
+                Mide cuánta guita te paga la empresa en dividendos cada año, en relación a su precio. Es clave para los
+                que invierten buscando una renta.
+              </p>
+              <div class="chart-container" style="height: 250px">
+                <canvas id="dyChart"></canvas>
+              </div>
+              <p class="text-center mt-2 text-lg font-bold">
+                Yield Calculado:
+                <span id="dyValue" class="text-orange-400">2.50</span>%
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="text-center mt-16 text-gray-500">
+      <p>
+        Hecho con 🧉 y ciencia de datos. Laboratorio de Modelos Fundamentales.
+      </p>
+    </footer>
+  </div>
+
+  <!-- Gemini Modal -->
+  <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10">
+              ✨
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                Explicación de Gemini
+              </h3>
+              <div class="mt-4 border-b border-gray-700 pb-4">
+                <label for="gemini-api-key-input" class="block text-sm font-medium text-gray-400">Tu Clave de API de
+                  Gemini</label>
+                <input type="password" id="gemini-api-key-input"
+                  class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  placeholder="Pegá tu clave acá..." />
+                <p class="mt-1 text-xs text-gray-500">
+                  Conseguí una clave gratis en
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                    class="text-orange-400 hover:underline">Google AI Studio</a>.
+                </p>
+              </div>
+              <p class="text-sm text-gray-400 my-4" id="modal-subtitle">
+                Pídele a la IA que te explique este modelo.
+              </p>
+
+              <div class="my-4 space-x-2">
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="simple">
+                  Explicación Simple
+                </button>
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="analogy">
+                  Analogía Creativa
+                </button>
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="business">
+                  Para Negocios
+                </button>
+              </div>
+
+              <div id="gemini-response-container"
+                class="mt-4 p-3 bg-black/50 rounded-md min-h-[150px] max-h-[300px] overflow-y-auto">
+                <div id="gemini-loader" class="hidden flex justify-center items-center h-full">
+                  <div class="loader"></div>
+                </div>
+                <p id="gemini-response" class="text-gray-300"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button id="close-modal-btn" type="button"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- NAVBAR ---
+      const mobileMenuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const hamburgerIcon = document.getElementById("hamburger-icon");
+      const closeIcon = document.getElementById("close-icon");
+
+      mobileMenuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+        hamburgerIcon.classList.toggle("hidden");
+        closeIcon.classList.toggle("hidden");
+      });
+
+      // --- 1. DCF ---
+      const growthSlider = document.getElementById("growthSlider");
+      const marginSlider = document.getElementById("marginSlider");
+      const discountSlider = document.getElementById("discountSlider");
+      const growthValue = document.getElementById("growthValue");
+      const marginValue = document.getElementById("marginValue");
+      const discountValue = document.getElementById("discountValue");
+      const dcfIntrinsicValue = document.getElementById("dcfIntrinsicValue");
+      const dcfVerdict = document.getElementById("dcfVerdict");
+      const dcfChartCtx = document.getElementById("dcfChart").getContext("2d");
+      let dcfChart;
+
+      const dcfCurrentPrice = 150.0;
+      document.getElementById("dcfCurrentPrice").textContent =
+        dcfCurrentPrice.toFixed(2);
+
+      function calculateDCF() {
+        const growthRate = parseFloat(growthSlider.value) / 100;
+        const cashFlowMargin = parseFloat(marginSlider.value) / 100;
+        const discountRate = parseFloat(discountSlider.value) / 100;
+
+        let initialRevenue = 1000; // Simulación base
+        let intrinsicValue = 0;
+        const years = 5;
+
+        let projectedRevenue = initialRevenue;
+        for (let i = 1; i <= years; i++) {
+          projectedRevenue *= 1 + growthRate;
+          const cashFlow = projectedRevenue * cashFlowMargin;
+          const discountedCashFlow = cashFlow / Math.pow(1 + discountRate, i);
+          intrinsicValue += discountedCashFlow;
+        }
+
+        const terminalGrowth = 0.025;
+        const lastCashFlow =
+          projectedRevenue * cashFlowMargin * (1 + terminalGrowth);
+        const terminalValue = lastCashFlow / (discountRate - terminalGrowth);
+        const discountedTerminalValue =
+          terminalValue / Math.pow(1 + discountRate, years);
+
+        intrinsicValue += discountedTerminalValue;
+
+        const sharesOutstanding = 50;
+        const valuePerShare = intrinsicValue / sharesOutstanding;
+
+        dcfIntrinsicValue.textContent = valuePerShare.toFixed(2);
+        growthValue.textContent = growthSlider.value;
+        marginValue.textContent = marginSlider.value;
+        discountValue.textContent = discountSlider.value;
+
+        if (valuePerShare > dcfCurrentPrice) {
+          dcfVerdict.textContent = "📉 Barata (Subvaluada)";
+          dcfVerdict.className = "mt-2 text-xl font-bold text-green-400";
+        } else {
+          dcfVerdict.textContent = "📈 Cara (Sobrevaluada)";
+          dcfVerdict.className = "mt-2 text-xl font-bold text-red-400";
+        }
+
+        updateDCFChart(valuePerShare);
+      }
+
+      function updateDCFChart(intrinsic) {
+        if (dcfChart) dcfChart.destroy();
+        dcfChart = new Chart(dcfChartCtx, {
+          type: "bar",
+          data: {
+            labels: ["Valor"],
+            datasets: [
+              {
+                label: "Precio Actual",
+                data: [dcfCurrentPrice],
+                backgroundColor: "#4b5563",
+                borderColor: "#6b7280",
+                borderWidth: 1,
+              },
+              {
+                label: "Valor Intrínseco (DCF)",
+                data: [intrinsic],
+                backgroundColor: "#f97316",
+                borderColor: "#fb923c",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            scales: {
+              x: {
+                title: { display: true, text: "Precio ($)", color: "#9ca3af" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: { grid: { display: false }, ticks: { display: false } },
+            },
+            plugins: { legend: { labels: { color: "#9ca3af" } } },
+          },
+        });
+      }
+
+      [growthSlider, marginSlider, discountSlider].forEach((s) =>
+        s.addEventListener("input", calculateDCF)
+      );
+
+      // --- 2. RATIOS ---
+      const priceSlider = document.getElementById("priceSlider");
+      const priceValue = document.getElementById("priceValue");
+      const peValue = document.getElementById("peValue");
+      const pbValue = document.getElementById("pbValue");
+      const dyValue = document.getElementById("dyValue");
+      const peChartCtx = document.getElementById("peChart").getContext("2d");
+      const pbChartCtx = document.getElementById("pbChart").getContext("2d");
+      const dyChartCtx = document.getElementById("dyChart").getContext("2d");
+      let peChart, pbChart, dyChart;
+
+      const earningsPerShare = 5.0;
+      const bookValuePerShare = 50.0;
+      const dividendPerShare = 2.5;
+
+      const industryPE = 25;
+      const industryPB = 2.5;
+      const industryDY = 2.0;
+
+      function createRatioChart(ctx, label, value, industryAverage) {
+        return new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: [label],
+            datasets: [
+              {
+                label: "Promedio del Sector",
+                data: [industryAverage],
+                backgroundColor: "#4b5563",
+              },
+              {
+                label: "Calculado",
+                data: [value],
+                backgroundColor: "#f97316",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { display: false },
+              y: {
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+            },
+            plugins: { legend: { display: false } },
+          },
+        });
+      }
+
+      function calculateRatios() {
+        const currentPrice = parseFloat(priceSlider.value);
+        priceValue.textContent = currentPrice.toFixed(2);
+
+        const pe = currentPrice / earningsPerShare;
+        const pb = currentPrice / bookValuePerShare;
+        const dy = (dividendPerShare / currentPrice) * 100;
+
+        peValue.textContent = pe.toFixed(1);
+        pbValue.textContent = pb.toFixed(1);
+        dyValue.textContent = dy.toFixed(2);
+
+        if (peChart) peChart.destroy();
+        peChart = createRatioChart(peChartCtx, "P/E Ratio", pe, industryPE);
+
+        if (pbChart) pbChart.destroy();
+        pbChart = createRatioChart(pbChartCtx, "P/B Ratio", pb, industryPB);
+
+        if (dyChart) dyChart.destroy();
+        dyChart = createRatioChart(
+          dyChartCtx,
+          "Dividend Yield (%)",
+          dy,
+          industryDY
+        );
+      }
+
+      priceSlider.addEventListener("input", calculateRatios);
+
+      // --- GEMINI API ---
+      const geminiModal = document.getElementById("gemini-modal");
+      const closeModalBtn = document.getElementById("close-modal-btn");
+      const geminiResponseEl = document.getElementById("gemini-response");
+      const geminiLoader = document.getElementById("gemini-loader");
+      const modalTitle = document.getElementById("modal-title");
+      const apiKeyInput = document.getElementById("gemini-api-key-input");
+      let currentModel = "";
+
+      document.querySelectorAll(".gemini-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          currentModel = e.target.dataset.model;
+          modalTitle.textContent = `Explicación de ${currentModel}`;
+          geminiResponseEl.innerHTML = "Seleccioná un estilo de explicación...";
+          geminiModal.classList.remove("hidden");
+        });
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        geminiModal.classList.add("hidden");
+      });
+
+      document.querySelectorAll(".prompt-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const style = e.target.dataset.style;
+          await callGemini(currentModel, style);
+        });
+      });
+
+      async function callGemini(modelName, style) {
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+          geminiResponseEl.innerHTML =
+            '<span class="text-red-400">¡Che, campeón! Necesitás poner tu clave de API de Gemini para que esto funcione. Conseguila gratis en Google AI Studio.</span>';
+          apiKeyInput.focus();
+          apiKeyInput.classList.add("border-red-500", "border-2");
+          return;
+        }
+        apiKeyInput.classList.remove("border-red-500", "border-2");
+
+        geminiLoader.classList.remove("hidden");
+        geminiResponseEl.innerHTML = "";
+
+        const prompts = {
+          simple: `Explica qué son y para qué sirven los modelos de ${modelName} como si se lo contaras a un amigo en un bar. Usa un lenguaje simple, directo y con tonada argentina.`,
+          analogy: `Explica los modelos de ${modelName} usando una analogía creativa y fácil de entender para alguien que no sabe nada de finanzas, con un toque de humor argentino.`,
+          business: `Explica cómo un inversor usaría los modelos de ${modelName} para decidir si comprar o no una acción. Dame un caso de uso práctico y concreto, bien argento.`,
+        };
+
+        const userQuery = prompts[style];
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        const payload = {
+          contents: [{ parts: [{ text: userQuery }] }],
+        };
+
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            const errorMessage = errorBody.error?.message || JSON.stringify(errorBody);
+            throw new Error(`Error de la API (${response.status}): ${errorMessage}`);
+          }
+
+          const result = await response.json();
+          const candidate = result.candidates?.[0];
+
+          if (candidate && candidate.content?.parts?.[0]?.text) {
+            let text = candidate.content.parts[0].text;
+            text = text.replace(
+              /\*\*(.*?)\*\*/g,
+              '<strong class="text-orange-400">$1</strong>'
+            );
+            text = text.replace(/\*/g, "");
+            text = text.replace(/\n/g, "<br>");
+            geminiResponseEl.innerHTML = text;
+          } else {
+            if (candidate?.finishReason === "SAFETY") {
+              geminiResponseEl.innerHTML = '<span class="text-yellow-400">La respuesta fue bloqueada por motivos de seguridad. Probá con otra pregunta.</span>';
+            } else {
+              console.error("Respuesta inesperada de Gemini:", result);
+              throw new Error("La IA no devolvió una respuesta válida.");
+            }
+          }
+        } catch (error) {
+          console.error("Error final llamando a Gemini:", error);
+          let userMessage = "Hubo un problema al conectar con la IA. ";
+          if (error.message.includes("API key") || error.message.includes("API_KEY")) {
+            userMessage += "Parece ser un problema con la clave de la API. ";
+          } else if (error.message.includes("Failed to fetch")) {
+            userMessage += "No se pudo conectar al servidor. Verificá tu conexión a internet. ";
+          }
+          userMessage += "Revisá la consola (F12) para más detalles.";
+          geminiResponseEl.innerHTML = `<span class="text-red-400">${userMessage}</span>`;
+        } finally {
+          geminiLoader.classList.add("hidden");
+        }
+      }
+
+      // --- INITIAL LOAD ---
+      window.addEventListener("load", () => {
+        calculateDCF();
+        calculateRatios();
+        if (window.MathJax) {
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+        }
+      });
+    </script>
+</body>
+
+</html>

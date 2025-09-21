@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Modelos No Supervisados y Secuenciales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+      .btn {
+        transition: all 0.2s;
+      }
+      .btn:hover {
+        transform: scale(1.05);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      .chart-container {
+        position: relative;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-gray-200">
+    <div class="container mx-auto p-4 md:p-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-6xl font-black text-white">
+          Laboratorio de Modelos
+          <span class="text-orange-500">No Supervisados y Secuenciales</span>
+        </h1>
+        <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+          Acá nos metemos con los bichos que piensan solos y los que tienen
+          memoria. Jugá con los parámetros y descubrí cómo encuentran patrones
+          ocultos o predicen el próximo paso.
+        </p>
+      </header>
+
+      <main class="space-y-16">
+        <!-- Sección 1: Modelos No Supervisados -->
+        <section id="no-supervisados">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            🕵️ 1. Modelos No Supervisados (Los Detectives)
+          </h2>
+          <div class="space-y-8">
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                Clustering (K-Means): El Organizador de Boliches 🕺💃
+              </h3>
+              <p class="text-gray-400 mb-6">
+                A este modelo le tirás un quilombo de gente en una pista y le
+                decís: "Che, armame 3 grupos". K-Means es el patovica que, sin
+                conocer a nadie, se las ingenia para armar los grupitos
+                (clusters) basándose en quién está cerca de quién. No sabe *qué*
+                son los grupos, solo que existen.
+              </p>
+              <div class="flex items-center space-x-4 mb-6">
+                <label for="clustersSlider" class="font-medium"
+                  >Cantidad de Grupos (K):
+                  <span id="clustersValue" class="font-bold text-orange-400"
+                    >3</span
+                  ></label
+                >
+                <input
+                  id="clustersSlider"
+                  type="range"
+                  min="2"
+                  max="8"
+                  value="3"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+                <button
+                  id="clusterBtn"
+                  class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                >
+                  Organizar Boliche
+                </button>
+              </div>
+              <div class="chart-container">
+                <canvas id="clusteringChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                Reducción de Dimensionalidad: El Resumidor de Chismes 📝
+              </h3>
+              <p class="text-gray-400 mb-6">
+                Estos modelos son como un periodista al que le contás un bardo
+                de 10 horas con 50 variables y te lo tiene que resumir en un
+                titular de 5 palabras sin perder la esencia. Son clave para
+                visualizar datos complejos.
+              </p>
+              <div class="grid lg:grid-cols-2 gap-8 mt-6">
+                <div>
+                  <h4 class="text-xl font-bold text-center mb-2">
+                    PCA (El Lógico)
+                  </h4>
+                  <p class="text-sm text-gray-400 text-center mb-4">
+                    PCA busca los ejes de "máxima acción". Es como si en un
+                    partido de fútbol, en vez de mirar a los 22 jugadores, te
+                    resumiera todo siguiendo solo la pelota y al referí.
+                  </p>
+                  <div class="chart-container">
+                    <canvas id="pcaChart"></canvas>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-xl font-bold text-center mb-2">
+                    t-SNE (El Sociólogo)
+                  </h4>
+                  <p class="text-sm text-gray-400 text-center mb-4">
+                    A t-SNE no le importa tanto la acción, sino mantener los
+                    "grupitos de amigos" juntos en el resumen. Es el mejor para
+                    visualizar clusters que en la vida real están todos
+                    mezclados.
+                  </p>
+                  <div class="chart-container">
+                    <canvas id="tsneChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sección 2: Modelos Secuenciales -->
+        <section id="secuenciales">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            🔮 2. Modelos Secuenciales (Los Adivinos con Memoria)
+          </h2>
+          <div class="grid lg:grid-cols-2 gap-8">
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                RNN (El de Memoria a Corto Plazo)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                Una Red Neuronal Recurrente es un bicho que tiene memoria.
+                Entiende que lo que pasó antes importa para adivinar lo que
+                viene. El problema es que es como Dory: se acuerda de lo que
+                pasó hace 5 minutos, pero se olvida del principio de la
+                película.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="rnnMemorySlider" class="block font-medium"
+                  >Complejidad de la Memoria:
+                  <span id="rnnMemoryValue" class="font-bold text-orange-400"
+                    >5</span
+                  ></label
+                >
+                <input
+                  id="rnnMemorySlider"
+                  type="range"
+                  min="1"
+                  max="10"
+                  value="5"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="rnnChart"></canvas>
+              </div>
+            </div>
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                LSTM (El de Memoria a Largo Plazo)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                La LSTM es una RNN con esteroides y un anotador. Tiene un
+                sistema de "compuertas" que le permite decidir qué información
+                vieja es importante y vale la pena guardar, y cuál es relleno y
+                se puede tirar. Por eso es un campeón para predecir series
+                largas y complejas.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="lstmMemorySlider" class="block font-medium"
+                  >Capacidad de Memoria a Largo Plazo:
+                  <span id="lstmMemoryValue" class="font-bold text-orange-400"
+                    >20</span
+                  ></label
+                >
+                <input
+                  id="lstmMemorySlider"
+                  type="range"
+                  min="5"
+                  max="50"
+                  value="20"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="lstmChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="text-center mt-16 text-gray-500">
+        <p>
+          Hecho con 🧉 y ciencia de datos. Laboratorio de Modelos No
+          Supervisados.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // --- CHART DEFAULTS ---
+      const chartOptions = (xlabel, ylabel) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: "linear",
+            position: "bottom",
+            title: { display: true, text: xlabel, color: "#9ca3af" },
+            grid: { color: "rgba(255,255,255,0.1)" },
+            ticks: { color: "#9ca3af" },
+          },
+          y: {
+            title: { display: true, text: ylabel, color: "#9ca3af" },
+            grid: { color: "rgba(255,255,255,0.1)" },
+            ticks: { color: "#9ca3af" },
+          },
+        },
+        plugins: { legend: { labels: { color: "#9ca3af" } } },
+      });
+
+      const colors = [
+        "#f97316",
+        "#34d399",
+        "#60a5fa",
+        "#f472b6",
+        "#fbbf24",
+        "#a78bfa",
+        "#ef4444",
+        "#22d3ee",
+      ];
+
+      // --- 1. CLUSTERING (K-MEANS) ---
+      const clustersSlider = document.getElementById("clustersSlider");
+      const clustersValue = document.getElementById("clustersValue");
+      const clusterBtn = document.getElementById("clusterBtn");
+      const clusteringChartCtx = document
+        .getElementById("clusteringChart")
+        .getContext("2d");
+      let clusteringChart;
+      let clusterData;
+
+      function generateClusterData(numPoints = 150, numClusters = 5) {
+        const data = [];
+        const centroids = Array.from({ length: numClusters }, () => ({
+          x: Math.random() * 10,
+          y: Math.random() * 10,
+        }));
+
+        for (let i = 0; i < numPoints; i++) {
+          const centroid = centroids[i % numClusters];
+          data.push({
+            x: centroid.x + (Math.random() - 0.5) * 3,
+            y: centroid.y + (Math.random() - 0.5) * 3,
+          });
+        }
+        return data;
+      }
+
+      function kMeans(data, k) {
+        // 1. Initialize centroids randomly
+        let centroids = data.slice(0, k).map((p) => ({ ...p }));
+        let assignments = [];
+        let changed = true;
+
+        for (let iter = 0; iter < 20 && changed; iter++) {
+          // Limit iterations
+          changed = false;
+          // 2. Assign points to the closest centroid
+          assignments = data.map((point) => {
+            let minDist = Infinity;
+            let bestCentroid = 0;
+            centroids.forEach((centroid, i) => {
+              const dist = Math.hypot(
+                point.x - centroid.x,
+                point.y - centroid.y
+              );
+              if (dist < minDist) {
+                minDist = dist;
+                bestCentroid = i;
+              }
+            });
+            return bestCentroid;
+          });
+
+          // 3. Recalculate centroids
+          const newCentroids = Array.from({ length: k }, () => ({
+            x: 0,
+            y: 0,
+            count: 0,
+          }));
+          data.forEach((point, i) => {
+            const assignment = assignments[i];
+            newCentroids[assignment].x += point.x;
+            newCentroids[assignment].y += point.y;
+            newCentroids[assignment].count++;
+          });
+
+          const updatedCentroids = newCentroids.map((c, i) => {
+            if (c.count === 0) return centroids[i]; // Keep old centroid if empty
+            return { x: c.x / c.count, y: c.y / c.count };
+          });
+
+          // Check if centroids moved
+          for (let i = 0; i < k; i++) {
+            if (
+              centroids[i].x !== updatedCentroids[i].x ||
+              centroids[i].y !== updatedCentroids[i].y
+            ) {
+              changed = true;
+              break;
+            }
+          }
+          centroids = updatedCentroids;
+        }
+        return assignments;
+      }
+
+      function drawClusteringChart(data, assignments = null) {
+        if (clusteringChart) clusteringChart.destroy();
+
+        const datasets = [];
+        if (assignments) {
+          const k = parseInt(clustersSlider.value);
+          for (let i = 0; i < k; i++) {
+            datasets.push({
+              label: `Grupo ${i + 1}`,
+              data: data.filter((_, idx) => assignments[idx] === i),
+              backgroundColor: colors[i % colors.length] + "80", // semi-transparent
+              type: "scatter",
+            });
+          }
+        } else {
+          datasets.push({
+            label: "Gente en el Boliche",
+            data: data,
+            backgroundColor: "rgba(255, 255, 255, 0.4)",
+            type: "scatter",
+          });
+        }
+
+        clusteringChart = new Chart(clusteringChartCtx, {
+          data: { datasets },
+          options: chartOptions("Eje X", "Eje Y"),
+        });
+      }
+
+      clusterBtn.addEventListener("click", () => {
+        const k = parseInt(clustersSlider.value);
+        const assignments = kMeans(clusterData, k);
+        drawClusteringChart(clusterData, assignments);
+      });
+
+      clustersSlider.addEventListener("input", (e) => {
+        clustersValue.textContent = e.target.value;
+        drawClusteringChart(clusterData); // Reset chart on slider change
+      });
+
+      // --- 2. DIMENSIONALITY REDUCTION ---
+      const pcaChartCtx = document.getElementById("pcaChart").getContext("2d");
+      const tsneChartCtx = document
+        .getElementById("tsneChart")
+        .getContext("2d");
+      let pcaChart, tsneChart;
+
+      function generatePCADataset() {
+        const data = [];
+        for (let i = 0; i < 100; i++) {
+          const r1 = Math.random() * 10 - 5;
+          const r2 = (Math.random() - 0.5) * 2;
+          // Create correlated data along a rotated axis
+          const x = 0.866 * r1 - 0.5 * r2;
+          const y = 0.5 * r1 + 0.866 * r2;
+          data.push({ x: x + 5, y: y + 5 });
+        }
+        return data;
+      }
+
+      function generateTSNEDataset() {
+        return generateClusterData(150, 3); // Use the same generator as clustering
+      }
+
+      function simulateTSNE(data) {
+        // This is a simulation of the result, not the actual algorithm
+        const assignments = kMeans(data, 3); // Find clusters first
+        const separatedCentroids = [
+          { x: 2, y: 8 },
+          { x: 8, y: 2 },
+          { x: 2, y: 2 },
+        ];
+
+        return data.map((point, i) => {
+          const clusterId = assignments[i];
+          const centroid = separatedCentroids[clusterId];
+          return {
+            x: centroid.x + (Math.random() - 0.5) * 2,
+            y: centroid.y + (Math.random() - 0.5) * 2,
+          };
+        });
+      }
+
+      function drawPCATsneCharts() {
+        const pcaData = generatePCADataset();
+        const tsneData = generateTSNEDataset();
+        const tsneResult = simulateTSNE(tsneData);
+
+        // PCA Chart
+        if (pcaChart) pcaChart.destroy();
+        pcaChart = new Chart(pcaChartCtx, {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: "Datos Originales",
+                data: pcaData,
+                backgroundColor: "rgba(255, 255, 255, 0.4)",
+              },
+              {
+                label: "Componente Principal 1",
+                data: [
+                  { x: 0, y: 2.5 },
+                  { x: 10, y: 7.5 },
+                ],
+                type: "line",
+                borderColor: colors[0],
+                borderWidth: 3,
+                pointRadius: 0,
+              },
+              {
+                label: "Componente Principal 2",
+                data: [
+                  { x: 3, y: 8 },
+                  { x: 7, y: 2 },
+                ],
+                type: "line",
+                borderColor: colors[1],
+                borderWidth: 2,
+                pointRadius: 0,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: chartOptions("Variable 1", "Variable 2"),
+        });
+
+        // t-SNE Chart
+        if (tsneChart) tsneChart.destroy();
+        const assignments = kMeans(tsneData, 3);
+        tsneChart = new Chart(tsneChartCtx, {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: "Grupo 1",
+                data: tsneResult.filter((_, i) => assignments[i] === 0),
+                backgroundColor: colors[0],
+              },
+              {
+                label: "Grupo 2",
+                data: tsneResult.filter((_, i) => assignments[i] === 1),
+                backgroundColor: colors[1],
+              },
+              {
+                label: "Grupo 3",
+                data: tsneResult.filter((_, i) => assignments[i] === 2),
+                backgroundColor: colors[2],
+              },
+            ],
+          },
+          options: chartOptions("Dimensión Reducida 1", "Dimensión Reducida 2"),
+        });
+      }
+
+      // --- 3. SEQUENTIAL MODELS ---
+      const rnnMemorySlider = document.getElementById("rnnMemorySlider");
+      const rnnMemoryValue = document.getElementById("rnnMemoryValue");
+      const lstmMemorySlider = document.getElementById("lstmMemorySlider");
+      const lstmMemoryValue = document.getElementById("lstmMemoryValue");
+      const rnnChartCtx = document.getElementById("rnnChart").getContext("2d");
+      const lstmChartCtx = document
+        .getElementById("lstmChart")
+        .getContext("2d");
+      let rnnChart, lstmChart;
+
+      function generateSequence(len = 100) {
+        const data = [];
+        for (let i = 0; i < len; i++) {
+          // A complex wave
+          data.push(Math.sin(i * 0.2) + Math.sin(i * 0.5) * 0.5);
+        }
+        return data;
+      }
+      const sequenceData = generateSequence();
+      const sequenceLabels = Array.from({ length: 100 }, (_, i) => i + 1);
+
+      function simulateRNN(data, memory) {
+        const prediction = [];
+        for (let i = 0; i < data.length; i++) {
+          if (i < memory) {
+            prediction.push(null);
+            continue;
+          }
+          // Simple prediction based on the average of last 'memory' points
+          const lookback = data.slice(i - memory, i);
+          const avg = lookback.reduce((a, b) => a + b, 0) / memory;
+          // RNNs tend to drift
+          const drift = (i / data.length - 0.5) * 0.2;
+          prediction.push(avg + drift);
+        }
+        return prediction;
+      }
+
+      function simulateLSTM(data, memory) {
+        const prediction = [];
+        for (let i = 0; i < data.length; i++) {
+          if (i < memory) {
+            prediction.push(null);
+            continue;
+          }
+          // LSTMs are better at capturing patterns
+          const lookback_short = data.slice(i - 5, i);
+          const trend_short = (lookback_short[4] - lookback_short[0]) / 5;
+
+          const lookback_long = data.slice(i - memory, i);
+          const trend_long =
+            (lookback_long[memory - 1] - lookback_long[0]) / memory;
+
+          prediction.push(data[i - 1] + (trend_short * 0.7 + trend_long * 0.3));
+        }
+        return prediction;
+      }
+
+      function updateRNNChart() {
+        const memory = parseInt(rnnMemorySlider.value);
+        rnnMemoryValue.textContent = memory;
+        if (rnnChart) rnnChart.destroy();
+
+        const predictionData = simulateRNN(sequenceData, memory);
+
+        rnnChart = new Chart(rnnChartCtx, {
+          type: "line",
+          data: {
+            labels: sequenceLabels.slice(0, 70),
+            datasets: [
+              {
+                label: "Serie Real",
+                data: sequenceData.slice(0, 70),
+                borderColor: "rgba(255,255,255,0.4)",
+                tension: 0.1,
+                pointRadius: 0,
+              },
+              {
+                label: "Predicción RNN",
+                data: predictionData.slice(0, 70),
+                borderColor: colors[0],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.1,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Valor"),
+        });
+      }
+
+      function updateLSTMChart() {
+        const memory = parseInt(lstmMemorySlider.value);
+        lstmMemoryValue.textContent = memory;
+        if (lstmChart) lstmChart.destroy();
+
+        const predictionData = simulateLSTM(sequenceData, memory);
+
+        lstmChart = new Chart(lstmChartCtx, {
+          type: "line",
+          data: {
+            labels: sequenceLabels.slice(0, 70),
+            datasets: [
+              {
+                label: "Serie Real",
+                data: sequenceData.slice(0, 70),
+                borderColor: "rgba(255,255,255,0.4)",
+                tension: 0.1,
+                pointRadius: 0,
+              },
+              {
+                label: "Predicción LSTM",
+                data: predictionData.slice(0, 70),
+                borderColor: colors[1],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.1,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Valor"),
+        });
+      }
+
+      rnnMemorySlider.addEventListener("input", updateRNNChart);
+      lstmMemorySlider.addEventListener("input", updateLSTMChart);
+
+      // --- INITIAL LOAD ---
+      window.addEventListener("load", () => {
+        clusterData = generateClusterData();
+        drawClusteringChart(clusterData);
+        clustersValue.textContent = clustersSlider.value;
+
+        drawPCATsneCharts();
+
+        updateRNNChart();
+        updateLSTMChart();
+      });
+    </script>
+  </body>
+</html>

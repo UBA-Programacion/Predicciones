@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Modelo Stock-to-Flow (S2F)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+      }
+      .chart-container {
+        position: relative;
+        height: 500px;
+      }
+      .asset-btn {
+        transition: all 0.2s;
+      }
+      .asset-btn.active {
+        background-color: #f97316;
+        color: white;
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(249, 115, 22, 0.5);
+      }
+    </style>
+  </head>
+  <body class="bg-black text-gray-200">
+    <div class="container mx-auto p-4 md:p-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-6xl font-black text-white">
+          Laboratorio del Modelo
+          <span class="text-orange-500">Stock-to-Flow (S2F)</span>
+        </h1>
+        <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+          Acá nos metemos con el modelo más polémico de todos. Analizamos la
+          escasez de distintos activos para intentar predecir su valor futuro.
+        </p>
+      </header>
+
+      <main class="space-y-16">
+        <section id="s2f">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            💎 Elige tu Activo Escaso
+          </h2>
+
+          <div class="flex justify-center gap-4 mb-8">
+            <button
+              id="btn-btc"
+              class="asset-btn active bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-3 px-6 rounded-lg"
+            >
+              🪙 Bitcoin
+            </button>
+            <button
+              id="btn-gold"
+              class="asset-btn bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-3 px-6 rounded-lg"
+            >
+              ⚜️ Oro
+            </button>
+            <button
+              id="btn-silver"
+              class="asset-btn bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-3 px-6 rounded-lg"
+            >
+              💿 Plata
+            </button>
+          </div>
+
+          <div class="card rounded-lg p-6">
+            <div class="grid lg:grid-cols-3 gap-8">
+              <div class="lg:col-span-1">
+                <h3
+                  id="assetTitle"
+                  class="text-2xl font-bold text-orange-400 mb-2"
+                >
+                  ¿Qué es el Stock-to-Flow?
+                </h3>
+                <p class="text-gray-400 mb-4">
+                  Es una forma de medir la abundancia (o escasez) de un recurso.
+                  La idea es simple:
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-gray-300">
+                  <li>
+                    <strong>Stock:</strong> Es la cantidad total que ya existe
+                    del recurso (el oro ya extraído, los bitcoins en
+                    circulación).
+                  </li>
+                  <li>
+                    <strong>Flow:</strong> Es la cantidad nueva que se produce
+                    cada año (el oro nuevo que se saca de las minas, los
+                    bitcoins nuevos que se minan).
+                  </li>
+                </ul>
+                <p class="text-gray-400 mt-4">
+                  El ratio **S2F = Stock / Flow** te dice cuántos años se
+                  tardaría en producir el stock actual. Un S2F alto significa
+                  que el activo es muy escaso.
+                </p>
+                <div class="bg-gray-900 p-4 rounded-lg mt-6">
+                  <p class="text-center text-lg">
+                    Ratio S2F Simulado (<span id="assetName">Bitcoin</span>)
+                  </p>
+                  <p
+                    id="s2fRatio"
+                    class="text-center text-5xl font-black text-white"
+                  >
+                    58
+                  </p>
+                  <p class="text-center text-gray-400">
+                    (Años para producir el stock actual)
+                  </p>
+                </div>
+              </div>
+              <div class="lg:col-span-2">
+                <h3 class="text-2xl font-bold text-orange-400 mb-2 text-center">
+                  La Predicción del S2F
+                </h3>
+                <p id="assetDescription" class="text-gray-400 mb-6 text-center">
+                  Para Bitcoin, la escasez está programada en su código a través
+                  de los **halvings** (eventos que cortan la producción a la
+                  mitad cada 4 años). Esto crea una "escalera" de predicción de
+                  precios.
+                </p>
+                <div class="chart-container">
+                  <canvas id="s2fChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="text-center mt-16 text-gray-500">
+        <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Modelos Cripto.</p>
+      </footer>
+    </div>
+
+    <script>
+      const s2fChartCtx = document.getElementById("s2fChart").getContext("2d");
+      const s2fRatioEl = document.getElementById("s2fRatio");
+      const assetNameEl = document.getElementById("assetName");
+      const assetDescriptionEl = document.getElementById("assetDescription");
+
+      const btnBtc = document.getElementById("btn-btc");
+      const btnGold = document.getElementById("btn-gold");
+      const btnSilver = document.getElementById("btn-silver");
+
+      let s2fChart;
+      let currentAsset = "btc";
+
+      const assetInfo = {
+        btc: {
+          name: "Bitcoin",
+          description:
+            'Para Bitcoin, la escasez está programada en su código a través de los **halvings** (eventos que cortan la producción a la mitad cada 4 años). Esto crea una "escalera" de predicción de precios.',
+        },
+        gold: {
+          name: "Oro",
+          description:
+            "El oro ha sido reserva de valor por milenios. Su S2F es altísimo y muy estable, ya que la producción anual es diminuta comparada con todo el oro que ya se extrajo en la historia de la humanidad.",
+        },
+        silver: {
+          name: "Plata",
+          description:
+            'La plata es un metal precioso, pero también industrial. Su S2F es alto, pero menor que el del oro, ya que gran parte se consume y no se guarda como reserva de valor, lo que aumenta el "flow" relativo.',
+        },
+      };
+
+      function generateS2FData(asset = "btc") {
+        const data = [];
+        const startDate = new Date("2010-01-01");
+        const days = 16 * 365; // 16 years
+
+        if (asset === "btc") {
+          let stock = 2_500_000;
+          let blockReward = 50;
+          let blocksPerDay = 144;
+          const halvings = {
+            [3 * 365]: 25,
+            [7 * 365]: 12.5,
+            [11 * 365]: 6.25,
+            [15 * 365]: 3.125,
+          };
+
+          for (let i = 0; i < days; i++) {
+            if (halvings[i]) blockReward = halvings[i];
+
+            const flow = blockReward * blocksPerDay * 365;
+            stock += blockReward * blocksPerDay;
+            const sf = stock / flow;
+            const modelPrice = 0.4 * Math.pow(sf, 3.3); // Adjusted formula
+
+            data.push({ sf, modelPrice });
+          }
+        } else {
+          // Gold and Silver
+          const baseSf = asset === "gold" ? 62 : 22;
+          for (let i = 0; i < days; i++) {
+            const sf = baseSf + Math.sin(i / 365) * (baseSf * 0.02); // Slight yearly variation
+            const modelPrice = 0.4 * Math.pow(sf, 3.3);
+            data.push({ sf, modelPrice });
+          }
+        }
+        return data;
+      }
+
+      function generateSimulatedPrice(s2fData, asset = "btc") {
+        let price = 1;
+
+        if (asset === "btc") {
+          return s2fData.map((d, i) => {
+            const cyclePosition = (i % (365 * 4)) / (365 * 4);
+            const bubbleFactor =
+              1 +
+              Math.sin(cyclePosition * Math.PI) *
+                4 *
+                Math.log10(d.modelPrice + 1);
+            const targetPrice = d.modelPrice * bubbleFactor;
+            const pull = (targetPrice - price) * 0.03;
+            price += pull + (Math.random() - 0.5) * (price * 0.05 * 1.2);
+            return Math.max(0.1, price);
+          });
+        } else {
+          // Gold and Silver
+          let volatility = asset === "gold" ? 0.015 : 0.025;
+          return s2fData.map((d) => {
+            const targetPrice = d.modelPrice;
+            const pull = (targetPrice - price) * 0.02;
+            price += pull + (Math.random() - 0.5) * (price * volatility);
+            return Math.max(1, price);
+          });
+        }
+      }
+
+      function drawS2FChart(asset) {
+        currentAsset = asset;
+
+        // Update UI text
+        assetNameEl.textContent = assetInfo[asset].name;
+        assetDescriptionEl.textContent = assetInfo[asset].description;
+
+        // Update active button
+        [btnBtc, btnGold, btnSilver].forEach((btn) =>
+          btn.classList.remove("active")
+        );
+        document.getElementById(`btn-${asset}`).classList.add("active");
+
+        const s2fData = generateS2FData(asset);
+        const simulatedPrice = generateSimulatedPrice(s2fData, asset);
+
+        const labels = s2fData.map((_, i) => {
+          const date = new Date("2010-01-01");
+          date.setDate(date.getDate() + i);
+          return date;
+        });
+
+        s2fRatioEl.textContent = s2fData[s2fData.length - 1].sf.toFixed(0);
+
+        if (s2fChart) s2fChart.destroy();
+
+        s2fChart = new Chart(s2fChartCtx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: `Precio Simulado de ${assetInfo[asset].name}`,
+                data: simulatedPrice,
+                borderColor: "rgba(255, 255, 255, 0.8)",
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.2,
+              },
+              {
+                label: "Predicción del Modelo S2F",
+                data: s2fData.map((d) => d.modelPrice),
+                borderColor: "#f97316",
+                borderWidth: 4,
+                pointRadius: 0,
+                stepped: asset === "btc" ? "before" : false,
+                tension: asset !== "btc" ? 0.4 : 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                type: "time",
+                time: { unit: "year" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: {
+                type: "logarithmic",
+                title: {
+                  display: true,
+                  text: "Precio (USD) - Escala Logarítmica",
+                  color: "#9ca3af",
+                },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: {
+                  color: "#9ca3af",
+                  callback: function (value, index, values) {
+                    if (value >= 1000000) return `${value / 1000000}M`;
+                    if (value >= 1000) return `${value / 1000}K`;
+                    return value;
+                  },
+                },
+              },
+            },
+            plugins: {
+              legend: { labels: { color: "#9ca3af" } },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.parsed.y !== null) {
+                      label += new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(context.parsed.y);
+                    }
+                    return label;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      btnBtc.addEventListener("click", () => drawS2FChart("btc"));
+      btnGold.addEventListener("click", () => drawS2FChart("gold"));
+      btnSilver.addEventListener("click", () => drawS2FChart("silver"));
+
+      window.addEventListener("load", () => {
+        drawS2FChart("btc");
+      });
+    </script>
+  </body>
+</html>

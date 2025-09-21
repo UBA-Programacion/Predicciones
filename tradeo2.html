@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Indicadores Técnicos Avanzados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn {
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #f97316;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-black text-gray-200">
+
+    <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-white font-bold text-xl">Predicciones<span
+                                class="text-orange-500">.AI</span></span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html#laboratorios"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+                        <a href="index.html#nosotros"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+                        <a href="index.html#contacto"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button"
+                        class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+                        aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú</span>
+                        <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html#laboratorios"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+                <a href="index.html#nosotros"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+                <a href="index.html#contacto"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center my-12">
+            <h1 class="text-4xl md:text-6xl font-black text-white">Laboratorio de <span
+                    class="text-orange-500">Indicadores Técnicos Avanzados</span></h1>
+            <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Acá nos metemos en la timba financiera con las herramientas
+                de los ninjas. Jugá con las perillas y descubrí los secretos del volumen, el momentum y hasta la
+                matemática divina de Fibonacci. Ponete la camisa floreada y vamos a escolacear en el mercado</p>
+        </header>
+
+        <main class="space-y-16">
+
+            <section id="estocastico">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+                        🏎️ 5. Oscilador Estocástico
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Oscilador Estocástico">✨ Explicámelo, Gemini</button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-4"><b>Analogía:</b> Es como el velocímetro de un auto. No te dice si vas
+                        rápido o despacio (el precio), sino si estás acelerando o frenando (el 'momentum'). Si el
+                        velocímetro está en la zona roja (arriba de 80), es que venís a los pedos y quizás tengas que
+                        bajar un cambio. Si está casi en cero (abajo de 20), es que estás frenado y es buen momento para
+                        acelerar.</p>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-gray-900 p-4 rounded-lg flex flex-col justify-center">
+                            <p class="font-mono text-center text-lg text-orange-400">`$$ \%K = \frac{C - L_n}{H_n - L_n}
+                                \cdot 100 $$`</p>
+                            <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                                <li><span class="font-bold text-white">C (Cierre):</span> El precio actual.</li>
+                                <li><span class="font-bold text-white">Lₙ (Low):</span> El precio más bajo de los
+                                    últimos 'n' días.</li>
+                                <li><span class="font-bold text-white">Hₙ (High):</span> El precio más alto de los
+                                    últimos 'n' días.</li>
+                                <li><span class="font-bold text-white">n (Período %K):</span> La variable que ajustás.
+                                    Define cuántos días mirás para atrás para calcular el rango de precios (el máximo y
+                                    mínimo).</li>
+                                <li><span class="font-bold text-white">Suavizado %D:</span> Otra variable que ajustás.
+                                    Es un promedio de la línea %K para que no sea tan errática y dé señales más claras.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block font-medium">Período %K (n): <span id="stochKValue"
+                                    class="font-bold text-orange-400">14</span></label>
+                            <input id="stochKSlider" type="range" min="5" max="30" value="14"
+                                class="w-full h-2 bg-gray-700 rounded-lg">
+                            <label class="block font-medium">Suavizado %D: <span id="stochDValue"
+                                    class="font-bold text-orange-400">3</span></label>
+                            <input id="stochDSlider" type="range" min="1" max="10" value="3"
+                                class="w-full h-2 bg-gray-700 rounded-lg">
+                        </div>
+                    </div>
+                    <div class="chart-container mt-8"><canvas id="priceForStochChart"></canvas></div>
+                    <div class="chart-container mt-4" style="height: 200px;"><canvas id="stochChart"></canvas></div>
+                </div>
+            </section>
+
+            <section id="obv">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+                        💸 6. On-Balance Volume (OBV)
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="On-Balance Volume (OBV)">✨ Explicámelo, Gemini</button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-4"><b>Analogía:</b> El OBV es como un detective que sigue la guita de los
+                        "peces gordos". No le importa el discurso (el precio), sino dónde están poniendo la plata (el
+                        volumen). Si el precio baja pero el OBV sube, es como si un millonario dijera que "el país se va
+                        al tacho" mientras compra empresas por dos mangos. Te está mintiendo.</p>
+                    <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                        <p class="font-mono text-center text-lg text-orange-400">`Si C > C_{ayer} \implies OBV =
+                            OBV_{ayer} + Vol`</p>
+                        <p class="font-mono text-center text-lg text-orange-400">`Si C < C_{ayer} \implies
+                                OBV=OBV_{ayer} - Vol`</p>
+                                <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                                    <li><span class="font-bold text-white">C (Cierre):</span> El precio al final del
+                                        día.</li>
+                                    <li><span class="font-bold text-white">Vol (Volumen):</span> Cuánta guita se movió
+                                        ese día.</li>
+                                    <li><span class="font-bold text-white">Variables:</span> Este indicador no tiene
+                                        variables para ajustar. Simplemente acumula o resta el volumen total de cada
+                                        día.</li>
+                                </ul>
+                    </div>
+                    <div class="chart-container mt-8"><canvas id="priceForObvChart"></canvas></div>
+                    <div class="chart-container mt-4" style="height: 200px;"><canvas id="obvChart"></canvas></div>
+                </div>
+            </section>
+
+            <section id="ichimoku">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+                        ☁️ 7. Nube de Ichimoku
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Nube de Ichimoku">✨ Explicámelo, Gemini</button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-4"><b>Analogía:</b> Ichimoku es como el pronóstico extendido del tiempo
+                        para el mercado. La "Nube" te dice el clima general: si el precio está arriba de la nube, hay
+                        sol y es tendencia alcista. Si está abajo, hay tormenta y es bajista. Las otras líneas son como
+                        el pronóstico a corto plazo, te dicen si mañana llueve o sale el sol.</p>
+                    <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                        <p class="font-mono text-center text-sm text-orange-400">Es un sistema de 5 líneas con cálculos
+                            basados en máximos y mínimos de distintos períodos.</p>
+                        <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                            <li><span class="font-bold text-white">Tenkan-sen (Línea Rápida):</span> Promedio de max/min
+                                de 9 períodos.</li>
+                            <li><span class="font-bold text-white">Kijun-sen (Línea Lenta):</span> Promedio de max/min
+                                de 26 períodos.</li>
+                            <li><span class="font-bold text-white">Senkou Span A y B (La Nube):</span> Promedios de las
+                                líneas anteriores, pero desplazados hacia el futuro.</li>
+                            <li><span class="font-bold text-white">Chikou Span (El Eco):</span> El precio actual, pero
+                                dibujado 26 días para atrás.</li>
+                            <li><span class="font-bold text-white">Variables:</span> Los períodos (9, 26, 52) son los
+                                estándares, aunque se pueden cambiar. En esta simulación no son ajustables.</li>
+                        </ul>
+                    </div>
+                    <div class="chart-container mt-8"><canvas id="ichimokuChart"></canvas></div>
+                </div>
+            </section>
+
+            <section id="fibonacci">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+                        🌀 8. Retrocesos de Fibonacci
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Retrocesos de Fibonacci">✨ Explicámelo, Gemini</button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-4"><b>Analogía:</b> Es como tirar una piedra para arriba. Sabés que en
+                        algún momento va a frenar y empezar a caer. Fibonacci te marca los "pisos" probables donde la
+                        piedra podría rebotar antes de seguir subiendo (o bajando, si la tiraste para abajo). Esos
+                        niveles (23.6%, 38.2%, 61.8%) son como camas elásticas para el precio.</p>
+                    <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                        <p class="font-mono text-center text-sm text-orange-400">No es una fórmula, sino una herramienta
+                            de dibujo que aplica ratios matemáticos a una tendencia.</p>
+                        <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                            <li><span class="font-bold text-white">Variables Clave:</span> El punto de inicio (mínimo) y
+                                el punto final (máximo) de una tendencia clara que vos elegís. La herramienta calcula
+                                automáticamente los niveles de retroceso.</li>
+                        </ul>
+                    </div>
+                    <div class="text-center mb-6">
+                        <button id="fiboBtn"
+                            class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">Generar
+                            Nueva Tendencia y Trazar Fibonacci</button>
+                    </div>
+                    <div class="chart-container mt-8"><canvas id="fibonacciChart"></canvas></div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-16 text-gray-500">
+            <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Predicciones.</p>
+        </footer>
+    </div>
+
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+                <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10">
+                            ✨
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Explicación de Gemini
+                            </h3>
+                            <div class="mt-4 border-b border-gray-700 pb-4">
+                                <label for="gemini-api-key-input" class="block text-sm font-medium text-gray-400">Tu
+                                    Clave de API de Gemini</label>
+                                <input type="password" id="gemini-api-key-input"
+                                    class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                                    placeholder="Pegá tu clave acá...">
+                                <p class="mt-1 text-xs text-gray-500">Conseguí una clave gratis en <a
+                                        href="https://aistudio.google.com/app/apikey" target="_blank"
+                                        class="text-orange-400 hover:underline">Google AI Studio</a>.</p>
+                            </div>
+                            <p class="text-sm text-gray-400 my-4" id="modal-subtitle">Pídele a la IA que te explique
+                                este modelo.</p>
+
+                            <div class="my-4 space-x-2">
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="simple">Explicación Simple</button>
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="analogy">Analogía Creativa</button>
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="business">Para Negocios</button>
+                            </div>
+
+                            <div id="gemini-response-container"
+                                class="mt-4 p-3 bg-black/50 rounded-md min-h-[150px] max-h-[300px] overflow-y-auto">
+                                <div id="gemini-loader" class="hidden flex justify-center items-center h-full">
+                                    <div class="loader"></div>
+                                </div>
+                                <p id="gemini-response" class="text-gray-300"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button id="close-modal-btn" type="button"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NAVBAR, DATA & DEFAULTS ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const hamburgerIcon = document.getElementById('hamburger-icon');
+        const closeIcon = document.getElementById('close-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            hamburgerIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        });
+
+        const CHART_POINTS = 100;
+        const priceLabels = Array.from({ length: CHART_POINTS }, (_, i) => `Día ${i + 1}`);
+        let priceData;
+
+        const chartDefaultsNoLegend = { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#9ca3af' }, grid: { color: "rgba(255,255,255,0.1)" } }, x: { ticks: { color: '#9ca3af' }, grid: { color: "rgba(255,255,255,0.1)" } } }, plugins: { legend: { display: false } } };
+        const chartDefaultsLegend = { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#9ca3af' }, grid: { color: "rgba(255,255,255,0.1)" } }, x: { ticks: { color: '#9ca3af' }, grid: { color: "rgba(255,255,255,0.1)" } } }, plugins: { legend: { labels: { color: '#9ca3af' } } } };
+
+        function generatePriceData() {
+            const data = []; let price = 100;
+            for (let i = 0; i < CHART_POINTS; i++) { price += (Math.random() - 0.49) * 5; price = Math.max(price, 50); data.push(price); }
+            return data;
+        }
+
+        function calculateSMA(data, period) { let sma = []; for (let i = period - 1; i < data.length; i++) { let sum = 0; for (let j = 0; j < period; j++) { sum += data[i - j]; } sma.push(sum / period); } return Array(period - 1).fill(null).concat(sma); }
+
+
+        // --- OSCILADOR ESTOCÁSTICO ---
+        const stochKSlider = document.getElementById('stochKSlider'); const stochDSlider = document.getElementById('stochDSlider'); const stochKValue = document.getElementById('stochKValue'); const stochDValue = document.getElementById('stochDValue'); const priceForStochChartCtx = document.getElementById('priceForStochChart').getContext('2d'); const stochChartCtx = document.getElementById('stochChart').getContext('2d');
+        let stochChart, priceForStochChart;
+        function calculateStochastic(data, periodK, periodD) { let K = []; for (let i = periodK - 1; i < data.length; i++) { const slice = data.slice(i - periodK + 1, i + 1); const L = Math.min(...slice); const H = Math.max(...slice); const C = data[i]; K.push(((C - L) / (H - L)) * 100); } K = Array(periodK - 1).fill(null).concat(K); const D = calculateSMA(K.filter(v => v !== null), periodD); return { K, D: Array(K.length - D.length).fill(null).concat(D) }; }
+        function updateStochasticChart() { stochKValue.textContent = stochKSlider.value; stochDValue.textContent = stochDSlider.value; if (stochChart) stochChart.destroy(); if (priceForStochChart) priceForStochChart.destroy(); const stochData = calculateStochastic(priceData, parseInt(stochKSlider.value), parseInt(stochDSlider.value)); priceForStochChart = new Chart(priceForStochChartCtx, { type: 'line', data: { labels: priceLabels, datasets: [{ label: 'Precio', data: priceData, borderColor: 'rgba(255,255,255,0.7)', pointRadius: 0 }] }, options: chartDefaultsNoLegend }); stochChart = new Chart(stochChartCtx, { type: 'line', data: { labels: priceLabels, datasets: [{ label: '%K', data: stochData.K, borderColor: '#60a5fa', pointRadius: 0 }, { label: '%D', data: stochData.D, borderColor: '#f472b6', pointRadius: 0 }] }, options: { ...chartDefaultsLegend, scales: { y: { min: 0, max: 100, ticks: { color: '#9ca3af' }, grid: { color: "rgba(255,255,255,0.1)" } }, x: { ticks: { color: '#9ca3af' }, grid: { color: "rgba(255,255,255,0.1)" } } } } }); }
+        stochKSlider.addEventListener('input', updateStochasticChart);
+        stochDSlider.addEventListener('input', updateStochasticChart);
+
+        // --- ON-BALANCE VOLUME (OBV) ---
+        const obvChartCtx = document.getElementById('obvChart').getContext('2d'); const priceForObvChartCtx = document.getElementById('priceForObvChart').getContext('2d');
+        let obvChart, priceForObvChart;
+        function calculateOBV(data, volume) { let obv = [0]; for (let i = 1; i < data.length; i++) { if (data[i] > data[i - 1]) { obv.push(obv[i - 1] + volume[i]); } else if (data[i] < data[i - 1]) { obv.push(obv[i - 1] - volume[i]); } else { obv.push(obv[i - 1]); } } return obv; }
+        function updateOBVChart() { if (obvChart) obvChart.destroy(); if (priceForObvChart) priceForObvChart.destroy(); const volumeData = Array.from({ length: CHART_POINTS }, () => 1000 + Math.random() * 500); const obvData = calculateOBV(priceData, volumeData); priceForObvChart = new Chart(priceForObvChartCtx, { type: 'line', data: { labels: priceLabels, datasets: [{ label: 'Precio', data: priceData, borderColor: 'rgba(255,255,255,0.7)', pointRadius: 0 }] }, options: chartDefaultsNoLegend }); obvChart = new Chart(obvChartCtx, { type: 'line', data: { labels: priceLabels, datasets: [{ label: 'OBV', data: obvData, borderColor: '#34d399', pointRadius: 0 }] }, options: chartDefaultsNoLegend }); }
+
+        // --- NUBE DE ICHIMOKU ---
+        const ichimokuChartCtx = document.getElementById('ichimokuChart').getContext('2d');
+        let ichimokuChart;
+        function calculateIchimoku(data) { const tenkan = [], kijun = [], senkouA = [], senkouB = []; const chikou = []; for (let i = 0; i < data.length; i++) { if (i >= 8) { const slice = data.slice(i - 8, i + 1); tenkan.push((Math.max(...slice) + Math.min(...slice)) / 2); } else { tenkan.push(null); } if (i >= 25) { const slice = data.slice(i - 25, i + 1); kijun.push((Math.max(...slice) + Math.min(...slice)) / 2); } else { kijun.push(null); } if (i < data.length - 26) { chikou.push(data[i + 26]); } else { chikou.push(null); } } for (let i = 0; i < data.length; i++) { senkouA.push((tenkan[i] + kijun[i]) / 2); if (i >= 51) { const slice = data.slice(i - 51, i + 1); senkouB.push((Math.max(...slice) + Math.min(...slice)) / 2); } else { senkouB.push(null); } } return { tenkan, kijun, senkouA: Array(26).fill(null).concat(senkouA), senkouB: Array(26).fill(null).concat(senkouB), chikou }; }
+        function updateIchimokuChart() { if (ichimokuChart) ichimokuChart.destroy(); const ichimokuData = calculateIchimoku(priceData); ichimokuChart = new Chart(ichimokuChartCtx, { type: 'line', data: { labels: priceLabels, datasets: [{ label: 'Precio', data: priceData, borderColor: 'rgba(255,255,255,0.9)', borderWidth: 2.5, pointRadius: 0 }, { label: 'Tenkan-sen', data: ichimokuData.tenkan, borderColor: '#60a5fa', pointRadius: 0 }, { label: 'Kijun-sen', data: ichimokuData.kijun, borderColor: '#f472b6', pointRadius: 0 }, { label: 'Senkou Span A', data: ichimokuData.senkouA, borderColor: 'rgba(52, 211, 153, 0.5)', fill: '+1', pointRadius: 0 }, { label: 'Senkou Span B', data: ichimokuData.senkouB, borderColor: 'rgba(239, 68, 68, 0.5)', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: false, pointRadius: 0 }, { label: 'Chikou Span', data: ichimokuData.chikou, borderColor: '#a78bfa', borderDash: [5, 5], pointRadius: 0 }] }, options: chartDefaultsLegend }); }
+
+        // --- RETROCESOS DE FIBONACCI ---
+        const fiboBtn = document.getElementById('fiboBtn'); const fibonacciChartCtx = document.getElementById('fibonacciChart').getContext('2d');
+        let fibonacciChart;
+        function drawFibonacciChart() { if (fibonacciChart) fibonacciChart.destroy(); const trendData = []; let price = 50; const startIdx = 10; const endIdx = 60; for (let i = 0; i < CHART_POINTS; i++) { if (i > startIdx && i < endIdx) { price += Math.random() * 2; } else { price += (Math.random() - 0.5) * 2; } trendData.push(price); } const minPrice = Math.min(...trendData.slice(startIdx, endIdx)); const maxPrice = Math.max(...trendData.slice(startIdx, endIdx)); const diff = maxPrice - minPrice; const levels = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1]; const fiboLines = levels.map(level => ({ label: `${(level * 100).toFixed(1)}%`, value: maxPrice - diff * level })); fibonacciChart = new Chart(fibonacciChartCtx, { type: 'line', data: { labels: priceLabels, datasets: [{ label: 'Precio', data: trendData, borderColor: 'rgba(255,255,255,0.7)', pointRadius: 0 }] }, options: { ...chartDefaultsLegend, plugins: { ...chartDefaultsLegend.plugins, annotation: { annotations: fiboLines.map((line, i) => ({ type: 'line', yMin: line.value, yMax: line.value, borderColor: `rgba(251, 191, 36, ${1 - i * 0.15})`, borderWidth: 2, label: { content: line.label, enabled: true, position: 'end', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white', font: { size: 10 } } })) } } } }); }
+        fiboBtn.addEventListener('click', drawFibonacciChart);
+
+        // --- GEMINI API LOGIC ---
+        const geminiModal = document.getElementById('gemini-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const geminiResponseEl = document.getElementById('gemini-response');
+        const geminiLoader = document.getElementById('gemini-loader');
+        const modalTitle = document.getElementById('modal-title');
+        const apiKeyInput = document.getElementById('gemini-api-key-input');
+        let currentModel = '';
+
+        document.querySelectorAll('.gemini-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                currentModel = e.target.dataset.model;
+                modalTitle.textContent = `Explicación de ${currentModel}`;
+                geminiResponseEl.innerHTML = 'Seleccioná un estilo de explicación...';
+                geminiModal.classList.remove('hidden');
+            });
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            geminiModal.classList.add('hidden');
+        });
+
+        document.querySelectorAll('.prompt-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const style = e.target.dataset.style;
+                await callGemini(currentModel, style);
+            });
+        });
+
+        async function callGemini(modelName, style) {
+            const apiKey = apiKeyInput.value.trim() || "";
+            if (!apiKey) {
+                geminiResponseEl.innerHTML = '<span class="text-red-400">¡Che, campeón! Necesitás poner tu clave de API de Gemini para que esto funcione.</span>';
+                apiKeyInput.focus();
+                apiKeyInput.classList.add('border-red-500');
+                return;
+            }
+            apiKeyInput.classList.remove('border-red-500');
+
+            geminiLoader.classList.remove('hidden');
+            geminiResponseEl.innerHTML = '';
+
+            const prompts = {
+                simple: `Explica qué es y para qué sirve el indicador técnico ${modelName} como si se lo contaras a un amigo en un bar. Usa un lenguaje simple, directo y con tonada argentina.`,
+                analogy: `Explica el indicador técnico ${modelName} usando una analogía creativa y fácil de entender para alguien que no sabe nada de trading, con un toque de humor argentino.`,
+                business: `Explica cómo un trader usaría el indicador ${modelName} para decidir si comprar o vender. Dame un caso de uso práctico y concreto, bien argento.`
+            };
+
+            const userQuery = prompts[style];
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }] };
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`Error de la API: ${response.status}`);
+                const result = await response.json();
+                const text = result.candidates[0].content.parts[0].text;
+                geminiResponseEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-orange-400">$1</strong>').replace(/\n/g, '<br>');
+            } catch (error) {
+                console.error("Error llamando a Gemini:", error);
+                geminiResponseEl.innerHTML = '<span class="text-red-400">Hubo un problema al conectar con la IA. Verificá tu clave de API y la consola.</span>';
+            } finally {
+                geminiLoader.classList.add('hidden');
+            }
+        }
+
+        // --- INITIAL LOAD ---
+        window.addEventListener('load', () => {
+            priceData = generatePriceData();
+            updateStochasticChart();
+            updateOBVChart();
+            updateIchimokuChart();
+            drawFibonacciChart();
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            }
+        });
+    </script>
+</body>
+
+</html>

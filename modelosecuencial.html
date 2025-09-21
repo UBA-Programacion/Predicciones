@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de Modelos Secuenciales</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+    }
+
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+    }
+
+    /* Gemini Modal Styles */
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #f97316;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-black text-gray-200">
+  <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span class="text-white font-bold text-xl">Predicciones<span class="text-orange-500">.AI</span></span>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            <a href="index.html#laboratorios"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+            <a href="index.html#nosotros"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+            <a href="index.html#contacto"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          <button type="button" id="mobile-menu-button"
+            class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+            aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Abrir menú</span>
+            <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="index.html#laboratorios"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+        <a href="index.html#nosotros"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+        <a href="index.html#contacto"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4 md:p-8">
+    <header class="text-center my-12">
+      <h1 class="text-4xl md:text-6xl font-black text-white">
+        Laboratorio de
+        <span class="text-orange-500">Modelos Secuenciales</span>
+      </h1>
+      <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+        Acá nos metemos con los cerebros artificiales que tienen memoria. Jugá
+        con las perillas y descubrí cómo predicen el próximo paso en una
+        secuencia.
+      </p>
+    </header>
+
+    <main class="space-y-16">
+      <!-- Sección: Modelos Secuenciales -->
+      <section id="secuenciales">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            🔮 1. Modelos Secuenciales (Los Adivinos con Memoria)
+          </h2>
+          <button class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg"
+            data-model="Modelos Secuenciales (RNN y LSTM)">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              RNN (El de Memoria a Corto Plazo)
+            </h3>
+            <p class="text-gray-400 mb-6">
+              Una Red Neuronal Recurrente es un bicho que tiene memoria.
+              Entiende que lo que pasó antes importa para adivinar lo que
+              viene. El problema es que es como Dory: se acuerda de lo que
+              pasó hace 5 minutos, pero se olvida del principio de la película
+              (problema del gradiente desvanecido).
+            </p>
+            <div class="bg-gray-900 p-4 rounded-lg mb-6">
+              <p class="font-mono text-center text-lg text-orange-400">
+                `$$ h_t = f(W_{hh}h_{t-1} + W_{xh}x_t + b_h) $$`
+              </p>
+              <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                <li>
+                  <span class="font-bold text-white">hₜ:</span> El "chisme" o
+                  memoria de la red en el momento actual.
+                </li>
+                <li>
+                  <span class="font-bold text-white">hₜ₋₁:</span> El chisme
+                  que se acordaba del paso anterior.
+                </li>
+                <li>
+                  <span class="font-bold text-white">xₜ:</span> La nueva data
+                  que entra ahora.
+                </li>
+                <li>
+                  <span class="font-bold text-white">W, b:</span> Los "pesos"
+                  y "sesgos" que la red aprende.
+                </li>
+                <li>
+                  <span class="font-bold text-white">En criollo:</span> El
+                  recuerdo de hoy es una mezcla del recuerdo de ayer más la
+                  data nueva que entró.
+                </li>
+              </ul>
+            </div>
+            <div class="space-y-4 mb-6">
+              <label for="rnnMemorySlider" class="block font-medium">Ventana de Memoria (lookback):
+                <span id="rnnMemoryValue" class="font-bold text-orange-400">5</span></label>
+              <input id="rnnMemorySlider" type="range" min="1" max="15" value="5"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400">
+                Simula cuántos pasos para atrás mira la RNN. Con poca memoria,
+                se olvida de la tendencia a largo plazo y la predicción
+                "deriva".
+              </p>
+            </div>
+            <div class="chart-container">
+              <canvas id="rnnChart"></canvas>
+            </div>
+          </div>
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              LSTM (El de Memoria a Largo Plazo)
+            </h3>
+            <p class="text-gray-400 mb-6">
+              La LSTM es una RNN con esteroides y un anotador. Tiene un
+              sistema de "compuertas" que le permite decidir qué información
+              vieja es importante y vale la pena guardar en su memoria a largo
+              plazo (`Cₜ`), y cuál es relleno y se puede tirar. Por eso es un
+              campeón para predecir series largas y complejas.
+            </p>
+            <div class="bg-gray-900 p-4 rounded-lg mb-6">
+              <p class="font-mono text-center text-lg text-orange-400">
+                `$$ C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t $$`
+              </p>
+              <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                <li>
+                  <span class="font-bold text-white">Cₜ:</span> El "cuaderno
+                  de anotaciones" (memoria a largo plazo) actualizado.
+                </li>
+                <li>
+                  <span class="font-bold text-white">fₜ:</span> La "compuerta
+                  de olvido": decide qué tirar del cuaderno viejo.
+                </li>
+                <li>
+                  <span class="font-bold text-white">iₜ:</span> La "compuerta
+                  de entrada": decide qué data nueva es digna de anotar.
+                </li>
+                <li>
+                  <span class="font-bold text-white">Ĉₜ:</span> La data nueva
+                  candidata a ser anotada.
+                </li>
+                <li>
+                  <span class="font-bold text-white">En criollo:</span> La
+                  memoria de hoy es lo que queda de la memoria de ayer
+                  (después de olvidar) más la data nueva importante que
+                  decidió guardar.
+                </li>
+              </ul>
+            </div>
+            <div class="space-y-4 mb-6">
+              <label for="lstmMemorySlider" class="block font-medium">Capacidad de Memoria a Largo Plazo:
+                <span id="lstmMemoryValue" class="font-bold text-orange-400">20</span></label>
+              <input id="lstmMemorySlider" type="range" min="5" max="50" value="20"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+              <p class="text-xs text-gray-400">
+                Simula qué tan bien la LSTM recuerda patrones lejanos. Con más
+                capacidad, puede seguir la tendencia a largo plazo mucho mejor
+                que la RNN.
+              </p>
+            </div>
+            <div class="chart-container">
+              <canvas id="lstmChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center mt-16 text-gray-500">
+      <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Predicciones.</p>
+    </footer>
+  </div>
+
+  <!-- Gemini Modal -->
+  <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <!-- ...código del modal de Gemini... -->
+  </div>
+
+  <script>
+    // --- LÓGICA PARA EL MENÚ RESPONSIVO ---
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const hamburgerIcon = document.getElementById("hamburger-icon");
+    const closeIcon = document.getElementById("close-icon");
+    mobileMenuButton.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+      hamburgerIcon.classList.toggle("hidden");
+      closeIcon.classList.toggle("hidden");
+    });
+
+    // --- LÓGICA PARA MODELOS SECUENCIALES ---
+    // --- CHART DEFAULTS ---
+    const mlChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: "linear",
+          position: "bottom",
+          title: { display: true, text: "Paso de Tiempo", color: "#9ca3af" },
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#9ca3af" },
+        },
+        y: {
+          title: { display: true, text: "Valor", color: "#9ca3af" },
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#9ca3af" },
+        },
+      },
+      plugins: { legend: { labels: { color: "#9ca3af" } } },
+    };
+    const colors = ["#f97316", "#34d399", "#60a5fa", "#f472b6"];
+
+    // --- DATA GENERATION ---
+    function generateSequence(len = 100) {
+      const data = [];
+      for (let i = 0; i < len; i++) {
+        const trend = i * 0.05;
+        const seasonal = Math.sin(i * 0.2) + Math.sin(i * 0.5) * 0.5;
+        data.push(trend + seasonal);
+      }
+      return data;
+    }
+    const sequenceData = generateSequence();
+    const sequenceLabels = Array.from({ length: 100 }, (_, i) => i + 1);
+
+    // --- RNN ---
+    const rnnMemorySlider = document.getElementById("rnnMemorySlider");
+    const rnnMemoryValue = document.getElementById("rnnMemoryValue");
+    const rnnChartCtx = document.getElementById("rnnChart").getContext("2d");
+    let rnnChart;
+
+    function simulateRNN(data, memory) {
+      const prediction = [];
+      for (let i = 0; i < data.length; i++) {
+        if (i < memory) {
+          prediction.push(null);
+          continue;
+        }
+        const lookback = data.slice(i - memory, i);
+        const avg = lookback.reduce((a, b) => a + b, 0) / memory;
+        const drift = (i / data.length - 0.5) * (memory / 2); // Error se acumula y olvida la tendencia
+        prediction.push(avg + drift);
+      }
+      return prediction;
+    }
+
+    function updateRNNChart() {
+      const memory = parseInt(rnnMemorySlider.value);
+      rnnMemoryValue.textContent = memory;
+      if (rnnChart) rnnChart.destroy();
+
+      const predictionData = simulateRNN(sequenceData, memory);
+      const displayLength = 80;
+
+      rnnChart = new Chart(rnnChartCtx, {
+        type: "line",
+        data: {
+          labels: sequenceLabels.slice(0, displayLength),
+          datasets: [
+            {
+              label: "Serie Real",
+              data: sequenceData.slice(0, displayLength),
+              borderColor: "rgba(255,255,255,0.4)",
+              tension: 0.2,
+              pointRadius: 0,
+            },
+            {
+              label: "Predicción RNN",
+              data: predictionData.slice(0, displayLength),
+              borderColor: colors[0],
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.2,
+              borderDash: [5, 5],
+            },
+          ],
+        },
+        options: mlChartOptions,
+      });
+    }
+    rnnMemorySlider.addEventListener("input", updateRNNChart);
+
+    // --- LSTM ---
+    const lstmMemorySlider = document.getElementById("lstmMemorySlider");
+    const lstmMemoryValue = document.getElementById("lstmMemoryValue");
+    const lstmChartCtx = document
+      .getElementById("lstmChart")
+      .getContext("2d");
+    let lstmChart;
+
+    function simulateLSTM(data, memory) {
+      const prediction = [];
+      for (let i = 0; i < data.length; i++) {
+        if (i < memory) {
+          prediction.push(null);
+          continue;
+        }
+        const lookback_short = data.slice(i - 5, i);
+        const trend_short =
+          lookback_short.length > 1
+            ? (lookback_short[lookback_short.length - 1] -
+              lookback_short[0]) /
+            lookback_short.length
+            : 0;
+        const lookback_long = data.slice(i - memory, i);
+        const trend_long =
+          lookback_long.length > 1
+            ? (lookback_long[lookback_long.length - 1] - lookback_long[0]) /
+            lookback_long.length
+            : 0;
+        prediction.push(data[i - 1] + (trend_short * 0.6 + trend_long * 0.4)); // Pondera más la tendencia larga
+      }
+      return prediction;
+    }
+
+    function updateLSTMChart() {
+      const memory = parseInt(lstmMemorySlider.value);
+      lstmMemoryValue.textContent = memory;
+      if (lstmChart) lstmChart.destroy();
+
+      const predictionData = simulateLSTM(sequenceData, memory);
+      const displayLength = 80;
+
+      lstmChart = new Chart(lstmChartCtx, {
+        type: "line",
+        data: {
+          labels: sequenceLabels.slice(0, displayLength),
+          datasets: [
+            {
+              label: "Serie Real",
+              data: sequenceData.slice(0, displayLength),
+              borderColor: "rgba(255,255,255,0.4)",
+              tension: 0.2,
+              pointRadius: 0,
+            },
+            {
+              label: "Predicción LSTM",
+              data: predictionData.slice(0, displayLength),
+              borderColor: colors[1],
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.2,
+              borderDash: [5, 5],
+            },
+          ],
+        },
+        options: mlChartOptions,
+      });
+    }
+    lstmMemorySlider.addEventListener("input", updateLSTMChart);
+
+    // --- GEMINI API LOGIC ---
+    // ... (Este código se mantiene igual, no necesita cambios)
+
+    // Carga inicial
+    window.addEventListener("load", () => {
+      updateRNNChart();
+      updateLSTMChart();
+      if (window.MathJax) {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      }
+    });
+  </script>
+</body>
+
+</html>

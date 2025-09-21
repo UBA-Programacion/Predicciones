@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Datos Alternativos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+      .btn {
+        transition: all 0.2s;
+      }
+      .btn:hover {
+        transform: scale(1.05);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      .chart-container {
+        position: relative;
+        height: 350px;
+      }
+      /* Gemini Modal Styles */
+      .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+      .modal-content {
+        background-color: #1e1e1e;
+      }
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #f97316;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-black text-gray-200">
+    <nav class="bg-gray-900 border-b border-gray-700 sticky top-0 z-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <span class="text-white font-bold text-xl">Predicciones.AI</span>
+            </div>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="#social"
+                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >Social</a
+              >
+              <a
+                href="#onchain"
+                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >On-Chain</a
+              >
+              <a
+                href="#"
+                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >Fundamentales</a
+              >
+              <a
+                href="#"
+                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >Machine Learning</a
+              >
+              <a
+                href="#"
+                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >Nosotros</a
+              >
+              <a
+                href="#"
+                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >Contacto</a
+              >
+            </div>
+          </div>
+          <div class="-mr-2 flex md:hidden">
+            <button
+              type="button"
+              id="mobile-menu-button"
+              class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+              aria-controls="mobile-menu"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Abrir menú</span>
+              <svg
+                id="hamburger-icon"
+                class="block h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+              <svg
+                id="close-icon"
+                class="hidden h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="md:hidden hidden" id="mobile-menu">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <a
+            href="#social"
+            class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+            >Social</a
+          >
+          <a
+            href="#onchain"
+            class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+            >On-Chain</a
+          >
+          <a
+            href="#"
+            class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+            >Fundamentales</a
+          >
+          <a
+            href="#"
+            class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+            >Machine Learning</a
+          >
+          <a
+            href="#"
+            class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+            >Nosotros</a
+          >
+          <a
+            href="#"
+            class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+            >Contacto</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mx-auto p-4 md:p-8">
+      <header class="text-center my-12">
+        <h1 class="text-4xl md:text-6xl font-black text-white">
+          Laboratorio de <span class="text-orange-500">Datos Alternativos</span>
+        </h1>
+        <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+          Acá nos convertimos en detectives. Analizamos el humor de la gente,
+          las búsquedas en Google y las tripas de la blockchain para encontrar
+          pistas que el mercado todavía no vio.
+        </p>
+      </header>
+
+      <main class="space-y-16">
+        <!-- Sección 1: Sentimiento y Búsquedas -->
+        <section id="social">
+          <div class="flex justify-between items-start mb-8">
+            <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+              🗣️ 1. El Humor de la Multitud
+            </h2>
+          </div>
+          <div class="grid lg:grid-cols-2 gap-8">
+            <div class="card rounded-lg p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-2xl font-bold text-orange-400">
+                  Sentimiento en Redes Sociales
+                </h3>
+                <button
+                  class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                  data-model="Sentimiento en Redes Sociales"
+                >
+                  ✨ Gemini
+                </button>
+              </div>
+              <p class="text-gray-400 mb-6">
+                El mercado se mueve por miedo y codicia. Este modelo analiza si
+                la gente en Twitter y Reddit está eufórica (señal de posible
+                pico) o en pánico (posible piso). Es el termómetro del
+                "sentimiento" popular.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="sentimentSlider" class="block font-medium"
+                  >Sentimiento del Mercado:
+                  <span id="sentimentValue" class="font-bold text-orange-400"
+                    >Neutral</span
+                  ></label
+                >
+                <input
+                  id="sentimentSlider"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="50"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="sentimentChart"></canvas>
+              </div>
+            </div>
+            <div class="card rounded-lg p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-2xl font-bold text-orange-400">
+                  Volumen de Búsqueda en Google Trends
+                </h3>
+                <button
+                  class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                  data-model="Volumen de Búsqueda en Google Trends"
+                >
+                  ✨ Gemini
+                </button>
+              </div>
+              <p class="text-gray-400 mb-6">
+                Cuando tu tía te pregunta cómo comprar Bitcoin, es una señal. Un
+                pico de búsquedas en Google suele indicar la llegada de nuevos
+                inversores (retail), lo que a menudo precede a picos de euforia
+                y correcciones.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="trendsSlider" class="block font-medium"
+                  >Interés de Búsqueda (0-100):
+                  <span id="trendsValue" class="font-bold text-orange-400"
+                    >20</span
+                  ></label
+                >
+                <input
+                  id="trendsSlider"
+                  type="range"
+                  min="5"
+                  max="100"
+                  value="20"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="trendsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sección 2: Análisis On-Chain -->
+        <section id="onchain">
+          <div class="flex justify-between items-start mb-8">
+            <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+              🔗 2. Análisis On-Chain (Las Tripas de la Blockchain)
+            </h2>
+          </div>
+          <div class="space-y-8">
+            <div class="card rounded-lg p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-2xl font-bold text-orange-400">
+                  La Salud de la Red
+                </h3>
+                <button
+                  class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                  data-model="Salud de la Red On-Chain (Hash Rate, Wallets Activas)"
+                >
+                  ✨ Gemini
+                </button>
+              </div>
+              <p class="text-gray-400 mb-6">
+                Acá miramos los signos vitales de la red. Un **Hash Rate**
+                creciente significa que la red es más segura y los mineros
+                confían en ella. Más **Wallets Activas** significa más adopción.
+                Ambas son señales de salud a largo plazo.
+              </p>
+              <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label for="hashRateSlider" class="block font-medium"
+                    >Tendencia del Hash Rate:
+                    <span id="hashRateValue" class="font-bold text-orange-400"
+                      >Crecimiento Moderado</span
+                    ></label
+                  >
+                  <input
+                    id="hashRateSlider"
+                    type="range"
+                    min="0"
+                    max="2"
+                    value="1"
+                    step="1"
+                    class="w-full"
+                  />
+                </div>
+                <div>
+                  <label for="walletsSlider" class="block font-medium"
+                    >Tendencia de Billeteras Activas:
+                    <span id="walletsValue" class="font-bold text-orange-400"
+                      >Crecimiento Moderado</span
+                    ></label
+                  >
+                  <input
+                    id="walletsSlider"
+                    type="range"
+                    min="0"
+                    max="2"
+                    value="1"
+                    step="1"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="healthChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card rounded-lg p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-2xl font-bold text-orange-400">
+                  Métricas Ninja: SOPR y Puell Multiple
+                </h3>
+                <button
+                  class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                  data-model="Métricas On-Chain Avanzadas (SOPR, Puell Multiple)"
+                >
+                  ✨ Gemini
+                </button>
+              </div>
+              <p class="text-gray-400 mb-6">
+                Estos son para los que la tienen clara. No miran el precio,
+                miran el comportamiento de los jugadores más importantes: los
+                tenedores y los mineros.
+              </p>
+              <div class="grid lg:grid-cols-2 gap-8 mt-6">
+                <div>
+                  <h4 class="text-xl font-bold text-center mb-2">
+                    SOPR (El Termómetro de Ganancias)
+                  </h4>
+                  <p class="text-sm text-gray-400 text-center mb-4">
+                    Mide si las monedas que se mueven se están vendiendo con
+                    ganancia (SOPR > 1) o con pérdida (SOPR < 1). Un valor muy
+                    alto indica euforia; un valor bajo, capitulación.
+                  </p>
+                  <div class="space-y-4 mb-6">
+                    <label for="soprSlider" class="block font-medium"
+                      >SOPR Simulado:
+                      <span id="soprValue" class="font-bold text-orange-400"
+                        >1.00</span
+                      ></label
+                    >
+                    <input
+                      id="soprSlider"
+                      type="range"
+                      min="0.9"
+                      max="1.2"
+                      value="1.0"
+                      step="0.01"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div class="chart-container" style="height: 250px">
+                    <canvas id="soprChart"></canvas>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-xl font-bold text-center mb-2">
+                    Puell Multiple (El Estrés de los Mineros)
+                  </h4>
+                  <p class="text-sm text-gray-400 text-center mb-4">
+                    Compara lo que ganan los mineros hoy con el promedio del
+                    último año. Si ganan mucho más (valor alto), pueden vender y
+                    tirar el precio abajo. Si ganan poco (valor bajo), indica
+                    estrés y posibles pisos de mercado.
+                  </p>
+                  <div class="space-y-4 mb-6">
+                    <label for="puellSlider" class="block font-medium"
+                      >Puell Multiple Simulado:
+                      <span id="puellValue" class="font-bold text-orange-400"
+                        >1.5</span
+                      ></label
+                    >
+                    <input
+                      id="puellSlider"
+                      type="range"
+                      min="0.3"
+                      max="4"
+                      value="1.5"
+                      step="0.1"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div class="chart-container" style="height: 250px">
+                    <canvas id="puellChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="text-center mt-16 text-gray-500">
+        <p>
+          Hecho con 🧉 y ciencia de datos. Laboratorio de Datos Alternativos.
+        </p>
+      </footer>
+    </div>
+
+    <!-- Gemini Modal -->
+    <div
+      id="gemini-modal"
+      class="hidden fixed inset-0 z-50 overflow-y-auto"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+      >
+        <div class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+        <span
+          class="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+          >&#8203;</span
+        >
+        <div
+          class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50"
+        >
+          <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10"
+              >
+                ✨
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <h3
+                  class="text-lg leading-6 font-medium text-white"
+                  id="modal-title"
+                >
+                  Explicación de Gemini
+                </h3>
+                <div class="mt-4 border-b border-gray-700 pb-4">
+                  <label
+                    for="gemini-api-key-input"
+                    class="block text-sm font-medium text-gray-400"
+                    >Tu Clave de API de Gemini</label
+                  >
+                  <input
+                    type="password"
+                    id="gemini-api-key-input"
+                    class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                    placeholder="Pegá tu clave acá..."
+                  />
+                  <p class="mt-1 text-xs text-gray-500">
+                    Conseguí una clave gratis en
+                    <a
+                      href="https://aistudio.google.com/app/apikey"
+                      target="_blank"
+                      class="text-orange-400 hover:underline"
+                      >Google AI Studio</a
+                    >.
+                  </p>
+                </div>
+                <p class="text-sm text-gray-400 my-4" id="modal-subtitle">
+                  Pídele a la IA que te explique este modelo.
+                </p>
+
+                <div class="my-4 space-x-2">
+                  <button
+                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                    data-style="simple"
+                  >
+                    Explicación Simple
+                  </button>
+                  <button
+                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                    data-style="analogy"
+                  >
+                    Analogía Creativa
+                  </button>
+                  <button
+                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                    data-style="business"
+                  >
+                    Para Negocios
+                  </button>
+                </div>
+
+                <div
+                  id="gemini-response-container"
+                  class="mt-4 p-3 bg-black/50 rounded-md min-h-[150px] max-h-[300px] overflow-y-auto"
+                >
+                  <div
+                    id="gemini-loader"
+                    class="hidden flex justify-center items-center h-full"
+                  >
+                    <div class="loader"></div>
+                  </div>
+                  <p id="gemini-response" class="text-gray-300"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              id="close-modal-btn"
+              type="button"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- NAVBAR ---
+      const mobileMenuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const hamburgerIcon = document.getElementById("hamburger-icon");
+      const closeIcon = document.getElementById("close-icon");
+
+      mobileMenuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+        hamburgerIcon.classList.toggle("hidden");
+        closeIcon.classList.toggle("hidden");
+      });
+
+      const chartOptions = (
+        xlabel,
+        ylabel,
+        yMin = undefined,
+        yMax = undefined
+      ) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: { display: true, text: xlabel, color: "#9ca3af" },
+            grid: { color: "rgba(255,255,255,0.1)" },
+            ticks: { color: "#9ca3af" },
+          },
+          y: {
+            title: { display: true, text: ylabel, color: "#9ca3af" },
+            grid: { color: "rgba(255,255,255,0.1)" },
+            ticks: { color: "#9ca3af" },
+            min: yMin,
+            max: yMax,
+          },
+        },
+        plugins: { legend: { labels: { color: "#9ca3af" } } },
+      });
+      const colors = [
+        "#f97316",
+        "#34d399",
+        "#60a5fa",
+        "#f472b6",
+        "#fbbf24",
+        "#a78bfa",
+        "#ef4444",
+        "#22d3ee",
+      ];
+
+      // --- 1. SOCIAL SENTIMENT ---
+      const sentimentSlider = document.getElementById("sentimentSlider");
+      const sentimentValue = document.getElementById("sentimentValue");
+      const sentimentChartCtx = document
+        .getElementById("sentimentChart")
+        .getContext("2d");
+      let sentimentChart;
+
+      function updateSentiment() {
+        const sentiment = parseInt(sentimentSlider.value);
+        const sentimentLabels = {
+          0: "Pánico Extremo",
+          25: "Miedo",
+          50: "Neutral",
+          75: "Codicia",
+          100: "Euforia Extrema",
+        };
+        let label = "Neutral";
+        if (sentiment <= 15) label = sentimentLabels[0];
+        else if (sentiment <= 35) label = sentimentLabels[25];
+        else if (sentiment <= 65) label = sentimentLabels[50];
+        else if (sentiment <= 85) label = sentimentLabels[75];
+        else label = sentimentLabels[100];
+        sentimentValue.textContent = label;
+
+        drawSentimentChart(sentiment);
+      }
+
+      function drawSentimentChart(sentiment) {
+        if (sentimentChart) sentimentChart.destroy();
+
+        let price = 50000;
+        const priceData = Array.from({ length: 50 }, (_, i) => {
+          const trend = ((sentiment - 50) / 50) * (price * 0.01) * (i / 50);
+          price += (Math.random() - 0.48) * (price * 0.05) + trend;
+          return price;
+        });
+
+        sentimentChart = new Chart(sentimentChartCtx, {
+          type: "line",
+          data: {
+            labels: Array.from({ length: 50 }, (_, i) => `Día ${i + 1}`),
+            datasets: [
+              {
+                label: "Precio Simulado",
+                data: priceData,
+                borderColor: colors[0],
+                tension: 0.2,
+                pointRadius: 0,
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Precio (USD)"),
+        });
+      }
+      sentimentSlider.addEventListener("input", updateSentiment);
+
+      // --- 2. GOOGLE TRENDS ---
+      const trendsSlider = document.getElementById("trendsSlider");
+      const trendsValue = document.getElementById("trendsValue");
+      const trendsChartCtx = document
+        .getElementById("trendsChart")
+        .getContext("2d");
+      let trendsChart;
+
+      function updateTrends() {
+        const interest = parseInt(trendsSlider.value);
+        trendsValue.textContent = interest;
+        drawTrendsChart(interest);
+      }
+
+      function drawTrendsChart(interest) {
+        if (trendsChart) trendsChart.destroy();
+
+        const trendData = Array.from({ length: 50 }, (_, i) => {
+          if (i > 35 && i < 45)
+            return Math.min(100, Math.random() * 10 + interest);
+          return Math.random() * 15 + 5;
+        });
+
+        const priceData = [];
+        let price = 40000;
+        trendData.forEach((trend, i) => {
+          const trendEffect = i > 40 ? (trendData[i - 3] - 20) * 100 : 0;
+          price += (Math.random() - 0.5) * 2000 + trendEffect;
+          priceData.push(price);
+        });
+
+        trendsChart = new Chart(trendsChartCtx, {
+          type: "line",
+          data: {
+            labels: Array.from({ length: 50 }, (_, i) => `Semana ${i + 1}`),
+            datasets: [
+              {
+                label: "Precio de Bitcoin",
+                data: priceData,
+                borderColor: colors[1],
+                tension: 0.2,
+                pointRadius: 0,
+                yAxisID: "y",
+              },
+              {
+                label: "Interés de Búsqueda",
+                data: trendData,
+                borderColor: colors[2],
+                tension: 0.2,
+                pointRadius: 0,
+                yAxisID: "y1",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: {
+                type: "linear",
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Precio (USD)",
+                  color: "#9ca3af",
+                },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y1: {
+                type: "linear",
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Interés (0-100)",
+                  color: "#9ca3af",
+                },
+                grid: { drawOnChartArea: false },
+                ticks: { color: "#9ca3af" },
+              },
+            },
+            plugins: { legend: { labels: { color: "#9ca3af" } } },
+          },
+        });
+      }
+      trendsSlider.addEventListener("input", updateTrends);
+
+      // --- 3. NETWORK HEALTH ---
+      const hashRateSlider = document.getElementById("hashRateSlider");
+      const walletsSlider = document.getElementById("walletsSlider");
+      const hashRateValue = document.getElementById("hashRateValue");
+      const walletsValue = document.getElementById("walletsValue");
+      const healthChartCtx = document
+        .getElementById("healthChart")
+        .getContext("2d");
+      let healthChart;
+      const trendLabels = [
+        "Estancado",
+        "Crecimiento Moderado",
+        "Crecimiento Exponencial",
+      ];
+
+      function updateHealth() {
+        hashRateValue.textContent = trendLabels[hashRateSlider.value];
+        walletsValue.textContent = trendLabels[walletsSlider.value];
+        drawHealthChart();
+      }
+
+      function drawHealthChart() {
+        if (healthChart) healthChart.destroy();
+
+        const hashTrend = [0.001, 0.005, 0.02][hashRateSlider.value];
+        const walletTrend = [0.001, 0.005, 0.02][walletsSlider.value];
+
+        let price = 20000,
+          hash = 100,
+          wallets = 100000;
+        const priceData = [],
+          hashData = [],
+          walletData = [];
+
+        for (let i = 0; i < 50; i++) {
+          hash *= 1 + hashTrend + (Math.random() - 0.5) * 0.01;
+          wallets *= 1 + walletTrend + (Math.random() - 0.5) * 0.01;
+          const fundamentalValue = Math.sqrt(hash * wallets) / 1000;
+          price =
+            fundamentalValue + (Math.random() - 0.5) * (fundamentalValue * 0.3);
+          priceData.push(price);
+          hashData.push(hash);
+          walletData.push(wallets);
+        }
+
+        healthChart = new Chart(healthChartCtx, {
+          type: "line",
+          data: {
+            labels: Array.from({ length: 50 }, (_, i) => `Mes ${i + 1}`),
+            datasets: [
+              {
+                label: "Precio",
+                data: priceData,
+                borderColor: colors[3],
+                yAxisID: "y",
+              },
+              {
+                label: "Hash Rate",
+                data: hashData,
+                borderColor: colors[4],
+                yAxisID: "y1",
+              },
+              {
+                label: "Billeteras Activas",
+                data: walletData,
+                borderColor: colors[5],
+                yAxisID: "y1",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: {
+                type: "linear",
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Precio (USD)",
+                  color: "#9ca3af",
+                },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y1: {
+                type: "linear",
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Métricas On-Chain",
+                  color: "#9ca3af",
+                },
+                grid: { drawOnChartArea: false },
+                ticks: { color: "#9ca3af" },
+              },
+            },
+            plugins: { legend: { labels: { color: "#9ca3af" } } },
+          },
+        });
+      }
+      [hashRateSlider, walletsSlider].forEach((s) =>
+        s.addEventListener("input", updateHealth)
+      );
+
+      // --- 4. ADVANCED METRICS ---
+      const soprSlider = document.getElementById("soprSlider");
+      const soprValue = document.getElementById("soprValue");
+      const soprChartCtx = document
+        .getElementById("soprChart")
+        .getContext("2d");
+      let soprChart;
+
+      const puellSlider = document.getElementById("puellSlider");
+      const puellValue = document.getElementById("puellValue");
+      const puellChartCtx = document
+        .getElementById("puellChart")
+        .getContext("2d");
+      let puellChart;
+
+      function updateAdvanced() {
+        const sopr = parseFloat(soprSlider.value);
+        soprValue.textContent = sopr.toFixed(2);
+
+        const puell = parseFloat(puellSlider.value);
+        puellValue.textContent = puell.toFixed(1);
+
+        drawSOPRChart(sopr);
+        drawPuellChart(puell);
+      }
+
+      function drawSOPRChart(value) {
+        if (soprChart) soprChart.destroy();
+        soprChart = new Chart(soprChartCtx, {
+          type: "line",
+          data: {
+            labels: ["SOPR"],
+            datasets: [
+              {
+                data: [0.95, 1.05, 1.2], // For background colors
+                backgroundColor: [
+                  "rgba(34, 197, 94, 0.5)",
+                  "rgba(245, 158, 11, 0.5)",
+                  "rgba(239, 68, 68, 0.5)",
+                ],
+                type: "bar",
+                barPercentage: 1.0,
+                categoryPercentage: 1.0,
+              },
+              {
+                label: "Valor Actual",
+                data: [{ x: 0, y: value }],
+                type: "scatter",
+                pointRadius: 10,
+                pointBackgroundColor: "white",
+              },
+              {
+                label: "Equilibrio",
+                data: [
+                  { x: -0.5, y: 1 },
+                  { x: 0.5, y: 1 },
+                ],
+                type: "line",
+                borderColor: "white",
+                borderDash: [5, 5],
+                borderWidth: 2,
+                pointRadius: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            scales: {
+              x: {
+                min: 0.88,
+                max: 1.22,
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: { display: false },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false },
+            },
+          },
+        });
+      }
+
+      function drawPuellChart(value) {
+        if (puellChart) puellChart.destroy();
+        puellChart = new Chart(puellChartCtx, {
+          type: "line",
+          data: {
+            labels: ["Puell"],
+            datasets: [
+              {
+                data: [0.5, 2, 4],
+                backgroundColor: [
+                  "rgba(34, 197, 94, 0.5)",
+                  "rgba(245, 158, 11, 0.5)",
+                  "rgba(239, 68, 68, 0.5)",
+                ],
+                type: "bar",
+                barPercentage: 1.0,
+                categoryPercentage: 1.0,
+              },
+              {
+                label: "Valor Actual",
+                data: [{ x: 0, y: value }],
+                type: "scatter",
+                pointRadius: 10,
+                pointBackgroundColor: "white",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            scales: {
+              x: {
+                min: 0,
+                max: 4.5,
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: { display: false },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false },
+            },
+          },
+        });
+      }
+      [soprSlider, puellSlider].forEach((s) =>
+        s.addEventListener("input", updateAdvanced)
+      );
+
+      // --- GEMINI API LOGIC ---
+      const geminiModal = document.getElementById("gemini-modal");
+      const closeModalBtn = document.getElementById("close-modal-btn");
+      const geminiResponseEl = document.getElementById("gemini-response");
+      const geminiLoader = document.getElementById("gemini-loader");
+      const modalTitle = document.getElementById("modal-title");
+      const apiKeyInput = document.getElementById("gemini-api-key-input");
+      let currentModel = "";
+
+      document.querySelectorAll(".gemini-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          currentModel = e.target.dataset.model;
+          modalTitle.textContent = `Explicación de ${currentModel}`;
+          geminiResponseEl.innerHTML = "Seleccioná un estilo de explicación...";
+          geminiModal.classList.remove("hidden");
+        });
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        geminiModal.classList.add("hidden");
+      });
+
+      document.querySelectorAll(".prompt-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const style = e.target.dataset.style;
+          await callGemini(currentModel, style);
+        });
+      });
+
+      async function callGemini(modelName, style) {
+        const apiKey = apiKeyInput.value.trim() || "";
+
+        geminiLoader.classList.remove("hidden");
+        geminiResponseEl.innerHTML = "";
+        apiKeyInput.classList.remove("border-red-500", "border-2");
+
+        const prompts = {
+          simple: `Explica qué son y para qué sirven los modelos de ${modelName} como si se lo contaras a un amigo en un bar. Usa un lenguaje simple, directo y con tonada argentina.`,
+          analogy: `Explica los modelos de ${modelName} usando una analogía creativa y fácil de entender para alguien que no sabe nada de finanzas o blockchain, con un toque de humor argentino.`,
+          business: `Explica cómo un inversor de criptomonedas usaría los modelos de ${modelName} para decidir si comprar o no. Dame un caso de uso práctico y concreto, bien argento.`,
+        };
+
+        const userQuery = prompts[style];
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const systemInstruction = {
+          parts: [
+            {
+              text: "Respondé en español, con tonada argentina (estilo porteño), de forma clara y concisa. Mantené un tono amigable y cercano, como si estuvieras charlando con un amigo.",
+            },
+          ],
+        };
+        const payload = {
+          contents: [{ parts: [{ text: userQuery }] }],
+          systemInstruction: systemInstruction,
+        };
+
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok) {
+            const errorBody = await response
+              .json()
+              .catch(() => response.text());
+            const errorMessage =
+              errorBody.error?.message || JSON.stringify(errorBody);
+            throw new Error(
+              `Error de la API (${response.status}): ${errorMessage}`
+            );
+          }
+
+          const result = await response.json();
+          const candidate = result.candidates?.[0];
+
+          if (candidate && candidate.content?.parts?.[0]?.text) {
+            let text = candidate.content.parts[0].text;
+            text = text.replace(
+              /\*\*(.*?)\*\*/g,
+              '<strong class="text-orange-400">$1</strong>'
+            );
+            text = text.replace(/\*/g, "");
+            text = text.replace(/\n/g, "<br>");
+            geminiResponseEl.innerHTML = text;
+          } else {
+            if (candidate?.finishReason === "SAFETY") {
+              throw new Error(
+                "La respuesta fue bloqueada por motivos de seguridad."
+              );
+            }
+            throw new Error("La IA no devolvió una respuesta válida.");
+          }
+        } catch (error) {
+          console.error("Error final llamando a Gemini:", error);
+          let userMessage = "Hubo un problema al conectar con la IA. ";
+          if (
+            error.message.includes("API key") ||
+            error.message.includes("unregistered caller")
+          ) {
+            userMessage =
+              "¡Che, campeón! La clave de API de Gemini es incorrecta o no es válida. Conseguila gratis en Google AI Studio y pegala arriba.";
+            apiKeyInput.classList.add("border-red-500", "border-2");
+          } else if (error.message.includes("Failed to fetch")) {
+            userMessage +=
+              "No se pudo conectar al servidor. Verificá tu conexión a internet.";
+          } else {
+            userMessage = error.message;
+          }
+          geminiResponseEl.innerHTML = `<span class="text-red-400">${userMessage}</span>`;
+        } finally {
+          geminiLoader.classList.add("hidden");
+        }
+      }
+
+      // --- INITIAL LOAD ---
+      window.addEventListener("load", () => {
+        updateSentiment();
+        updateTrends();
+        updateHealth();
+        updateAdvanced();
+      });
+    </script>
+  </body>
+</html>

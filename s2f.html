@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de Modelo Stock-to-Flow (S2F) Cross-Asset</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+    }
+
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #f97316;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 450px;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Gemini Modal Styles */
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #f97316;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-black text-gray-200">
+  <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span class="text-white font-bold text-xl">Predicciones<span class="text-orange-500">.AI</span></span>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            <a href="index.html#laboratorios"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+            <a href="index.html#nosotros"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+            <a href="index.html#contacto"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          <button type="button" id="mobile-menu-button"
+            class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+            aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Abrir menú</span>
+            <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="index.html#laboratorios"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+        <a href="index.html#nosotros"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+        <a href="index.html#contacto"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4 md:p-8">
+    <header class="text-center my-12">
+      <h1 class="text-4xl md:text-6xl font-black text-white">
+        Laboratorio de Modelo <span class="text-orange-500">Stock-to-Flow (S2F) Cross-Asset</span>
+      </h1>
+      <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+        ¿El valor viene de la escasez? Compará distintos metales, commodities y criptomonedas en un solo gráfico para
+        ver si esta teoría se cumple en la vida real.
+      </p>
+    </header>
+
+    <main class="space-y-16">
+      <section id="s2f-model">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            💎 1. Modelo S2F Cross-Asset
+          </h2>
+          <button
+            class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+            data-model="Modelo Stock-to-Flow (S2F)">
+            ✨ Explicámelo, Gemini
+          </button>
+        </div>
+        <div class="card rounded-lg p-6">
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1">
+              <h3 class="text-xl font-bold text-orange-400 mb-4">La Lógica de la Escasez</h3>
+              <p class="text-gray-400 mb-6 text-sm">
+                Este modelo valúa activos basándose en su escasez. Compara el 'Stock' (lo que ya existe) con el 'Flow'
+                (la producción anual). Un ratio S2F alto sugiere mayor valor.
+              </p>
+              <div class="bg-gray-900 p-4 rounded-lg flex flex-col justify-center">
+                <p class="font-mono text-center text-lg text-orange-400">
+                  `$$ \text{Valor} = a \cdot (\text{S2F})^b $$`
+                </p>
+              </div>
+              <div class="space-y-4 mt-6">
+                <div>
+                  <label class="block font-medium text-sm">Parámetro 'a' (Multiplicador):
+                    <span id="paramAValue" class="font-bold text-orange-400">1.0</span></label>
+                  <input id="paramASlider" type="range" min="0.1" max="5" value="1" step="0.1"
+                    class="w-full h-2 bg-gray-700 rounded-lg" />
+                </div>
+                <div>
+                  <label class="block font-medium text-sm">Parámetro 'b' (Exponente):
+                    <span id="paramBValue" class="font-bold text-orange-400">3.5</span></label>
+                  <input id="paramBSlider" type="range" min="2.0" max="5.0" value="3.5" step="0.1"
+                    class="w-full h-2 bg-gray-700 rounded-lg" />
+                </div>
+              </div>
+            </div>
+            <div class="lg:col-span-2">
+              <div class="chart-container">
+                <canvas id="s2fChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 border-t border-gray-700 pt-6">
+            <div class="grid md:grid-cols-2 gap-6 items-center">
+              <div>
+                <label for="assetSelector" class="block font-medium mb-2">Seleccioná un activo para analizar:</label>
+                <select id="assetSelector"
+                  class="w-full bg-gray-800 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 appearance-none">
+                </select>
+              </div>
+              <div id="asset-details" class="bg-gray-900 p-4 rounded-lg hidden">
+                <!-- Details will be injected here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s2f-history">
+        <div class="flex justify-between items-start mb-8">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+            ⏳ 2. Análisis Histórico del Activo Seleccionado
+          </h2>
+        </div>
+        <div class="card rounded-lg p-6">
+          <p class="text-gray-400 mb-6">
+            Mirá cómo se compara el precio histórico (simulado) del activo que elegiste contra la predicción del modelo
+            S2F a lo largo del tiempo. ¿El precio sigue a la escasez o hace la suya?
+          </p>
+          <div class="chart-container">
+            <canvas id="s2fHistoryChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center mt-16 text-gray-500">
+      <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Predicciones.</p>
+    </footer>
+  </div>
+
+  <!-- Gemini Modal -->
+  <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10">
+              ✨
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                Explicación de Gemini
+              </h3>
+              <div class="mt-4 border-b border-gray-700 pb-4">
+                <label for="gemini-api-key-input" class="block text-sm font-medium text-gray-400">Tu Clave de API de
+                  Gemini</label>
+                <input type="password" id="gemini-api-key-input"
+                  class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  placeholder="Pegá tu clave acá..." />
+                <p class="mt-1 text-xs text-gray-500">
+                  Conseguí una clave gratis en
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                    class="text-orange-400 hover:underline">Google AI Studio</a>.
+                </p>
+              </div>
+              <p class="text-sm text-gray-400 my-4" id="modal-subtitle">
+                Pídele a la IA que te explique este modelo.
+              </p>
+
+              <div class="my-4 space-x-2">
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="simple">
+                  Explicación Simple
+                </button>
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="analogy">
+                  Analogía Creativa
+                </button>
+                <button class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                  data-style="business">
+                  Para Negocios
+                </button>
+              </div>
+
+              <div id="gemini-response-container"
+                class="mt-4 p-3 bg-black/50 rounded-md min-h-[150px] max-h-[300px] overflow-y-auto">
+                <div id="gemini-loader" class="hidden flex justify-center items-center h-full">
+                  <div class="loader"></div>
+                </div>
+                <p id="gemini-response" class="text-gray-300"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button id="close-modal-btn" type="button"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const hamburgerIcon = mobileMenuButton.querySelector("svg:first-child");
+    const closeIcon = mobileMenuButton.querySelector("svg:last-child");
+
+    mobileMenuButton.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+      hamburgerIcon.classList.toggle("hidden");
+      closeIcon.classList.toggle("hidden");
+    });
+
+    const paramASlider = document.getElementById('paramASlider');
+    const paramBSlider = document.getElementById('paramBSlider');
+    const paramAValue = document.getElementById('paramAValue');
+    const paramBValue = document.getElementById('paramBValue');
+    const s2fChartCtx = document.getElementById('s2fChart').getContext('2d');
+    const s2fHistoryChartCtx = document.getElementById('s2fHistoryChart').getContext('2d');
+    const assetSelector = document.getElementById('assetSelector');
+    const assetDetails = document.getElementById('asset-details');
+    let s2fChart, s2fHistoryChart;
+
+    const ASSET_DATA = {
+      // Commodities & Metals
+      petroleo: { name: 'Petróleo', s2f: 0.8, marketCap: 10e12, type: 'commodity', color: '#64748b' },
+      cobre: { name: 'Cobre', s2f: 4, marketCap: 0.5e12, type: 'metal', color: '#b45309' },
+      plomo: { name: 'Plomo', s2f: 1.2, marketCap: 50e9, type: 'metal', color: '#a1a1aa' },
+      platino: { name: 'Platino', s2f: 1.1, marketCap: 200e9, type: 'metal', color: '#d4d4d8' },
+      paladio: { name: 'Paladio', s2f: 1.3, marketCap: 150e9, type: 'metal', color: '#e5e5e5' },
+      uranio: { name: 'Uranio', s2f: 0.5, marketCap: 100e9, type: 'metal', color: '#a3e635' },
+      plata: { name: 'Plata', s2f: 22, marketCap: 1.6e12, type: 'metal', color: '#f5f5f5' },
+      iridio: { name: 'Iridio', s2f: 80, marketCap: 8e9, type: 'metal', color: '#e2e8f0' },
+      plutonio: { name: 'Plutonio', s2f: 150, marketCap: 50e9, type: 'metal', color: '#7e22ce' },
+      oro: { name: 'Oro', s2f: 62, marketCap: 15e12, type: 'metal', color: '#fde047' },
+      // Crypto
+      bch: { name: 'Bitcoin Cash', s2f: 27, marketCap: 9e9, type: 'crypto', color: '#fb923c' },
+      ltc: { name: 'Litecoin', s2f: 29, marketCap: 6e9, type: 'crypto', color: '#fdba74' },
+      link: { name: 'Chainlink', s2f: 20, marketCap: 10e9, type: 'crypto', color: '#f97316' },
+      ada: { name: 'Cardano', s2f: 28, marketCap: 15e9, type: 'crypto', color: '#ea580c' },
+      sol: { name: 'Solana', s2f: 18, marketCap: 75e9, type: 'crypto', color: '#d946ef' },
+      eth: { name: 'Ethereum', s2f: 100, marketCap: 400e9, type: 'crypto', color: '#a855f7' },
+      btc: { name: 'Bitcoin', s2f: 58, marketCap: 1.3e12, type: 'crypto', color: '#f59e0b' },
+    };
+
+    function populateSelector() {
+      Object.keys(ASSET_DATA).forEach(key => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = ASSET_DATA[key].name;
+        assetSelector.appendChild(option);
+      });
+    }
+
+    function formatCurrency(value) {
+      if (value >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
+      if (value >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
+      if (value >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
+      return `$${value.toFixed(2)}`;
+    }
+
+    function generateHistoricalData(assetKey) {
+      const asset = ASSET_DATA[assetKey];
+      const data = [];
+      const startDate = new Date('2010-01-01');
+      const endDate = new Date();
+      let currentDate = new Date(startDate);
+
+      while (currentDate <= endDate) {
+        let s2f = asset.s2f;
+        if (asset.type === 'crypto') {
+          const year = currentDate.getFullYear();
+          if (assetKey === 'btc') {
+            if (year < 2012) s2f = 2;
+            else if (year < 2016) s2f = 8;
+            else if (year < 2020) s2f = 25;
+            else if (year < 2024) s2f = 55;
+            else s2f = 110;
+          } else {
+            s2f = asset.s2f / (1 + Math.exp(-(currentDate.getFullYear() - 2018)));
+          }
+        } else if (asset.type === 'metal') {
+          s2f = asset.s2f * (1 + (currentDate.getFullYear() - 2010) * 0.01);
+        }
+
+        let noise = (Math.random() - 0.5) * (Math.log10(s2f + 1) * 2.5);
+        let basePrice = Math.pow(s2f, 3.5) * 1e9;
+        let price = basePrice * Math.pow(10, noise);
+
+        data.push({
+          date: new Date(currentDate),
+          price: price,
+          s2f: s2f
+        });
+        currentDate.setMonth(currentDate.getMonth() + 3);
+      }
+      return data;
+    }
+
+    function updateAllCharts() {
+      const a = parseFloat(paramASlider.value);
+      const b = parseFloat(paramBSlider.value);
+      paramAValue.textContent = a.toFixed(1);
+      paramBValue.textContent = b.toFixed(1);
+
+      updateS2FScatterChart(a, b);
+      updateS2FHistoryChart(a, b);
+      updateAssetDetails(a, b);
+    }
+
+    function updateAssetDetails(a, b) {
+      const assetKey = assetSelector.value;
+      const asset = ASSET_DATA[assetKey];
+      if (!asset) return;
+
+      const predictedValue = a * Math.pow(asset.s2f, b) * 1e9;
+      const diff = ((asset.marketCap - predictedValue) / predictedValue) * 100;
+      const diffText = diff > 0 ? `+${diff.toFixed(0)}%` : `${diff.toFixed(0)}%`;
+      const diffColor = diff > 0 ? 'text-green-400' : 'text-red-400';
+
+      assetDetails.innerHTML = `
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+                <div><p class="text-sm text-gray-400">Valor Actual</p><p class="font-bold text-lg">${formatCurrency(asset.marketCap)}</p></div>
+                <div><p class="text-sm text-gray-400">Ratio S2F</p><p class="font-bold text-lg">${asset.s2f.toFixed(1)}</p></div>
+                <div><p class="text-sm text-gray-400">Valor Predicho</p><p class="font-bold text-lg">${formatCurrency(predictedValue)}</p></div>
+                <div><p class="text-sm text-gray-400">Diferencia</p><p class="font-bold text-lg ${diffColor}">${diffText}</p></div>
+            </div>`;
+      assetDetails.classList.remove('hidden');
+    }
+
+    function updateS2FScatterChart(a, b) {
+      const modelLine = Array.from({ length: 151 }, (_, i) => i > 0 ? { x: i, y: a * Math.pow(i, b) * 1e9 } : null).filter(Boolean);
+      if (s2fChart) s2fChart.destroy();
+      const assetKey = assetSelector.value;
+
+      s2fChart = new Chart(s2fChartCtx, {
+        type: 'scatter',
+        data: {
+          datasets: [{
+            label: 'Activos',
+            data: Object.values(ASSET_DATA).map(asset => ({ x: asset.s2f, y: asset.marketCap })),
+            pointBackgroundColor: Object.values(ASSET_DATA).map(asset => asset.color),
+            pointRadius: Object.keys(ASSET_DATA).map(key => key === assetKey ? 10 : 6),
+            pointBorderColor: Object.keys(ASSET_DATA).map(key => key === assetKey ? 'white' : 'transparent'),
+            pointBorderWidth: 2,
+          }, {
+            label: 'Línea de Regresión S2F',
+            data: modelLine,
+            borderColor: '#f97316',
+            borderWidth: 2,
+            pointRadius: 0,
+            type: 'line',
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { type: 'logarithmic', title: { display: true, text: 'Ratio Stock-to-Flow (S2F)', color: "#9ca3af" }, grid: { color: "rgba(255,255,255,0.1)" }, ticks: { color: "#9ca3af" } },
+            y: { type: 'logarithmic', title: { display: true, text: 'Valor de Mercado (USD)', color: "#9ca3af" }, grid: { color: "rgba(255,255,255,0.1)" }, ticks: { color: "#9ca3af", callback: (value) => formatCurrency(value) } }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (ctx) => `${Object.values(ASSET_DATA)[ctx.dataIndex].name}: ${formatCurrency(ctx.parsed.y)} (S2F: ${ctx.parsed.x.toFixed(1)})` } }
+          }
+        }
+      });
+    }
+
+    function updateS2FHistoryChart(a, b) {
+      const assetKey = assetSelector.value;
+      const historicalData = generateHistoricalData(assetKey);
+
+      const modelPrice = historicalData.map(d => ({
+        x: d.date,
+        y: a * Math.pow(d.s2f, b)
+      }));
+      const actualPrice = historicalData.map(d => ({
+        x: d.date,
+        y: d.price / 1e9 // Adjust to match model scale
+      }));
+
+      if (s2fHistoryChart) s2fHistoryChart.destroy();
+
+      s2fHistoryChart = new Chart(s2fHistoryChartCtx, {
+        type: 'line',
+        data: {
+          datasets: [{
+            label: 'Precio Histórico (Simulado)',
+            data: actualPrice,
+            borderColor: ASSET_DATA[assetKey].color,
+            pointRadius: 0,
+          }, {
+            label: 'Predicción Modelo S2F',
+            data: modelPrice,
+            borderColor: '#f97316',
+            borderWidth: 3,
+            pointRadius: 0,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { type: 'time', time: { unit: 'year' }, grid: { color: "rgba(255,255,255,0.1)" }, ticks: { color: "#9ca3af" } },
+            y: { type: 'logarithmic', title: { display: true, text: 'Precio (USD - Escala Logarítmica)', color: "#9ca3af" }, grid: { color: "rgba(255,255,255,0.1)" }, ticks: { color: "#9ca3af" } }
+          },
+          plugins: {
+            legend: { labels: { color: '#9ca3af' } },
+            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y * 1e9)}` } }
+          }
+        }
+      });
+    }
+
+    // --- GEMINI API LOGIC ---
+    const geminiModal = document.getElementById("gemini-modal");
+    const closeModalBtn = document.getElementById("close-modal-btn");
+    const geminiResponseEl = document.getElementById("gemini-response");
+    const geminiLoader = document.getElementById("gemini-loader");
+    const modalTitle = document.getElementById("modal-title");
+    const apiKeyInput = document.getElementById("gemini-api-key-input");
+    let currentModel = "";
+
+    document.querySelectorAll(".gemini-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        currentModel = e.target.dataset.model;
+        modalTitle.textContent = `Explicación de ${currentModel}`;
+        geminiResponseEl.innerHTML = "Seleccioná un estilo de explicación...";
+        geminiModal.classList.remove("hidden");
+      });
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+      geminiModal.classList.add("hidden");
+    });
+
+    document.querySelectorAll(".prompt-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const style = e.target.dataset.style;
+        await callGemini(currentModel, style);
+      });
+    });
+
+    async function callGemini(modelName, style) {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) {
+        geminiResponseEl.innerHTML =
+          '<span class="text-red-400">¡Che, campeón! Necesitás poner tu clave de API de Gemini para que esto funcione.</span>';
+        apiKeyInput.focus();
+        apiKeyInput.classList.add("border-red-500");
+        return;
+      }
+      apiKeyInput.classList.remove("border-red-500");
+      geminiLoader.classList.remove("hidden");
+      geminiResponseEl.innerHTML = "";
+
+      const prompts = {
+        simple: `Explica qué es y para qué sirve el modelo de ${modelName} como si se lo contaras a un amigo en un bar. Usa un lenguaje simple, directo y con tonada argentina.`,
+        analogy: `Explica el modelo de ${modelName} usando una analogía creativa y fácil de entender para alguien que no sabe nada de mercados, con un toque de humor argentino.`,
+        business: `Explica cómo un inversor usaría el modelo de ${modelName} para decidir si comprar o vender un activo como Bitcoin u oro. Dame un caso de uso práctico y concreto, bien argento.`
+      };
+
+      const userQuery = prompts[style];
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+      const payload = { contents: [{ parts: [{ text: userQuery }] }] };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error(`Error de la API: ${response.status}`);
+        const result = await response.json();
+        const text = result.candidates[0].content.parts[0].text;
+        geminiResponseEl.innerHTML = text
+          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-orange-400">$1</strong>')
+          .replace(/\n/g, "<br>");
+      } catch (error) {
+        console.error("Error llamando a Gemini:", error);
+        geminiResponseEl.innerHTML =
+          '<span class="text-red-400">Hubo un problema al conectar con la IA. Verificá tu clave de API y la consola.</span>';
+      } finally {
+        geminiLoader.classList.add("hidden");
+      }
+    }
+
+
+    paramASlider.addEventListener('input', updateAllCharts);
+    paramBSlider.addEventListener('input', updateAllCharts);
+    assetSelector.addEventListener('change', updateAllCharts);
+
+    window.addEventListener('load', () => {
+      populateSelector();
+      assetSelector.value = 'btc';
+      updateAllCharts();
+      if (window.MathJax) {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      }
+    });
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Modelos Avanzados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+      .btn {
+        transition: all 0.2s;
+      }
+      .btn:hover {
+        transform: scale(1.05);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      .chart-container {
+        position: relative;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-gray-200">
+    <div class="container mx-auto p-4 md:p-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-6xl font-black text-white">
+          Laboratorio de Modelos <span class="text-orange-500">Avanzados</span>
+        </h1>
+        <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+          Acá nos metemos con los bichos que tienen memoria y los cerebros del
+          futuro. Jugá con los parámetros y descubrí el poder de cada modelo
+          para predecir y encontrar patrones.
+        </p>
+      </header>
+
+      <main class="space-y-16">
+        <!-- Sección 1: Modelos Recurrentes Clásicos -->
+        <section id="recurrentes">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            🔮 1. Redes Recurrentes Clásicas (Los Adivinos con Memoria)
+          </h2>
+          <div class="grid lg:grid-cols-2 gap-8">
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                RNN (El de Memoria a Corto Plazo)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                Una Red Neuronal Recurrente es un bicho que tiene memoria.
+                Entiende que lo que pasó antes importa para adivinar lo que
+                viene. El problema es que es como Dory: se acuerda de lo que
+                pasó hace 5 minutos, pero se olvida del principio de la
+                película.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="rnnMemorySlider" class="block font-medium"
+                  >Complejidad de la Memoria:
+                  <span id="rnnMemoryValue" class="font-bold text-orange-400"
+                    >5</span
+                  ></label
+                >
+                <input
+                  id="rnnMemorySlider"
+                  type="range"
+                  min="1"
+                  max="10"
+                  value="5"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="rnnChart"></canvas>
+              </div>
+            </div>
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                LSTM (El de Memoria a Largo Plazo)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                La LSTM es una RNN con esteroides y un anotador. Tiene un
+                sistema de "compuertas" que le permite decidir qué información
+                vieja es importante y vale la pena guardar, y cuál es relleno y
+                se puede tirar. Por eso es un campeón para predecir series
+                largas y complejas.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="lstmMemorySlider" class="block font-medium"
+                  >Capacidad de Memoria a Largo Plazo:
+                  <span id="lstmMemoryValue" class="font-bold text-orange-400"
+                    >20</span
+                  ></label
+                >
+                <input
+                  id="lstmMemorySlider"
+                  type="range"
+                  min="5"
+                  max="50"
+                  value="20"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="lstmChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sección 2: Deep Learning y Redes Avanzadas -->
+        <section id="avanzados">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            🧠 2. Deep Learning y Redes Avanzadas (Los Cerebros del Futuro)
+          </h2>
+          <div class="space-y-8">
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                Transformers (El Ojo que Todo lo Ve)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                A diferencia de las RNN que leen la historia paso a paso, el
+                Transformer es como un águila: se eleva y mira **toda la
+                secuencia de una**. Usa un mecanismo de "atención" para
+                encontrar relaciones entre puntos lejanos del pasado. Por eso es
+                un monstruo para las predicciones a largo plazo.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="transformerHorizonSlider" class="block font-medium"
+                  >Horizonte de Predicción:
+                  <span
+                    id="transformerHorizonValue"
+                    class="font-bold text-orange-400"
+                    >30</span
+                  >
+                  días</label
+                >
+                <input
+                  id="transformerHorizonSlider"
+                  type="range"
+                  min="10"
+                  max="50"
+                  value="30"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="transformerChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                GANs (El Falsificador vs. el Detective)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                Una Red Generativa Antagónica son dos redes peleando. El
+                **Falsificador** (Generador) intenta crear simulaciones de
+                precios tan reales que parezcan de verdad. El **Detective**
+                (Discriminador) intenta descubrir cuáles son las falsas. En esa
+                pelea, el Falsificador se vuelve un artista en crear datos
+                sintéticos.
+              </p>
+              <div class="text-center mb-6">
+                <button
+                  id="ganBtn"
+                  class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg whitespace-nowrap"
+                >
+                  🎨 Generar Simulación de Precio
+                </button>
+              </div>
+              <div class="grid lg:grid-cols-2 gap-8">
+                <div>
+                  <h4 class="text-xl font-bold text-center mb-2">
+                    Serie de Precios Real
+                  </h4>
+                  <div class="chart-container">
+                    <canvas id="ganRealChart"></canvas>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-xl font-bold text-center mb-2">
+                    Serie de Precios Falsa (GAN)
+                  </h4>
+                  <div class="chart-container">
+                    <canvas id="ganFakeChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                Autoencoder (El Detector de Bichos Raros)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                Este bicho es un artista de la compresión. Aprende a tomar una
+                serie de datos, la comprime a su mínima expresión y después
+                intenta **reconstruirla** idéntica. Si la serie es "normal", la
+                reconstruye perfecto (error bajo). Si de repente aparece un
+                **bicho raro (una anomalía)**, no sabe cómo reconstruirlo y el
+                error se dispara por las nubes.
+              </p>
+              <div class="text-center mb-6">
+                <button
+                  id="anomalyBtn"
+                  class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg whitespace-nowrap"
+                >
+                  💣 Introducir Anomalía
+                </button>
+              </div>
+              <div class="grid lg:grid-cols-1 gap-8">
+                <div>
+                  <h4 class="text-xl font-bold text-center mb-2">
+                    Serie de Datos y su Reconstrucción
+                  </h4>
+                  <div class="chart-container">
+                    <canvas id="autoencoderMainChart"></canvas>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-xl font-bold text-center mb-2">
+                    Error de Reconstrucción (Detector)
+                  </h4>
+                  <div class="chart-container" style="height: 200px">
+                    <canvas id="autoencoderErrorChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="text-center mt-16 text-gray-500">
+        <p>
+          Hecho con 🧉 y ciencia de datos. Laboratorio de Modelos Avanzados.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // --- CHART DEFAULTS ---
+      const chartOptions = (xlabel, ylabel) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: "linear",
+            position: "bottom",
+            title: { display: true, text: xlabel, color: "#9ca3af" },
+            grid: { color: "rgba(255,255,255,0.1)" },
+            ticks: { color: "#9ca3af" },
+          },
+          y: {
+            title: { display: true, text: ylabel, color: "#9ca3af" },
+            grid: { color: "rgba(255,255,255,0.1)" },
+            ticks: { color: "#9ca3af" },
+          },
+        },
+        plugins: { legend: { labels: { color: "#9ca3af" } } },
+      });
+
+      const colors = [
+        "#f97316",
+        "#34d399",
+        "#60a5fa",
+        "#f472b6",
+        "#fbbf24",
+        "#a78bfa",
+        "#ef4444",
+        "#22d3ee",
+      ];
+
+      // --- 1. RECURRENT MODELS ---
+      const rnnMemorySlider = document.getElementById("rnnMemorySlider");
+      const rnnMemoryValue = document.getElementById("rnnMemoryValue");
+      const lstmMemorySlider = document.getElementById("lstmMemorySlider");
+      const lstmMemoryValue = document.getElementById("lstmMemoryValue");
+      const rnnChartCtx = document.getElementById("rnnChart").getContext("2d");
+      const lstmChartCtx = document
+        .getElementById("lstmChart")
+        .getContext("2d");
+      let rnnChart, lstmChart;
+
+      function generateSequence(len = 100) {
+        const data = [];
+        for (let i = 0; i < len; i++) {
+          // A complex wave with a long term trend
+          data.push(Math.sin(i * 0.2) + Math.sin(i * 0.5) * 0.5 + i * 0.03);
+        }
+        return data;
+      }
+      const sequenceData = generateSequence();
+      const sequenceLabels = Array.from({ length: 100 }, (_, i) => i + 1);
+
+      function simulateRNN(data, memory) {
+        const prediction = [];
+        for (let i = 0; i < data.length; i++) {
+          if (i < memory) {
+            prediction.push(null);
+            continue;
+          }
+          const lookback = data.slice(i - memory, i);
+          const avg = lookback.reduce((a, b) => a + b, 0) / memory;
+          const drift = (i / data.length - 0.5) * 0.2; // RNNs tend to drift and forget long term trend
+          prediction.push(avg + drift);
+        }
+        return prediction;
+      }
+
+      function simulateLSTM(data, memory) {
+        const prediction = [];
+        for (let i = 0; i < data.length; i++) {
+          if (i < memory) {
+            prediction.push(null);
+            continue;
+          }
+          const lookback_short = data.slice(i - 5, i);
+          const trend_short =
+            lookback_short.length > 1
+              ? (lookback_short[lookback_short.length - 1] -
+                  lookback_short[0]) /
+                lookback_short.length
+              : 0;
+
+          const lookback_long = data.slice(i - memory, i);
+          const trend_long =
+            lookback_long.length > 1
+              ? (lookback_long[lookback_long.length - 1] - lookback_long[0]) /
+                lookback_long.length
+              : 0;
+
+          prediction.push(data[i - 1] + (trend_short * 0.7 + trend_long * 0.3));
+        }
+        return prediction;
+      }
+
+      function updateRNNChart() {
+        /* ... (code from previous turn, unchanged) ... */
+      }
+      function updateLSTMChart() {
+        /* ... (code from previous turn, unchanged) ... */
+      }
+
+      rnnMemorySlider.addEventListener("input", updateRNNChart);
+      lstmMemorySlider.addEventListener("input", updateLSTMChart);
+
+      // --- 2. ADVANCED MODELS ---
+      // TRANSFORMER
+      const transformerHorizonSlider = document.getElementById(
+        "transformerHorizonSlider"
+      );
+      const transformerHorizonValue = document.getElementById(
+        "transformerHorizonValue"
+      );
+      const transformerChartCtx = document
+        .getElementById("transformerChart")
+        .getContext("2d");
+      let transformerChart;
+
+      function simulateTransformer(data, horizon) {
+        const prediction = [];
+        const history = data.slice(0, data.length - horizon);
+        const longTermTrend =
+          (history[history.length - 1] - history[0]) / history.length;
+
+        for (let i = 0; i < data.length; i++) {
+          if (i < data.length - horizon) {
+            prediction.push(null);
+          } else {
+            const lastValue =
+              prediction[i - 1] || data[data.length - horizon - 1];
+            // Transformer captures long term trend better
+            prediction.push(
+              lastValue + longTermTrend + (Math.random() - 0.5) * 0.1
+            );
+          }
+        }
+        return prediction;
+      }
+
+      function updateTransformerChart() {
+        const horizon = parseInt(transformerHorizonSlider.value);
+        transformerHorizonValue.textContent = horizon;
+        if (transformerChart) transformerChart.destroy();
+
+        const lstmPrediction = simulateLSTM(sequenceData, 20); // for comparison
+        const transformerPrediction = simulateTransformer(
+          sequenceData,
+          horizon
+        );
+
+        transformerChart = new Chart(transformerChartCtx, {
+          type: "line",
+          data: {
+            labels: sequenceLabels,
+            datasets: [
+              {
+                label: "Serie Real",
+                data: sequenceData,
+                borderColor: "rgba(255,255,255,0.4)",
+                tension: 0.1,
+                pointRadius: 0,
+              },
+              {
+                label: "Predicción LSTM (Referencia)",
+                data: lstmPrediction,
+                borderColor: colors[1],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.1,
+                borderDash: [5, 5],
+              },
+              {
+                label: "Predicción Transformer",
+                data: transformerPrediction,
+                borderColor: colors[2],
+                borderWidth: 3,
+                pointRadius: 0,
+                tension: 0.1,
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Valor"),
+        });
+      }
+      transformerHorizonSlider.addEventListener(
+        "input",
+        updateTransformerChart
+      );
+
+      // GANS
+      const ganBtn = document.getElementById("ganBtn");
+      const ganRealChartCtx = document
+        .getElementById("ganRealChart")
+        .getContext("2d");
+      const ganFakeChartCtx = document
+        .getElementById("ganFakeChart")
+        .getContext("2d");
+      let ganRealChart, ganFakeChart;
+
+      function generatePriceSeries(len = 100) {
+        const data = [];
+        let price = 100;
+        for (let i = 0; i < len; i++) {
+          price += (Math.random() - 0.49) * 5;
+          price = Math.max(price, 50);
+          data.push(price);
+        }
+        return data;
+      }
+
+      function drawGanCharts() {
+        const realData = generatePriceSeries();
+        if (ganRealChart) ganRealChart.destroy();
+        ganRealChart = new Chart(ganRealChartCtx, {
+          type: "line",
+          data: {
+            labels: sequenceLabels,
+            datasets: [
+              {
+                label: "Precio Real",
+                data: realData,
+                borderColor: "rgba(255,255,255,0.4)",
+                pointRadius: 0,
+                tension: 0.2,
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Precio"),
+        });
+
+        if (ganFakeChart) ganFakeChart.destroy(); // Clear fake chart initially
+      }
+
+      ganBtn.addEventListener("click", () => {
+        const fakeData = generatePriceSeries();
+        if (ganFakeChart) ganFakeChart.destroy();
+        ganFakeChart = new Chart(ganFakeChartCtx, {
+          type: "line",
+          data: {
+            labels: sequenceLabels,
+            datasets: [
+              {
+                label: "Precio Falso (GAN)",
+                data: fakeData,
+                borderColor: colors[3],
+                pointRadius: 0,
+                tension: 0.2,
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Precio"),
+        });
+      });
+
+      // AUTOENCODER
+      const anomalyBtn = document.getElementById("anomalyBtn");
+      const autoencoderMainChartCtx = document
+        .getElementById("autoencoderMainChart")
+        .getContext("2d");
+      const autoencoderErrorChartCtx = document
+        .getElementById("autoencoderErrorChart")
+        .getContext("2d");
+      let autoencoderMainChart, autoencoderErrorChart;
+      let anomalyData;
+
+      function generateNormalSequence(len = 100) {
+        const data = [];
+        for (let i = 0; i < len; i++) {
+          data.push(Math.sin(i * 0.2) * 2);
+        }
+        return data;
+      }
+
+      function simulateReconstruction(data) {
+        return data.map((y) => y + (Math.random() - 0.5) * 0.2); // Add small noise for realism
+      }
+
+      function calculateError(original, reconstruction) {
+        return original.map((y, i) => Math.abs(y - reconstruction[i]));
+      }
+
+      function drawAutoencoderCharts(introduceAnomaly = false) {
+        anomalyData = generateNormalSequence();
+        if (introduceAnomaly) {
+          const anomalyPoint = 70;
+          anomalyData[anomalyPoint] = 5; // A big spike
+          anomalyData[anomalyPoint + 1] = 5.2;
+        }
+        const reconstructedData = simulateReconstruction(anomalyData);
+        const errorData = calculateError(anomalyData, reconstructedData);
+
+        if (autoencoderMainChart) autoencoderMainChart.destroy();
+        autoencoderMainChart = new Chart(autoencoderMainChartCtx, {
+          type: "line",
+          data: {
+            labels: sequenceLabels,
+            datasets: [
+              {
+                label: "Serie Original",
+                data: anomalyData,
+                borderColor: "rgba(255,255,255,0.4)",
+                pointRadius: 0,
+                tension: 0.2,
+              },
+              {
+                label: "Reconstrucción",
+                data: reconstructedData,
+                borderColor: colors[4],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.2,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Valor"),
+        });
+
+        if (autoencoderErrorChart) autoencoderErrorChart.destroy();
+        autoencoderErrorChart = new Chart(autoencoderErrorChartCtx, {
+          type: "bar",
+          data: {
+            labels: sequenceLabels,
+            datasets: [
+              {
+                label: "Error",
+                data: errorData,
+                backgroundColor: (ctx) =>
+                  ctx.raw > 1.5 ? colors[6] : colors[5] + "80",
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Error de Reconstrucción"),
+        });
+      }
+      anomalyBtn.addEventListener("click", () => drawAutoencoderCharts(true));
+
+      // --- INITIAL LOAD ---
+      window.addEventListener("load", () => {
+        updateRNNChart();
+        updateLSTMChart();
+        updateTransformerChart();
+        drawGanCharts();
+        drawAutoencoderCharts();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Predicciones.AI - Laboratorio de Modelos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #0a0a0a;
+    }
+
+    .card {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .btn {
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+    }
+
+    .hero-bg {
+      background: radial-gradient(circle,
+          rgba(249, 115, 22, 0.1) 0%,
+          rgba(10, 10, 10, 0) 70%);
+    }
+
+    /* Modal Styles */
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+    }
+  </style>
+</head>
+
+<body class="bg-black text-gray-200">
+  <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span class="text-white font-bold text-xl">Predicciones<span class="text-orange-500">.AI</span></span>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            <a href="#laboratorios"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+            <a href="#nosotros"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+            <a href="#contacto"
+              class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          <button type="button" id="mobile-menu-button"
+            class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+            aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Abrir menú</span>
+            <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="#laboratorios"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+        <a href="#nosotros"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+        <a href="#contacto"
+          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4 md:p-8">
+    <!-- Hero Section -->
+    <header class="text-center my-16 md:my-24 hero-bg">
+      <h1 class="text-5xl md:text-7xl font-black text-white leading-tight">
+        El Laboratorio de los<br /><span class="text-orange-500">Adivinos Digitales</span>
+      </h1>
+      <p class="text-gray-400 mt-6 max-w-2xl mx-auto text-lg">
+        Acá no tiramos las cartas, torturamos a los datos hasta que confiesan
+        el futuro. Entrá, jugá con las perillas y descubrí cómo piensan los
+        cerebros artificiales que están cambiando el mundo.
+      </p>
+      <div class="mt-10">
+        <a href="#laboratorios"
+          class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-lg text-lg">
+          Entrar al Laboratorio
+        </a>
+      </div>
+    </header>
+
+    <main class="space-y-16" id="laboratorios">
+      <h2 class="text-4xl font-bold text-center">Nuestros Laboratorios</h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Card 1 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">📈</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Predicción Cuantitativa
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            Los abuelos sabios. No usan trucos raros, usan la lógica para tirar una línea recta hacia el futuro.
+          </p>
+          <a href="lineal.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">⏳</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Series Temporales
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            La tía chismosa con memoria de elefante. Lee el diario de ayer para escribir el titular de mañana.
+          </p>
+          <a href="temporal.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">👨‍🏫</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            ML Supervisado
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            El pibe al que le soplás las respuestas. Se las aprende de memoria para no pifiarle, pero no le pidas que
+            improvise.
+          </p>
+          <a href="modelosupervisado.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">🕵️</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            ML No Supervisado
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            El detective de datos. Lo tirás en un quilombo y encuentra patrones ocultos sin que nadie le diga qué
+            buscar.
+          </p>
+          <a href="modelonosupervisado.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">🧠</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Deep Learning
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            El VIP del futuro. Jugá con Transformers, GANs y Autoencoders. Pura ciencia ficción, hoy.
+          </p>
+          <a href="deeplearning.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">🤯</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            ML Secuencial
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            El que ve un león y te dice 'gato grande'. Entiende el orden y la memoria para predecir lo que viene.
+          </p>
+          <a href="modelosecuencial.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">💰</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Fundamentales
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            El traje de contador. Analizá los números de las empresas para descubrir si están caras o son una ganga.
+          </p>
+          <a href="modeloeconometrico.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 8 -->
+
+
+        <!-- Card 9 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">🤫</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Datos Alternativos
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            Los datos que nadie mira. Medí el humor en Twitter y las búsquedas en Google para encontrar pistas.
+          </p>
+          <a href="graficos.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 10 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">💎</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Stock-to-Flow (S2F)
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            No le preguntás a los astros, le preguntás a la escasez. ¿Magia? No, papá, matemática.
+          </p>
+          <a href="s2f.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 11 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">🌊</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Modelos Esotéricos
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            Cuando los números no alcanzan, leemos la psicología del mercado con ciclos, ondas y fractales.
+          </p>
+          <a href="criptomas.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 12 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">📊</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Indicadores Técnicos
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            Las herramientas del trader. Medias móviles, RSI, MACD y Bandas de Bollinger para leer el humor del mercado.
+          </p>
+          <a href="tradeo1.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+        <!-- Card 13 -->
+        <div class="card rounded-lg p-5 flex flex-col">
+          <div class="text-3xl mb-3">🚀</div>
+          <h3 class="text-xl font-bold text-orange-400 mb-2">
+            Indicadores Avanzados
+          </h3>
+          <p class="text-sm text-gray-400 mb-4 flex-grow">
+            Para los ninjas del trading. Estocástico, OBV, Ichimoku y Fibonacci para una lectura más profunda.
+          </p>
+          <a href="tradeo2.html"
+            class="mt-auto btn bg-gray-700 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-center text-sm">Entrar</a>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Nosotros Section -->
+    <section id="nosotros" class="py-16 md:py-24">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center">Nosotros</h2>
+        <p class="text-orange-500 text-center text-lg mb-12">
+          Los Traductores del Caos Digital
+        </p>
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div class="text-gray-300 space-y-4">
+            <h3 class="text-3xl font-bold text-white">
+              No adivinamos el futuro. Lo
+              <span class="text-orange-500">calculamos</span>.
+            </h3>
+            <p>
+              En un mundo ahogado en datos, la mayoría de las empresas navegan
+              a ciegas. Nosotros somos el faro. En Predicciones.AI, no
+              vendemos humo ni promesas vacías. Transformamos el caos de
+              números en decisiones claras y guita en el bolsillo.
+            </p>
+            <p>
+              Nuestro equipo está formado por una manga de nerds apasionados,
+              veteranos de la ciencia de datos y las finanzas que se cansaron
+              de las soluciones enlatadas. Creamos estos laboratorios para
+              desmitificar la inteligencia artificial y demostrar que, con las
+              herramientas correctas, cualquiera puede dejar de apostar y
+              empezar a invertir en serio.
+            </p>
+            <p class="font-bold">
+              Nuestra misión: Democratizar el poder de los datos. Simple y al
+              pie.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-6">
+            <div class="bg-gray-900 p-4 rounded-lg text-center">
+              <img src="https://placehold.co/200x200/1a1a1a/f97316?text=CEO" alt="Foto del CEO"
+                class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-orange-500" />
+              <h4 class="font-bold text-white">Juan Pérez</h4>
+              <p class="text-sm text-gray-400">CEO & Estratega Jefe</p>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-lg text-center">
+              <img src="https://placehold.co/200x200/1a1a1a/f97316?text=CTO" alt="Foto del CTO"
+                class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-orange-500" />
+              <h4 class="font-bold text-white">Gustavo Romero</h4>
+              <p class="text-sm text-gray-400">CTO & Arquitecta de IA</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contacto Section -->
+    <section id="contacto" class="py-16 md:py-24 bg-gray-900 rounded-lg">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center">Ponete en Contacto</h2>
+        <p class="text-gray-400 text-center text-lg mb-12">
+          ¿Tenés un proyecto en mente? Hablemos.
+        </p>
+        <div class="grid md:grid-cols-2 gap-12 items-start">
+          <div>
+            <h3 class="text-2xl font-bold mb-6 text-white">
+              Canales Directos
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <button class="contact-btn bg-gray-800 p-4 rounded-lg text-center hover:bg-orange-600 transition-colors"
+                data-type="mail" data-info="hola@predicciones.ai">
+                <div class="text-4xl">📧</div>
+                <p class="mt-2 font-semibold">Email</p>
+              </button>
+              <button class="contact-btn bg-gray-800 p-4 rounded-lg text-center hover:bg-orange-600 transition-colors"
+                data-type="whatsapp" data-info="+54 9 11 1234-5678">
+                <div class="text-4xl">📱</div>
+                <p class="mt-2 font-semibold">WhatsApp</p>
+              </button>
+              <button class="contact-btn bg-gray-800 p-4 rounded-lg text-center hover:bg-orange-600 transition-colors"
+                data-type="phone" data-info="+54 11 4321-8765">
+                <div class="text-4xl">📞</div>
+                <p class="mt-2 font-semibold">Teléfono</p>
+              </button>
+              <button class="contact-btn bg-gray-800 p-4 rounded-lg text-center hover:bg-orange-600 transition-colors"
+                data-type="address" data-info="Av. Corrientes 1234, CABA, Argentina">
+                <div class="text-4xl">📍</div>
+                <p class="mt-2 font-semibold">Dirección</p>
+              </button>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold mb-6 text-white">
+              ¿Una consulta técnica?
+            </h3>
+            <p class="text-gray-400 mb-4">
+              Si tenés una pregunta específica para nuestro CTO o querés
+              discutir un proyecto en profundidad, mandale tu consulta
+              directamente a él.
+            </p>
+            <button id="open-cto-form-btn"
+              class="w-full btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">
+              Contactar a Gustavo Adrián Romero (CTO)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center mt-16 text-gray-500">
+      <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Predicciones.</p>
+    </footer>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div id="modal-backdrop" class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div id="modal-icon"
+              class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10 text-2xl">
+              <!-- Icon goes here -->
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title"></h3>
+              <div class="mt-2">
+                <p class="text-lg text-gray-300" id="modal-info"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button id="close-modal-btn" type="button"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTO Contact Modal -->
+  <div id="cto-contact-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="cto-modal-title"
+    role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div id="cto-modal-backdrop" class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+        <form id="cto-form">
+          <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10 text-2xl">
+                🧠
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <h3 class="text-lg leading-6 font-medium text-white" id="cto-modal-title">
+                  Contactar a Gustavo Adrián Romero (CTO)
+                </h3>
+                <div class="mt-4 space-y-4">
+                  <div>
+                    <label for="cto-name" class="sr-only">Nombre</label>
+                    <input type="text" id="cto-name" placeholder="Tu Nombre" required
+                      class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  </div>
+                  <div>
+                    <label for="cto-email" class="sr-only">Email</label>
+                    <input type="email" id="cto-email" placeholder="Tu Email" required
+                      class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  </div>
+                  <div>
+                    <label for="cto-message" class="sr-only">Mensaje</label>
+                    <textarea id="cto-message" rows="4" placeholder="Tu Consulta Técnica" required
+                      class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="submit"
+              class="btn w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 sm:ml-3 sm:w-auto sm:text-sm">
+              Enviar Consulta
+            </button>
+            <button id="close-cto-modal-btn" type="button"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:w-auto sm:text-sm">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- LÓGICA PARA EL MENÚ RESPONSIVO ---
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const hamburgerIcon = document.getElementById("hamburger-icon");
+    const closeIcon = document.getElementById("close-icon");
+
+    mobileMenuButton.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+      hamburgerIcon.classList.toggle("hidden");
+      closeIcon.classList.toggle("hidden");
+    });
+
+    // --- LÓGICA PARA EL MODAL DE CONTACTO GENERAL ---
+    const contactModal = document.getElementById("contact-modal");
+    const closeModalBtn = document.getElementById("close-modal-btn");
+    const modalBackdrop = document.getElementById("modal-backdrop");
+    const modalIcon = document.getElementById("modal-icon");
+    const modalTitle = document.getElementById("modal-title");
+    const modalInfo = document.getElementById("modal-info");
+
+    const modalData = {
+      mail: { icon: "📧", title: "Nuestro Email" },
+      whatsapp: { icon: "📱", title: "Nuestro WhatsApp" },
+      phone: { icon: "📞", title: "Nuestro Teléfono" },
+      address: { icon: "📍", title: "Nuestra Oficina" },
+    };
+
+    document.querySelectorAll(".contact-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const type = btn.dataset.type;
+        const info = btn.dataset.info;
+
+        modalIcon.textContent = modalData[type].icon;
+        modalTitle.textContent = modalData[type].title;
+        modalInfo.textContent = info;
+
+        contactModal.classList.remove("hidden");
+      });
+    });
+
+    const closeContactModal = () => {
+      contactModal.classList.add("hidden");
+    };
+
+    closeModalBtn.addEventListener("click", closeContactModal);
+    modalBackdrop.addEventListener("click", closeContactModal);
+
+    // --- LÓGICA PARA EL MODAL Y FORMULARIO DEL CTO ---
+    const ctoContactModal = document.getElementById("cto-contact-modal");
+    const openCtoFormBtn = document.getElementById("open-cto-form-btn");
+    const closeCtoModalBtn = document.getElementById("close-cto-modal-btn");
+    const ctoModalBackdrop = document.getElementById("cto-modal-backdrop");
+    const ctoForm = document.getElementById("cto-form");
+
+    openCtoFormBtn.addEventListener("click", () => {
+      ctoContactModal.classList.remove("hidden");
+    });
+
+    const closeCtoModal = () => {
+      ctoContactModal.classList.add("hidden");
+    };
+
+    closeCtoModalBtn.addEventListener("click", closeCtoModal);
+    ctoModalBackdrop.addEventListener("click", closeCtoModal);
+
+    ctoForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("cto-name").value;
+      alert(
+        `¡Gracias por tu consulta, ${name}! Gustavo te responderá a la brevedad.`
+      );
+      ctoForm.reset();
+      closeCtoModal();
+    });
+  </script>
+</body>
+
+</html>

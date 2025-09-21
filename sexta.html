@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Modelos Fundamentales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+      .btn {
+        transition: all 0.2s;
+      }
+      .btn:hover {
+        transform: scale(1.05);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      .chart-container {
+        position: relative;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-gray-200">
+    <div class="container mx-auto p-4 md:p-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-6xl font-black text-white">
+          Laboratorio de Modelos
+          <span class="text-orange-500">Fundamentales</span>
+        </h1>
+        <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+          Acá dejamos de mirar el gráfico y nos ponemos el traje de contador.
+          Jugá con los supuestos y descubrí cómo los profesionales intentan
+          calcular el "valor real" de una empresa.
+        </p>
+      </header>
+
+      <main class="space-y-16">
+        <!-- Sección 1: Flujo de Caja Descontado (DCF) -->
+        <section id="dcf">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            💰 1. Flujo de Caja Descontado (DCF): La Máquina del Tiempo de la
+            Guita
+          </h2>
+          <div class="card rounded-lg p-6">
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div>
+                <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                  Adivinando la Guita del Futuro
+                </h3>
+                <p class="text-gray-400 mb-6">
+                  Este es el abuelo de todos los modelos. La idea es simple:
+                  adivinar cuánta guita va a generar una empresa en los próximos
+                  años y "traerla" al presente para ver cuánto vale hoy. Si el
+                  valor que calculamos (intrínseco) es más alto que el precio en
+                  la bolsa, ¡puede ser una ganga!
+                </p>
+
+                <div class="space-y-4 mb-6">
+                  <div>
+                    <label for="growthSlider" class="block font-medium"
+                      >Crecimiento de Ingresos Anual:
+                      <span id="growthValue" class="font-bold text-orange-400"
+                        >5</span
+                      >%</label
+                    >
+                    <input
+                      id="growthSlider"
+                      type="range"
+                      min="-5"
+                      max="20"
+                      value="5"
+                      step="1"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label for="marginSlider" class="block font-medium"
+                      >Margen de Ganancia (Flujo de Caja):
+                      <span id="marginValue" class="font-bold text-orange-400"
+                        >15</span
+                      >%</label
+                    >
+                    <input
+                      id="marginSlider"
+                      type="range"
+                      min="5"
+                      max="40"
+                      value="15"
+                      step="1"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label for="discountSlider" class="block font-medium"
+                      >Tasa de Descuento (Riesgo):
+                      <span id="discountValue" class="font-bold text-orange-400"
+                        >8</span
+                      >%</label
+                    >
+                    <input
+                      id="discountSlider"
+                      type="range"
+                      min="5"
+                      max="15"
+                      value="8"
+                      step="0.5"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <div class="bg-gray-900 p-4 rounded-lg text-center">
+                  <p class="text-lg">Precio Actual de la Acción:</p>
+                  <p class="text-4xl font-black text-white">
+                    $<span id="dcfCurrentPrice">150.00</span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                <div class="bg-gray-900 p-4 rounded-lg text-center mb-6">
+                  <p class="text-lg">Valor Intrínseco Calculado (DCF):</p>
+                  <p class="text-4xl font-black text-white">
+                    $<span id="dcfIntrinsicValue">165.78</span>
+                  </p>
+                  <p
+                    id="dcfVerdict"
+                    class="mt-2 text-xl font-bold text-green-400"
+                  >
+                    📉 Barata (Subvaluada)
+                  </p>
+                </div>
+                <div class="chart-container" style="height: 300px">
+                  <canvas id="dcfChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sección 2: Ratios Financieros -->
+        <section id="ratios">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            ⚖️ 2. Ratios Financieros (Comparando Figuritas)
+          </h2>
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              ¿Caro o Barato? La Clave es Comparar
+            </h3>
+            <p class="text-gray-400 mb-6">
+              Un ratio por sí solo no dice nada. Es como tener una sola
+              figurita. La magia aparece cuando lo comparás con el promedio de
+              otras empresas del mismo palo (el "promedio del sector") o con su
+              propio historial. Mové el precio de la acción y mirá cómo cambian
+              los ratios.
+            </p>
+
+            <div class="space-y-4 mb-8">
+              <label for="priceSlider" class="block font-medium text-xl"
+                >Precio Simulado de la Acción: $<span
+                  id="priceValue"
+                  class="font-bold text-orange-400"
+                  >100.00</span
+                ></label
+              >
+              <input
+                id="priceSlider"
+                type="range"
+                min="50"
+                max="300"
+                value="100"
+                step="1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+              <!-- P/E Ratio -->
+              <div class="bg-gray-900 p-4 rounded-lg">
+                <h4 class="text-xl font-bold text-center mb-2">
+                  Ratio P/E (Precio/Ganancias)
+                </h4>
+                <p class="text-sm text-gray-400 text-center mb-4">
+                  Mide cuántos años tardaría la empresa en ganar lo que vale
+                  hoy. Un P/E alto significa que el mercado espera un
+                  crecimiento zarpado.
+                </p>
+                <div class="chart-container" style="height: 250px">
+                  <canvas id="peChart"></canvas>
+                </div>
+                <p class="text-center mt-2 text-lg font-bold">
+                  P/E Calculado:
+                  <span id="peValue" class="text-orange-400">20.0</span>
+                </p>
+              </div>
+              <!-- P/B Ratio -->
+              <div class="bg-gray-900 p-4 rounded-lg">
+                <h4 class="text-xl font-bold text-center mb-2">
+                  Ratio P/B (Precio/Valor Libros)
+                </h4>
+                <p class="text-sm text-gray-400 text-center mb-4">
+                  Compara el precio de mercado con el valor "contable" de la
+                  empresa (lo que valdría si se liquidara todo). Un P/B bajo
+                  puede ser una señal de que está barata.
+                </p>
+                <div class="chart-container" style="height: 250px">
+                  <canvas id="pbChart"></canvas>
+                </div>
+                <p class="text-center mt-2 text-lg font-bold">
+                  P/B Calculado:
+                  <span id="pbValue" class="text-orange-400">2.0</span>
+                </p>
+              </div>
+              <!-- Dividend Yield -->
+              <div class="bg-gray-900 p-4 rounded-lg">
+                <h4 class="text-xl font-bold text-center mb-2">
+                  Dividend Yield (Rendimiento por Dividendo)
+                </h4>
+                <p class="text-sm text-gray-400 text-center mb-4">
+                  Mide cuánta guita te paga la empresa en dividendos cada año,
+                  en relación a su precio. Es clave para los que invierten
+                  buscando una renta.
+                </p>
+                <div class="chart-container" style="height: 250px">
+                  <canvas id="dyChart"></canvas>
+                </div>
+                <p class="text-center mt-2 text-lg font-bold">
+                  Yield Calculado:
+                  <span id="dyValue" class="text-orange-400">2.50</span>%
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="text-center mt-16 text-gray-500">
+        <p>
+          Hecho con 🧉 y ciencia de datos. Laboratorio de Modelos Fundamentales.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // --- 1. DCF ---
+      const growthSlider = document.getElementById("growthSlider");
+      const marginSlider = document.getElementById("marginSlider");
+      const discountSlider = document.getElementById("discountSlider");
+      const growthValue = document.getElementById("growthValue");
+      const marginValue = document.getElementById("marginValue");
+      const discountValue = document.getElementById("discountValue");
+      const dcfIntrinsicValue = document.getElementById("dcfIntrinsicValue");
+      const dcfVerdict = document.getElementById("dcfVerdict");
+      const dcfChartCtx = document.getElementById("dcfChart").getContext("2d");
+      let dcfChart;
+
+      const dcfCurrentPrice = 150.0;
+      document.getElementById("dcfCurrentPrice").textContent =
+        dcfCurrentPrice.toFixed(2);
+
+      function calculateDCF() {
+        const growthRate = parseFloat(growthSlider.value) / 100;
+        const cashFlowMargin = parseFloat(marginSlider.value) / 100;
+        const discountRate = parseFloat(discountSlider.value) / 100;
+
+        let initialRevenue = 1000; // Simulación base
+        let intrinsicValue = 0;
+        const years = 5;
+
+        for (let i = 1; i <= years; i++) {
+          initialRevenue *= 1 + growthRate;
+          const cashFlow = initialRevenue * cashFlowMargin;
+          const discountedCashFlow = cashFlow / Math.pow(1 + discountRate, i);
+          intrinsicValue += discountedCashFlow;
+        }
+
+        // Terminal Value (simplified)
+        const terminalGrowth = 0.025;
+        const lastCashFlow =
+          initialRevenue * cashFlowMargin * (1 + terminalGrowth);
+        const terminalValue = lastCashFlow / (discountRate - terminalGrowth);
+        const discountedTerminalValue =
+          terminalValue / Math.pow(1 + discountRate, years);
+
+        intrinsicValue += discountedTerminalValue;
+
+        // Per share value (simulated)
+        const sharesOutstanding = 50;
+        const valuePerShare = intrinsicValue / sharesOutstanding;
+
+        dcfIntrinsicValue.textContent = valuePerShare.toFixed(2);
+        growthValue.textContent = growthSlider.value;
+        marginValue.textContent = marginSlider.value;
+        discountValue.textContent = discountSlider.value;
+
+        if (valuePerShare > dcfCurrentPrice) {
+          dcfVerdict.textContent = "📉 Barata (Subvaluada)";
+          dcfVerdict.className = "mt-2 text-xl font-bold text-green-400";
+        } else {
+          dcfVerdict.textContent = "📈 Cara (Sobrevaluada)";
+          dcfVerdict.className = "mt-2 text-xl font-bold text-red-400";
+        }
+
+        updateDCFChart(valuePerShare);
+      }
+
+      function updateDCFChart(intrinsic) {
+        if (dcfChart) dcfChart.destroy();
+        dcfChart = new Chart(dcfChartCtx, {
+          type: "bar",
+          data: {
+            labels: ["Valor"],
+            datasets: [
+              {
+                label: "Precio Actual",
+                data: [dcfCurrentPrice],
+                backgroundColor: "#4b5563",
+                borderColor: "#6b7280",
+                borderWidth: 1,
+              },
+              {
+                label: "Valor Intrínseco (DCF)",
+                data: [intrinsic],
+                backgroundColor: "#f97316",
+                borderColor: "#fb923c",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            scales: {
+              x: {
+                title: { display: true, text: "Precio ($)", color: "#9ca3af" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: { grid: { display: false }, ticks: { display: false } },
+            },
+            plugins: { legend: { labels: { color: "#9ca3af" } } },
+          },
+        });
+      }
+
+      [growthSlider, marginSlider, discountSlider].forEach((s) =>
+        s.addEventListener("input", calculateDCF)
+      );
+
+      // --- 2. RATIOS ---
+      const priceSlider = document.getElementById("priceSlider");
+      const priceValue = document.getElementById("priceValue");
+      const peValue = document.getElementById("peValue");
+      const pbValue = document.getElementById("pbValue");
+      const dyValue = document.getElementById("dyValue");
+      const peChartCtx = document.getElementById("peChart").getContext("2d");
+      const pbChartCtx = document.getElementById("pbChart").getContext("2d");
+      const dyChartCtx = document.getElementById("dyChart").getContext("2d");
+      let peChart, pbChart, dyChart;
+
+      // Base fundamental data for simulation
+      const earningsPerShare = 5.0;
+      const bookValuePerShare = 50.0;
+      const dividendPerShare = 2.5;
+
+      // Industry Averages
+      const industryPE = 25;
+      const industryPB = 2.5;
+      const industryDY = 2.0;
+
+      function createRatioChart(ctx, label, value, industryAverage) {
+        return new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: [label],
+            datasets: [
+              {
+                label: "Promedio del Sector",
+                data: [industryAverage],
+                backgroundColor: "#4b5563",
+              },
+              {
+                label: "Calculado",
+                data: [value],
+                backgroundColor: "#f97316",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { display: false },
+              y: {
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+            },
+            plugins: { legend: { display: false } },
+          },
+        });
+      }
+
+      function calculateRatios() {
+        const currentPrice = parseFloat(priceSlider.value);
+        priceValue.textContent = currentPrice.toFixed(2);
+
+        const pe = currentPrice / earningsPerShare;
+        const pb = currentPrice / bookValuePerShare;
+        const dy = (dividendPerShare / currentPrice) * 100;
+
+        peValue.textContent = pe.toFixed(1);
+        pbValue.textContent = pb.toFixed(1);
+        dyValue.textContent = dy.toFixed(2);
+
+        if (peChart) peChart.destroy();
+        peChart = createRatioChart(peChartCtx, "P/E Ratio", pe, industryPE);
+
+        if (pbChart) pbChart.destroy();
+        pbChart = createRatioChart(pbChartCtx, "P/B Ratio", pb, industryPB);
+
+        if (dyChart) dyChart.destroy();
+        dyChart = createRatioChart(
+          dyChartCtx,
+          "Dividend Yield (%)",
+          dy,
+          industryDY
+        );
+      }
+
+      priceSlider.addEventListener("input", calculateRatios);
+
+      // --- INITIAL LOAD ---
+      window.addEventListener("load", () => {
+        calculateDCF();
+        calculateRatios();
+      });
+    </script>
+  </body>
+</html>

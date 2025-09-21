@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Indicadores Técnicos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+        }
+
+        .card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn {
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        /* Gemini Modal Styles */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #f97316;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+    </style>
+</head>
+
+<body class="bg-black text-gray-200">
+    <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-white font-bold text-xl">Predicciones<span
+                                class="text-orange-500">.AI</span></span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html#laboratorios"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+                        <a href="index.html#nosotros"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+                        <a href="index.html#contacto"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button"
+                        class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+                        aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú</span>
+                        <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html#laboratorios"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+                <a href="index.html#nosotros"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+                <a href="index.html#contacto"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center my-12">
+            <h1 class="text-4xl md:text-6xl font-black text-white">
+                Laboratorio de
+                <span class="text-orange-500">Indicadores Técnicos</span>
+            </h1>
+            <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+                Acá nos metemos en la timba financiera. Jugá con las perillas y
+                descubrí cómo los traders leen el humor del mercado para intentar
+                pegarla.
+            </p>
+        </header>
+
+        <main class="space-y-16">
+            <!-- Sección 1: Medias Móviles -->
+            <section id="medias-moviles">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+                        📈 1. Medias Móviles (SMA y EMA)
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Medias Móviles (SMA y EMA)">
+                        ✨ Explicámelo, Gemini
+                    </button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-6">
+                        El ABC del trader. Suavizan el quilombo del precio para mostrarte
+                        la tendencia de fondo. Si el precio está por arriba, la cosa viene
+                        bien; si está por abajo, ojo al piojo.
+                    </p>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <p class="font-mono text-center text-lg text-orange-400">
+                                `$$ \text{SMA} = \frac{\sum_{i=1}^{n} P_i}{n} $$`
+                            </p>
+                            <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                                <li>
+                                    <span class="font-bold text-white">SMA:</span> El promedio
+                                    simple. Todas las velas valen lo mismo.
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">EMA:</span> El promedio
+                                    que le da más bola a lo que pasó ayer que a lo que pasó hace
+                                    un mes. Reacciona más rápido a los cambios.
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">n (Período):</span> La
+                                    variable clave. Es cuántos días para atrás mirás. Un período
+                                    corto (ej. 20) es para el corto plazo; uno largo (ej. 200)
+                                    es para ver la película completa.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block font-medium">Período SMA (lenta):
+                                <span id="smaValue" class="font-bold text-orange-400">50</span></label>
+                            <input id="smaSlider" type="range" min="10" max="200" value="50"
+                                class="w-full h-2 bg-gray-700 rounded-lg" />
+                            <label class="block font-medium">Período EMA (rápida):
+                                <span id="emaValue" class="font-bold text-orange-400">20</span></label>
+                            <input id="emaSlider" type="range" min="5" max="100" value="20"
+                                class="w-full h-2 bg-gray-700 rounded-lg" />
+                        </div>
+                    </div>
+                    <div class="chart-container mt-8">
+                        <canvas id="maChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 2: Bandas de Bollinger -->
+            <section id="bollinger">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+                        🌊 2. Bandas de Bollinger
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Bandas de Bollinger">
+                        ✨ Explicámelo, Gemini
+                    </button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-6">
+                        Son como un elástico que envuelve al precio. Cuando el elástico se
+                        aprieta, significa que el mercado está tranquilo y se puede venir
+                        un sacudón. Cuando se estira, hay mucho bardo (volatilidad).
+                    </p>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <p class="font-mono text-center text-lg text-orange-400">
+                                `$$ \text{Bandas} = \text{SMA}_n \pm (D \cdot \sigma_n) $$`
+                            </p>
+                            <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                                <li>
+                                    <span class="font-bold text-white">SMAₙ:</span> Una media
+                                    móvil simple que es el centro del elástico.
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">D (Desviación):</span> La
+                                    variable que controlás. Es qué tan lejos del centro querés
+                                    dibujar las bandas. Lo normal es 2.
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">σₙ (Sigma):</span> Mide
+                                    qué tan grande es el bardo (volatilidad) en los últimos 'n'
+                                    días.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block font-medium">Período (n):
+                                <span id="bbPeriodValue" class="font-bold text-orange-400">20</span></label>
+                            <input id="bbPeriodSlider" type="range" min="10" max="50" value="20"
+                                class="w-full h-2 bg-gray-700 rounded-lg" />
+                            <label class="block font-medium">Desviaciones Estándar (D):
+                                <span id="bbStdDevValue" class="font-bold text-orange-400">2</span></label>
+                            <input id="bbStdDevSlider" type="range" min="1" max="4" value="2" step="0.5"
+                                class="w-full h-2 bg-gray-700 rounded-lg" />
+                        </div>
+                    </div>
+                    <div class="chart-container mt-8">
+                        <canvas id="bollingerChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 3: RSI -->
+            <section id="rsi">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+                        ⚡ 3. RSI (Índice de Fuerza Relativa)
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Índice de Fuerza Relativa (RSI)">
+                        ✨ Explicámelo, Gemini
+                    </button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-6">
+                        El medidor de velocidad y cansancio del precio. Te dice si la suba
+                        o la baja se está quedando sin nafta. Si pasa de 70, está
+                        "sobrecomprado" (caro). Si baja de 30, está "sobrevendido"
+                        (barato).
+                    </p>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <p class="font-mono text-center text-lg text-orange-400">
+                                `$$ \text{RSI} = 100 - \frac{100}{1 + \text{RS}} $$`
+                            </p>
+                            <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                                <li>
+                                    <span class="font-bold text-white">RS:</span> Es el promedio
+                                    de las ganancias dividido el promedio de las pérdidas en los
+                                    últimos 'n' días.
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">n (Período):</span> La
+                                    variable que ajustás. Por lo general se usa 14. Mide cuántos
+                                    días atrás mirás para calcular la fuerza.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block font-medium">Período (n):
+                                <span id="rsiValue" class="font-bold text-orange-400">14</span></label>
+                            <input id="rsiSlider" type="range" min="7" max="28" value="14"
+                                class="w-full h-2 bg-gray-700 rounded-lg" />
+                        </div>
+                    </div>
+                    <div class="chart-container mt-8">
+                        <canvas id="priceForRsiChart"></canvas>
+                    </div>
+                    <div class="chart-container mt-4" style="height: 200px">
+                        <canvas id="rsiChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 4: MACD -->
+            <section id="macd">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">
+                        🚀 4. MACD
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="MACD (Moving Average Convergence Divergence)">
+                        ✨ Explicámelo, Gemini
+                    </button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-6">
+                        El rey de los que siguen tendencias. Compara dos medias móviles
+                        para ver si el envión del precio está ganando o perdiendo fuerza.
+                        Cuando la línea MACD (rápida) cruza para arriba a la Señal
+                        (lenta), es una señal de compra.
+                    </p>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <p class="font-mono text-center text-lg text-orange-400">
+                                `$$ \text{MACD} = \text{EMA}_{\text{rápida}} -
+                                \text{EMA}_{\text{lenta}} $$`
+                            </p>
+                            <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                                <li>
+                                    <span class="font-bold text-white">EMA rápida/lenta:</span>
+                                    Las dos variables que ajustás. Miden la velocidad del precio
+                                    en el corto y largo plazo. Los valores clásicos son 12 y 26.
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">Línea de Señal:</span> Un
+                                    promedio de la propia línea MACD, para suavizarla.
+                                </li>
+                                <li>
+                                    <span class="font-bold text-white">Histograma:</span> La
+                                    diferencia entre la línea MACD y la Señal. Muestra la fuerza
+                                    del cruce.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block font-medium">EMA Rápida:
+                                <span id="macdFastValue" class="font-bold text-orange-400">12</span></label>
+                            <input id="macdFastSlider" type="range" min="5" max="20" value="12"
+                                class="w-full h-2 bg-gray-700 rounded-lg" />
+                            <label class="block font-medium">EMA Lenta:
+                                <span id="macdSlowValue" class="font-bold text-orange-400">26</span></label>
+                            <input id="macdSlowSlider" type="range" min="21" max="50" value="26"
+                                class="w-full h-2 bg-gray-700 rounded-lg" />
+                        </div>
+                    </div>
+                    <div class="chart-container mt-8">
+                        <canvas id="priceForMacdChart"></canvas>
+                    </div>
+                    <div class="chart-container mt-4" style="height: 200px">
+                        <canvas id="macdChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-16 text-gray-500">
+            <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Predicciones.</p>
+        </footer>
+    </div>
+
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+                <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10">
+                            ✨
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                                Explicación de Gemini
+                            </h3>
+                            <div class="mt-4 border-b border-gray-700 pb-4">
+                                <label for="gemini-api-key-input" class="block text-sm font-medium text-gray-400">Tu
+                                    Clave de API de
+                                    Gemini</label>
+                                <input type="password" id="gemini-api-key-input"
+                                    class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                                    placeholder="Pegá tu clave acá..." />
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Conseguí una clave gratis en
+                                    <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                                        class="text-orange-400 hover:underline">Google AI Studio</a>.
+                                </p>
+                            </div>
+                            <p class="text-sm text-gray-400 my-4" id="modal-subtitle">
+                                Pídele a la IA que te explique este modelo.
+                            </p>
+
+                            <div class="my-4 space-x-2">
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="simple">
+                                    Explicación Simple
+                                </button>
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="analogy">
+                                    Analogía Creativa
+                                </button>
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="business">
+                                    Para Negocios
+                                </button>
+                            </div>
+
+                            <div id="gemini-response-container"
+                                class="mt-4 p-3 bg-black/50 rounded-md min-h-[150px] max-h-[300px] overflow-y-auto">
+                                <div id="gemini-loader" class="hidden flex justify-center items-center h-full">
+                                    <div class="loader"></div>
+                                </div>
+                                <p id="gemini-response" class="text-gray-300"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button id="close-modal-btn" type="button"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- LÓGICA PARA EL MENÚ RESPONSIVO ---
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const hamburgerIcon = mobileMenuButton.querySelector("svg:first-child");
+        const closeIcon = mobileMenuButton.querySelector("svg:last-child");
+
+        mobileMenuButton.addEventListener("click", () => {
+            mobileMenu.classList.toggle("hidden");
+            hamburgerIcon.classList.toggle("hidden");
+            closeIcon.classList.toggle("hidden");
+        });
+
+        // --- DATA & CHART DEFAULTS ---
+        let priceData;
+        const CHART_POINTS = 100;
+
+        function generatePriceData() {
+            const data = [];
+            let price = 100;
+            for (let i = 0; i < CHART_POINTS; i++) {
+                price += (Math.random() - 0.49) * 5;
+                price = Math.max(price, 50);
+                data.push(price);
+            }
+            return data;
+        }
+
+        // --- MEDIAS MÓVILES ---
+        const smaSlider = document.getElementById("smaSlider");
+        const emaSlider = document.getElementById("emaSlider");
+        const smaValue = document.getElementById("smaValue");
+        const emaValue = document.getElementById("emaValue");
+        const maChartCtx = document.getElementById("maChart").getContext("2d");
+        let maChart;
+
+        function calculateSMA(data, period) {
+            let sma = [];
+            for (let i = period - 1; i < data.length; i++) {
+                let sum = 0;
+                for (let j = 0; j < period; j++) {
+                    sum += data[i - j];
+                }
+                sma.push(sum / period);
+            }
+            return Array(period - 1)
+                .fill(null)
+                .concat(sma);
+        }
+
+        function calculateEMA(data, period) {
+            let ema = [];
+            let multiplier = 2 / (period + 1);
+            ema.push(data[0]);
+            for (let i = 1; i < data.length; i++) {
+                let newEma = (data[i] - ema[i - 1]) * multiplier + ema[i - 1];
+                ema.push(newEma);
+            }
+            return ema;
+        }
+
+        function updateMAChart() {
+            smaValue.textContent = smaSlider.value;
+            emaValue.textContent = emaSlider.value;
+            if (maChart) maChart.destroy();
+            const smaData = calculateSMA(priceData, parseInt(smaSlider.value));
+            const emaData = calculateEMA(priceData, parseInt(emaSlider.value));
+            maChart = new Chart(maChartCtx, {
+                type: "line",
+                data: {
+                    labels: Array.from({ length: CHART_POINTS }, (_, i) => `${i + 1}`),
+                    datasets: [
+                        {
+                            label: "Precio",
+                            data: priceData,
+                            borderColor: "rgba(255,255,255,0.7)",
+                            pointRadius: 0,
+                        },
+                        {
+                            label: "SMA",
+                            data: smaData,
+                            borderColor: "#60a5fa",
+                            pointRadius: 0,
+                        },
+                        {
+                            label: "EMA",
+                            data: emaData,
+                            borderColor: "#f472b6",
+                            pointRadius: 0,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                        x: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                    },
+                    plugins: { legend: { labels: { color: "#9ca3af" } } },
+                },
+            });
+        }
+        smaSlider.addEventListener("input", updateMAChart);
+        emaSlider.addEventListener("input", updateMAChart);
+
+        // --- BANDAS DE BOLLINGER ---
+        const bbPeriodSlider = document.getElementById("bbPeriodSlider");
+        const bbStdDevSlider = document.getElementById("bbStdDevSlider");
+        const bbPeriodValue = document.getElementById("bbPeriodValue");
+        const bbStdDevValue = document.getElementById("bbStdDevValue");
+        const bollingerChartCtx = document
+            .getElementById("bollingerChart")
+            .getContext("2d");
+        let bollingerChart;
+
+        function calculateBollingerBands(data, period, stdDev) {
+            let sma = calculateSMA(data, period);
+            let upper = [];
+            let lower = [];
+            for (let i = period - 1; i < data.length; i++) {
+                let slice = data.slice(i - period + 1, i + 1);
+                let std = Math.sqrt(
+                    slice.map((x) => Math.pow(x - sma[i], 2)).reduce((a, b) => a + b) /
+                    period
+                );
+                upper.push(sma[i] + std * stdDev);
+                lower.push(sma[i] - std * stdDev);
+            }
+            return {
+                middle: sma,
+                upper: Array(period - 1)
+                    .fill(null)
+                    .concat(upper),
+                lower: Array(period - 1)
+                    .fill(null)
+                    .concat(lower),
+            };
+        }
+
+        function updateBollingerChart() {
+            bbPeriodValue.textContent = bbPeriodSlider.value;
+            bbStdDevValue.textContent = bbStdDevSlider.value;
+            if (bollingerChart) bollingerChart.destroy();
+            const bbData = calculateBollingerBands(
+                priceData,
+                parseInt(bbPeriodSlider.value),
+                parseFloat(bbStdDevSlider.value)
+            );
+            bollingerChart = new Chart(bollingerChartCtx, {
+                type: "line",
+                data: {
+                    labels: Array.from({ length: CHART_POINTS }, (_, i) => `${i + 1}`),
+                    datasets: [
+                        {
+                            label: "Banda Superior",
+                            data: bbData.upper,
+                            borderColor: "rgba(52, 211, 153, 0.5)",
+                            pointRadius: 0,
+                            fill: "+1", // Fill to the next dataset
+                        },
+                        {
+                            label: "Banda Inferior",
+                            data: bbData.lower,
+                            borderColor: "rgba(52, 211, 153, 0.5)",
+                            pointRadius: 0,
+                            backgroundColor: "rgba(52, 211, 153, 0.1)",
+                        },
+                        {
+                            label: "Precio",
+                            data: priceData,
+                            borderColor: "rgba(255,255,255,0.7)",
+                            pointRadius: 0,
+                        },
+                        {
+                            label: "SMA (Centro)",
+                            data: bbData.middle,
+                            borderColor: "rgba(255,255,255,0.4)",
+                            pointRadius: 0,
+                            borderDash: [5, 5],
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                        x: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                    },
+                    plugins: { legend: { labels: { color: "#9ca3af" } } },
+                },
+            });
+        }
+        bbPeriodSlider.addEventListener("input", updateBollingerChart);
+        bbStdDevSlider.addEventListener("input", updateBollingerChart);
+
+        // --- RSI ---
+        const rsiSlider = document.getElementById("rsiSlider");
+        const rsiValue = document.getElementById("rsiValue");
+        const rsiChartCtx = document.getElementById("rsiChart").getContext("2d");
+        const priceForRsiChartCtx = document
+            .getElementById("priceForRsiChart")
+            .getContext("2d");
+        let rsiChart, priceForRsiChart;
+
+        function calculateRSI(data, period) {
+            let rsi = [];
+            let gains = [];
+            let losses = [];
+
+            for (let i = 1; i < data.length; i++) {
+                const change = data[i] - data[i - 1];
+                gains.push(change > 0 ? change : 0);
+                losses.push(change < 0 ? -change : 0);
+            }
+
+            let avgGain = gains.slice(0, period).reduce((a, b) => a + b, 0) / period;
+            let avgLoss = losses.slice(0, period).reduce((a, b) => a + b, 0) / period;
+
+            rsi.push(100 - 100 / (1 + avgGain / avgLoss));
+
+            for (let i = period; i < gains.length; i++) {
+                avgGain = (avgGain * (period - 1) + gains[i]) / period;
+                avgLoss = (avgLoss * (period - 1) + losses[i]) / period;
+                if (avgLoss === 0) {
+                    rsi.push(100);
+                } else {
+                    const rs = avgGain / avgLoss;
+                    rsi.push(100 - 100 / (1 + rs));
+                }
+            }
+            return Array(period).fill(null).concat(rsi);
+        }
+
+        function updateRSIChart() {
+            rsiValue.textContent = rsiSlider.value;
+            if (rsiChart) rsiChart.destroy();
+            if (priceForRsiChart) priceForRsiChart.destroy();
+            const rsiData = calculateRSI(priceData, parseInt(rsiSlider.value));
+            priceForRsiChart = new Chart(priceForRsiChartCtx, {
+                type: "line",
+                data: {
+                    labels: Array.from({ length: CHART_POINTS }, (_, i) => `${i + 1}`),
+                    datasets: [
+                        {
+                            label: "Precio",
+                            data: priceData,
+                            borderColor: "rgba(255,255,255,0.7)",
+                            pointRadius: 0,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                        x: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                    },
+                    plugins: { legend: { display: false } },
+                },
+            });
+            rsiChart = new Chart(rsiChartCtx, {
+                type: "line",
+                data: {
+                    labels: Array.from({ length: CHART_POINTS }, (_, i) => `${i + 1}`),
+                    datasets: [
+                        {
+                            label: "RSI",
+                            data: rsiData,
+                            borderColor: "#fbbf24",
+                            pointRadius: 0,
+                        },
+                        {
+                            label: "Sobrecompra",
+                            data: Array(CHART_POINTS).fill(70),
+                            borderColor: "rgba(248, 113, 113, 0.5)",
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                        },
+                        {
+                            label: "Sobreventa",
+                            data: Array(CHART_POINTS).fill(30),
+                            borderColor: "rgba(52, 211, 153, 0.5)",
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                        x: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                    },
+                    plugins: { legend: { display: false } },
+                },
+            });
+        }
+        rsiSlider.addEventListener("input", updateRSIChart);
+
+        // --- MACD ---
+        const macdFastSlider = document.getElementById("macdFastSlider");
+        const macdSlowSlider = document.getElementById("macdSlowSlider");
+        const macdFastValue = document.getElementById("macdFastValue");
+        const macdSlowValue = document.getElementById("macdSlowValue");
+        const macdChartCtx = document.getElementById("macdChart").getContext("2d");
+        const priceForMacdChartCtx = document
+            .getElementById("priceForMacdChart")
+            .getContext("2d");
+        let macdChart, priceForMacdChart;
+
+        function calculateMACD(data, fast, slow, signal) {
+            let emaFast = calculateEMA(data, fast);
+            let emaSlow = calculateEMA(data, slow);
+            let macdLine = emaFast.map((val, i) => val - emaSlow[i]);
+            let signalLine = calculateEMA(macdLine, signal);
+            let histogram = macdLine.map((val, i) => val - signalLine[i]);
+            return { macd: macdLine, signal: signalLine, histogram };
+        }
+
+        function updateMACDChart() {
+            macdFastValue.textContent = macdFastSlider.value;
+            macdSlowValue.textContent = macdSlowSlider.value;
+            if (macdChart) macdChart.destroy();
+            if (priceForMacdChart) priceForMacdChart.destroy();
+            const macdData = calculateMACD(
+                priceData,
+                parseInt(macdFastSlider.value),
+                parseInt(macdSlowSlider.value),
+                9
+            );
+            priceForMacdChart = new Chart(priceForMacdChartCtx, {
+                type: "line",
+                data: {
+                    labels: Array.from({ length: CHART_POINTS }, (_, i) => `${i + 1}`),
+                    datasets: [
+                        {
+                            label: "Precio",
+                            data: priceData,
+                            borderColor: "rgba(255,255,255,0.7)",
+                            pointRadius: 0,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                        x: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                    },
+                    plugins: { legend: { display: false } },
+                },
+            });
+            macdChart = new Chart(macdChartCtx, {
+                type: "bar",
+                data: {
+                    labels: Array.from({ length: CHART_POINTS }, (_, i) => `${i + 1}`),
+                    datasets: [
+                        {
+                            label: "Histograma",
+                            data: macdData.histogram,
+                            backgroundColor: (ctx) =>
+                                ctx.raw > 0
+                                    ? "rgba(52, 211, 153, 0.5)"
+                                    : "rgba(248, 113, 113, 0.5)",
+                        },
+                        {
+                            label: "MACD",
+                            data: macdData.macd,
+                            type: "line",
+                            borderColor: "#60a5fa",
+                            pointRadius: 0,
+                        },
+                        {
+                            label: "Señal",
+                            data: macdData.signal,
+                            type: "line",
+                            borderColor: "#f472b6",
+                            pointRadius: 0,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                        x: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "rgba(255,255,255,0.1)" },
+                        },
+                    },
+                    plugins: { legend: { labels: { color: "#9ca3af" } } },
+                },
+            });
+        }
+        macdFastSlider.addEventListener("input", updateMACDChart);
+        macdSlowSlider.addEventListener("input", updateMACDChart);
+
+        // --- GEMINI API LOGIC ---
+        const geminiModal = document.getElementById("gemini-modal");
+        const closeModalBtn = document.getElementById("close-modal-btn");
+        const geminiResponseEl = document.getElementById("gemini-response");
+        const geminiLoader = document.getElementById("gemini-loader");
+        const modalTitle = document.getElementById("modal-title");
+        const apiKeyInput = document.getElementById("gemini-api-key-input");
+        let currentModel = "";
+
+        document.querySelectorAll(".gemini-btn").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                currentModel = e.target.dataset.model;
+                modalTitle.textContent = `Explicación de ${currentModel}`;
+                geminiResponseEl.innerHTML = "Seleccioná un estilo de explicación...";
+                geminiModal.classList.remove("hidden");
+            });
+        });
+
+        closeModalBtn.addEventListener("click", () => {
+            geminiModal.classList.add("hidden");
+        });
+
+        document.querySelectorAll(".prompt-btn").forEach((btn) => {
+            btn.addEventListener("click", async (e) => {
+                const style = e.target.dataset.style;
+                await callGemini(currentModel, style);
+            });
+        });
+
+        async function callGemini(modelName, style) {
+            const apiKey = apiKeyInput.value.trim() || "";
+            if (!apiKey) {
+                geminiResponseEl.innerHTML =
+                    '<span class="text-red-400">¡Che, campeón! Necesitás poner tu clave de API de Gemini para que esto funcione.</span>';
+                apiKeyInput.focus();
+                apiKeyInput.classList.add("border-red-500");
+                return;
+            }
+            apiKeyInput.classList.remove("border-red-500");
+
+            geminiLoader.classList.remove("hidden");
+            geminiResponseEl.innerHTML = "";
+
+            const prompts = {
+                simple: `Explica qué es y para qué sirve el modelo de ${modelName} como si se lo contaras a un amigo en un bar. Usa un lenguaje simple, directo y con tonada argentina.`,
+                analogy: `Explica el modelo de ${modelName} usando una analogía creativa y fácil de entender para alguien que no sabe nada de machine learning, con un toque de humor argentino.`,
+                business: `Explica cómo una empresa podría usar el modelo de ${modelName} para ganar plata o mejorar su negocio. Dame un caso de uso práctico y concreto, bien argento.`,
+            };
+
+            const userQuery = prompts[style];
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }] };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+                if (!response.ok)
+                    throw new Error(`Error de la API: ${response.status}`);
+                const result = await response.json();
+                const text = result.candidates[0].content.parts[0].text;
+                geminiResponseEl.innerHTML = text
+                    .replace(
+                        /\*\*(.*?)\*\*/g,
+                        '<strong class="text-orange-400">$1</strong>'
+                    )
+                    .replace(/\n/g, "<br>");
+            } catch (error) {
+                console.error("Error llamando a Gemini:", error);
+                geminiResponseEl.innerHTML =
+                    '<span class="text-red-400">Hubo un problema al conectar con la IA. Verificá tu clave de API y la consola.</span>';
+            } finally {
+                geminiLoader.classList.add("hidden");
+            }
+        }
+
+        // --- INITIAL LOAD ---
+        window.addEventListener("load", () => {
+            priceData = generatePriceData();
+            updateMAChart();
+            updateBollingerChart();
+            updateRSIChart();
+            updateMACDChart();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Modelos Cripto Avanzados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn {
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #f97316;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #f97316;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-black text-gray-200">
+
+    <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-white font-bold text-xl">Predicciones<span
+                                class="text-orange-500">.AI</span></span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html#laboratorios"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Laboratorios</a>
+                        <a href="index.html#nosotros"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Nosotros</a>
+                        <a href="index.html#contacto"
+                            class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button"
+                        class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+                        aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú</span>
+                        <svg id="hamburger-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html#laboratorios"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Laboratorios</a>
+                <a href="index.html#nosotros"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nosotros</a>
+                <a href="index.html#contacto"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center my-12">
+            <h1 class="text-4xl md:text-6xl font-black text-white">
+                Laboratorio de Modelos<br><span class="text-orange-500">Esotéricos para Cripto</span>
+            </h1>
+            <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+                Acá dejamos los números duros y nos metemos con los modelos que leen la psicología del mercado. Son más
+                arte que ciencia, pero a veces, le pegan donde los demás pifian.
+            </p>
+        </header>
+
+        <main class="space-y-16">
+            <section id="ciclos">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">☀️❄️ 1. Modelo de Ciclos de Mercado
+                    </h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Modelo de Ciclos de Mercado">✨ Explicámelo, Gemini</button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-6">El mercado cripto es como el clima: tiene cuatro estaciones que se
+                        repiten. Este modelo intenta adivinar en qué estación estamos para saber si es momento de
+                        sembrar o de cosechar.</p>
+                    <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                        <p class="font-mono text-center text-lg text-orange-400">Patrón Cíclico: Acumulación → Alcista →
+                            Euforia → Bajista</p>
+                        <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                            <li><span class="font-bold text-white">Variable Clave:</span> Psicología de Masas.</li>
+                            <li><span class="font-bold text-white">¿Qué se modifica?:</span> La posición en el ciclo (la
+                                estación del año) para ver cómo se comporta el precio y el sentimiento.</li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4 mb-8">
+                        <label for="cicloSlider" class="block font-medium">Simular Posición en el Ciclo: <span
+                                id="cicloValue" class="font-bold text-orange-400">Primavera</span></label>
+                        <input id="cicloSlider" type="range" min="0" max="3" value="1" step="1"
+                            class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="ciclosChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="correlacion">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">👀 2. Análisis de Correlación</h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Análisis de Correlación">✨ Explicámelo, Gemini</button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-6">El boliche cripto no está solo en el barrio. Este modelo es el
+                        chismoso que se fija si, cuando a la bolsa yanqui le da un resfrío, a Bitcoin le agarra una
+                        neumonía. Mide si los mercados van de la mano o si cada uno hace la suya.</p>
+                    <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                        <div class="font-mono text-center text-lg text-orange-400">$$ \rho_{X,Y} =
+                            \frac{\text{cov}(X,Y)}{\sigma_X \sigma_Y} $$</div>
+                        <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                            <li><span class="font-bold text-white">ρ (rho):</span> El Coeficiente de Correlación. Va de
+                                -1 a 1.</li>
+                            <li><span class="font-bold text-white">¿Qué se modifica?:</span> El valor de ρ. Si es 1, se
+                                mueven juntos. Si es -1, se mueven al revés. Si es 0, no se dan bola.</li>
+                            <li><span class="font-bold text-white">X, Y:</span> Los precios de los dos activos (ej:
+                                Bitcoin y S&P 500).</li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4 mb-8">
+                        <label for="correlacionSlider" class="block font-medium">Simular Correlación con el S&P
+                            500: <span id="correlacionValue" class="font-bold text-orange-400">0.5</span></label>
+                        <input id="correlacionSlider" type="range" min="-1" max="1" value="0.5" step="0.1"
+                            class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="correlacionChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="elliott">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">🌊 3. Ondas de Elliott</h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Ondas de Elliott">✨ Explicámelo, Gemini</button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-6">Este modelo dice que el mercado se mueve como un surfer: 5 olas de
+                        impulso para arriba y 3 olas correctivas para abajo. No predice el precio exacto, pero intenta
+                        adivinar en qué parte del baile estamos.</p>
+                    <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                        <p class="font-mono text-center text-lg text-orange-400">Estructura de Onda: 5-3</p>
+                        <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                            <li><span class="font-bold text-white">Variables Clave:</span> Las 8 ondas (1, 2, 3, 4, 5,
+                                A, B, C) y las reglas de Fibonacci entre ellas.</li>
+                            <li><span class="font-bold text-white">¿Qué se modifica?:</span> Generamos un nuevo ciclo
+                                aleatorio para ver la estructura, que es la base del modelo.</li>
+                        </ul>
+                    </div>
+                    <div class="text-center mb-8">
+                        <button id="elliottBtn"
+                            class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">Generar
+                            Nuevo Ciclo de Ondas</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="elliottChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="fractales">
+                <div class="flex justify-between items-start mb-8">
+                    <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2">🥦 4. Modelo de Fractales</h2>
+                    <button
+                        class="btn gemini-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap"
+                        data-model="Modelo de Fractales">✨ Explicámelo, Gemini</button>
+                </div>
+                <div class="card rounded-lg p-6">
+                    <p class="text-gray-400 mb-6">Como un brócoli, el mercado se repite a sí mismo. El patrón de subidas
+                        y bajadas de un año se parece al de un día. Este modelo busca esos "ecos" en el gráfico para
+                        predecir el próximo movimiento.</p>
+                    <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                        <p class="font-mono text-center text-lg text-orange-400">Concepto: Auto-Similitud</p>
+                        <ul class="text-xs mt-2 space-y-1 text-gray-300">
+                            <li><span class="font-bold text-white">Variable Clave:</span> Patrones geométricos que se
+                                repiten en distintas escalas de tiempo.</li>
+                            <li><span class="font-bold text-white">¿Qué se modifica?:</span> Generamos dos series de
+                                tiempo y buscamos un patrón similar para ilustrar el concepto.</li>
+                        </ul>
+                    </div>
+                    <div class="text-center mb-8">
+                        <button id="fractalBtn"
+                            class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg">Buscar
+                            Fractal</button>
+                    </div>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-center mb-2">Patrón a Largo Plazo</h4>
+                            <div class="chart-container">
+                                <canvas id="fractalBigChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold text-center mb-2">Patrón a Corto Plazo</h4>
+                            <div class="chart-container">
+                                <canvas id="fractalSmallChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-16 text-gray-500">
+            <p>Hecho con 🧉 y ciencia de datos. Laboratorio de Predicciones.</p>
+        </footer>
+    </div>
+
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 modal-backdrop" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full modal-content border border-orange-500/50">
+                <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-600 sm:mx-0 sm:h-10 sm:w-10">
+                            ✨
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Explicación de Gemini
+                            </h3>
+                            <div class="mt-4 border-b border-gray-700 pb-4">
+                                <label for="gemini-api-key-input" class="block text-sm font-medium text-gray-400">Tu
+                                    Clave de API de Gemini</label>
+                                <input type="password" id="gemini-api-key-input"
+                                    class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                                    placeholder="Pegá tu clave acá...">
+                                <p class="mt-1 text-xs text-gray-500">Conseguí una clave gratis en <a
+                                        href="https://aistudio.google.com/app/apikey" target="_blank"
+                                        class="text-orange-400 hover:underline">Google AI Studio</a>.</p>
+                            </div>
+                            <p class="text-sm text-gray-400 my-4" id="modal-subtitle">Pídele a la IA que te explique
+                                este modelo.</p>
+
+                            <div class="my-4 space-x-2">
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="simple">Explicación Simple</button>
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="analogy">Analogía Creativa</button>
+                                <button
+                                    class="prompt-btn btn bg-gray-700 hover:bg-orange-600 text-xs py-1 px-3 rounded-full"
+                                    data-style="business">Para Negocios</button>
+                            </div>
+
+                            <div id="gemini-response-container"
+                                class="mt-4 p-3 bg-black/50 rounded-md min-h-[150px] max-h-[300px] overflow-y-auto">
+                                <div id="gemini-loader" class="hidden flex justify-center items-center h-full">
+                                    <div class="loader"></div>
+                                </div>
+                                <p id="gemini-response" class="text-gray-300"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button id="close-modal-btn" type="button"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- NAVBAR & DEFAULTS ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const hamburgerIcon = document.getElementById('hamburger-icon');
+        const closeIcon = document.getElementById('close-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            hamburgerIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        });
+
+        const chartOptions = (xlabel, ylabel) => ({
+            responsive: true, maintainAspectRatio: false,
+            scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } }, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } } },
+            plugins: { legend: { labels: { color: '#9ca3af' } } }
+        });
+        const colors = ['#f97316', '#34d399', '#60a5fa', '#f472b6', '#fbbf24'];
+
+        // --- 1. CICLOS DE MERCADO ---
+        const cicloSlider = document.getElementById('cicloSlider');
+        const cicloValue = document.getElementById('cicloValue');
+        const ciclosChartCtx = document.getElementById('ciclosChart').getContext('2d');
+        let ciclosChart;
+        const cicloLabels = ['Invierno (Acumulación)', 'Primavera (Alcista)', 'Verano (Euforia)', 'Otoño (Bajista)'];
+        const cicloColors = ['#60a5fa', '#34d399', '#f472b6', '#f97316'];
+
+        function drawCiclosChart() {
+            const cyclePhase = parseInt(cicloSlider.value);
+            cicloValue.textContent = cicloLabels[cyclePhase];
+
+            const data = [];
+            const labels = [];
+            const pointColors = [];
+            for (let i = 0; i < 100; i++) {
+                labels.push(`Día ${i + 1}`);
+                const angle = (i / 100) * 2 * Math.PI;
+                data.push(Math.sin(angle - Math.PI / 2) * 50 + 50);
+
+                let phase;
+                if (i < 25) phase = 0;
+                else if (i < 50) phase = 1;
+                else if (i < 75) phase = 2;
+                else phase = 3;
+                pointColors.push(cicloColors[phase]);
+            }
+
+            if (ciclosChart) ciclosChart.destroy();
+            ciclosChart = new Chart(ciclosChartCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Psicología del Ciclo',
+                        data,
+                        borderColor: '#4b5563',
+                        tension: 0.4,
+                        pointBackgroundColor: pointColors,
+                        pointRadius: (ctx) => (Math.floor(ctx.dataIndex / 25) === cyclePhase ? 6 : 3),
+                    }]
+                },
+                options: chartOptions('Tiempo', 'Sentimiento del Mercado')
+            });
+        }
+        cicloSlider.addEventListener('input', drawCiclosChart);
+
+        // --- 2. CORRELACIÓN ---
+        const correlacionSlider = document.getElementById('correlacionSlider');
+        const correlacionValue = document.getElementById('correlacionValue');
+        const correlacionChartCtx = document.getElementById('correlacionChart').getContext('2d');
+        let correlacionChart;
+
+        function drawCorrelacionChart() {
+            const correlation = parseFloat(correlacionSlider.value);
+            correlacionValue.textContent = correlation.toFixed(1);
+
+            const sp500Data = [];
+            let sp_price = 4000;
+            for (let i = 0; i < 100; i++) {
+                sp_price += (Math.random() - 0.45) * 50;
+                sp500Data.push(sp_price);
+            }
+
+            const btcData = [];
+            let btc_price = 50000;
+            for (let i = 0; i < 100; i++) {
+                const sp_move = (sp500Data[i] - (sp500Data[i - 1] || sp500Data[i])) / (sp500Data[i - 1] || sp500Data[i]);
+                const correlated_move = sp_move * correlation * 20000;
+                const random_move = (Math.random() - 0.5) * 4000;
+                btc_price += correlated_move + random_move;
+                btcData.push(btc_price);
+            }
+
+            if (correlacionChart) correlacionChart.destroy();
+            correlacionChart = new Chart(correlacionChartCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 100 }, (_, i) => `Día ${i + 1}`),
+                    datasets: [
+                        { label: 'Precio Bitcoin', data: btcData, borderColor: colors[0], yAxisID: 'y' },
+                        { label: 'S&P 500', data: sp500Data, borderColor: colors[2], yAxisID: 'y1' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' } }, y: { type: 'linear', position: 'left', title: { display: true, text: 'Precio Bitcoin (USD)', color: colors[0] }, grid: { color: 'rgba(255,255,255,0.1)' } }, y1: { type: 'linear', position: 'right', title: { display: true, text: 'S&P 500', color: colors[2] }, grid: { drawOnChartArea: false } } }, plugins: { legend: { labels: { color: '#9ca3af' } } } }
+            });
+        }
+        correlacionSlider.addEventListener('input', drawCorrelacionChart);
+
+        // --- 3. ELLIOTT WAVES ---
+        const elliottBtn = document.getElementById('elliottBtn');
+        const elliottChartCtx = document.getElementById('elliottChart').getContext('2d');
+        let elliottChart;
+
+        function drawElliottChart() {
+            const points = [{ x: 0, y: 100 }]; let currentPrice = 100; let currentTime = 0;
+            const wave1_height = 20 + Math.random() * 15; currentTime += 10 + Math.random() * 5; currentPrice += wave1_height; points.push({ x: currentTime, y: currentPrice });
+            const wave2_retrace = wave1_height * (0.382 + Math.random() * 0.2); currentTime += 5 + Math.random() * 3; currentPrice -= wave2_retrace; points.push({ x: currentTime, y: currentPrice });
+            const wave3_height = wave1_height * (1.618 + Math.random() * 0.8); currentTime += 12 + Math.random() * 8; currentPrice += wave3_height; points.push({ x: currentTime, y: currentPrice });
+            const wave4_retrace = wave3_height * (0.236 + Math.random() * 0.15); currentTime += 6 + Math.random() * 4; currentPrice -= wave4_retrace; if (currentPrice < points[1].y) { currentPrice = points[1].y + Math.random() * 5; } points.push({ x: currentTime, y: currentPrice });
+            const wave5_height = wave1_height * (0.618 + Math.random() * 0.8); currentTime += 8 + Math.random() * 5; currentPrice += wave5_height; points.push({ x: currentTime, y: currentPrice });
+            const waveA_drop = (points[5].y - points[4].y) * (1 + Math.random() * 0.5); currentTime += 10 + Math.random() * 5; currentPrice -= waveA_drop; points.push({ x: currentTime, y: currentPrice });
+            const waveB_rise = waveA_drop * (0.5 + Math.random() * 0.2); currentTime += 8 + Math.random() * 4; currentPrice += waveB_rise; points.push({ x: currentTime, y: currentPrice });
+            const waveC_drop = waveA_drop * (1.2 + Math.random() * 0.4); currentTime += 12 + Math.random() * 6; currentPrice -= waveC_drop; points.push({ x: currentTime, y: currentPrice });
+
+            const data = points.map(p => p.y);
+            const labels = ['0', '1', '2', '3', '4', '5', 'A', 'B', 'C'];
+
+            if (elliottChart) elliottChart.destroy();
+            elliottChart = new Chart(elliottChartCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Ondas de Elliott',
+                        data,
+                        borderColor: colors[3],
+                        tension: 0.2,
+                        pointRadius: 6,
+                        pointBackgroundColor: 'white',
+                        pointBorderColor: colors[3]
+                    }]
+                },
+                options: chartOptions('Puntos de Onda', 'Precio')
+            });
+        }
+        elliottBtn.addEventListener('click', drawElliottChart);
+
+        // --- 4. FRACTALS ---
+        const fractalBtn = document.getElementById('fractalBtn');
+        const fractalBigChartCtx = document.getElementById('fractalBigChart').getContext('2d');
+        const fractalSmallChartCtx = document.getElementById('fractalSmallChart').getContext('2d');
+        let fractalBigChart, fractalSmallChart;
+
+        function generateRandomWalk(len) {
+            const data = [];
+            let price = 50;
+            for (let i = 0; i < len; i++) {
+                price += (Math.random() - 0.5) * 5;
+                data.push(price);
+            }
+            return data;
+        }
+
+        function drawFractalCharts(highlight = false) {
+            const bigData = generateRandomWalk(100);
+            const smallPattern = bigData.slice(20, 40).map(p => p - bigData[20] + 30);
+            const smallData = generateRandomWalk(50).slice(0, 30).concat(smallPattern).concat(generateRandomWalk(50));
+
+            if (fractalBigChart) fractalBigChart.destroy();
+            fractalBigChart = new Chart(fractalBigChartCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 100 }, (_, i) => i + 1),
+                    datasets: [{ label: 'Precio (1 Año)', data: bigData, borderColor: colors[4] },
+                    { label: 'Patrón Original', data: Array(20).fill(null).concat(bigData.slice(20, 40)), borderColor: colors[0], borderWidth: 3 }]
+                },
+                options: chartOptions('Días', 'Precio')
+            });
+
+            if (fractalSmallChart) fractalSmallChart.destroy();
+            fractalSmallChart = new Chart(fractalSmallChartCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 100 }, (_, i) => i + 1),
+                    datasets: [{ label: 'Precio (1 Mes)', data: smallData, borderColor: colors[4] },
+                    { label: 'Fractal Encontrado', data: highlight ? Array(30).fill(null).concat(smallData.slice(30, 50)) : [], borderColor: colors[0], borderWidth: 3 }]
+                },
+                options: chartOptions('Horas', 'Precio')
+            });
+        }
+        fractalBtn.addEventListener('click', () => drawFractalCharts(true));
+
+        // --- GEMINI API LOGIC ---
+        const geminiModal = document.getElementById('gemini-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const geminiResponseEl = document.getElementById('gemini-response');
+        const geminiLoader = document.getElementById('gemini-loader');
+        const modalTitle = document.getElementById('modal-title');
+        const apiKeyInput = document.getElementById('gemini-api-key-input');
+        let currentModel = '';
+
+        document.querySelectorAll('.gemini-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                currentModel = e.target.dataset.model;
+                modalTitle.textContent = `Explicación de ${currentModel}`;
+                geminiResponseEl.innerHTML = 'Seleccioná un estilo de explicación...';
+                geminiModal.classList.remove('hidden');
+            });
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            geminiModal.classList.add('hidden');
+        });
+
+        document.querySelectorAll('.prompt-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const style = e.target.dataset.style;
+                await callGemini(currentModel, style);
+            });
+        });
+
+        async function callGemini(modelName, style) {
+            const apiKey = apiKeyInput.value.trim() || "";
+            if (!apiKey) {
+                geminiResponseEl.innerHTML = '<span class="text-red-400">¡Che, campeón! Necesitás poner tu clave de API de Gemini para que esto funcione.</span>';
+                apiKeyInput.focus();
+                apiKeyInput.classList.add('border-red-500');
+                return;
+            }
+            apiKeyInput.classList.remove('border-red-500');
+            geminiLoader.classList.remove('hidden');
+            geminiResponseEl.innerHTML = '';
+
+            const prompts = {
+                simple: `Explica qué es y para qué sirve el ${modelName} como si se lo contaras a un amigo en un bar. Usa un lenguaje simple, directo y con tonada argentina.`,
+                analogy: `Explica el ${modelName} usando una analogía creativa y fácil de entender para alguien que no sabe nada de mercados, con un toque de humor argentino.`,
+                business: `Explica cómo un trader de criptomonedas usaría el ${modelName} para tomar decisiones. Dame un caso de uso práctico y concreto, bien argento.`
+            };
+
+            const userQuery = prompts[style];
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }] };
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`Error de la API: ${response.status}`);
+                const result = await response.json();
+                const text = result.candidates[0].content.parts[0].text;
+                geminiResponseEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-orange-400">$1</strong>').replace(/\n/g, '<br>');
+            } catch (error) {
+                console.error("Error llamando a Gemini:", error);
+                geminiResponseEl.innerHTML = '<span class="text-red-400">Hubo un problema al conectar con la IA. Verificá tu clave de API y la consola.</span>';
+            } finally {
+                geminiLoader.classList.add('hidden');
+            }
+        }
+
+        // --- INITIAL LOAD ---
+        window.addEventListener('load', () => {
+            drawCiclosChart();
+            drawCorrelacionChart();
+            drawElliottChart();
+            drawFractalCharts();
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            }
+        });
+
+    </script>
+</body>
+
+</html>

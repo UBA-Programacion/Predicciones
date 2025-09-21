@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Modelos Secuenciales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+      .btn {
+        transition: all 0.2s;
+      }
+      .btn:hover {
+        transform: scale(1.05);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      .chart-container {
+        position: relative;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-gray-200">
+    <div class="container mx-auto p-4 md:p-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-6xl font-black text-white">
+          Laboratorio de Modelos
+          <span class="text-orange-500">Secuenciales</span>
+        </h1>
+        <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+          Acá nos metemos con los bichos que tienen memoria. Jugá con los
+          parámetros y descubrí cómo las Redes Neuronales Recurrentes (RNN) y
+          las LSTM intentan predecir el próximo paso de una secuencia.
+        </p>
+      </header>
+
+      <main class="space-y-16">
+        <!-- Sección: Modelos Secuenciales -->
+        <section id="secuenciales">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            🔮 Modelos Secuenciales (Los Adivinos con Memoria)
+          </h2>
+          <div class="grid lg:grid-cols-2 gap-8">
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                RNN (El de Memoria a Corto Plazo)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                Una Red Neuronal Recurrente es un bicho que tiene memoria.
+                Entiende que lo que pasó antes importa para adivinar lo que
+                viene. El problema es que es como Dory: se acuerda de lo que
+                pasó hace 5 minutos, pero se olvida del principio de la
+                película.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="rnnMemorySlider" class="block font-medium"
+                  >Complejidad de la Memoria:
+                  <span id="rnnMemoryValue" class="font-bold text-orange-400"
+                    >5</span
+                  ></label
+                >
+                <input
+                  id="rnnMemorySlider"
+                  type="range"
+                  min="1"
+                  max="10"
+                  value="5"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="rnnChart"></canvas>
+              </div>
+            </div>
+            <div class="card rounded-lg p-6">
+              <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                LSTM (El de Memoria a Largo Plazo)
+              </h3>
+              <p class="text-gray-400 mb-6">
+                La LSTM es una RNN con esteroides y un anotador. Tiene un
+                sistema de "compuertas" que le permite decidir qué información
+                vieja es importante y vale la pena guardar, y cuál es relleno y
+                se puede tirar. Por eso es un campeón para predecir series
+                largas y complejas.
+              </p>
+              <div class="space-y-4 mb-6">
+                <label for="lstmMemorySlider" class="block font-medium"
+                  >Capacidad de Memoria a Largo Plazo:
+                  <span id="lstmMemoryValue" class="font-bold text-orange-400"
+                    >20</span
+                  ></label
+                >
+                <input
+                  id="lstmMemorySlider"
+                  type="range"
+                  min="5"
+                  max="50"
+                  value="20"
+                  class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div class="chart-container">
+                <canvas id="lstmChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="text-center mt-16 text-gray-500">
+        <p>
+          Hecho con 🧉 y ciencia de datos. Laboratorio de Modelos Secuenciales.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // --- CHART DEFAULTS ---
+      const chartOptions = (xlabel, ylabel) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: "linear",
+            position: "bottom",
+            title: { display: true, text: xlabel, color: "#9ca3af" },
+            grid: { color: "rgba(255,255,255,0.1)" },
+            ticks: { color: "#9ca3af" },
+          },
+          y: {
+            title: { display: true, text: ylabel, color: "#9ca3af" },
+            grid: { color: "rgba(255,255,255,0.1)" },
+            ticks: { color: "#9ca3af" },
+          },
+        },
+        plugins: { legend: { labels: { color: "#9ca3af" } } },
+      });
+
+      const colors = [
+        "#f97316",
+        "#34d399",
+        "#60a5fa",
+        "#f472b6",
+        "#fbbf24",
+        "#a78bfa",
+        "#ef4444",
+        "#22d3ee",
+      ];
+
+      // --- SEQUENTIAL MODELS ---
+      const rnnMemorySlider = document.getElementById("rnnMemorySlider");
+      const rnnMemoryValue = document.getElementById("rnnMemoryValue");
+      const lstmMemorySlider = document.getElementById("lstmMemorySlider");
+      const lstmMemoryValue = document.getElementById("lstmMemoryValue");
+      const rnnChartCtx = document.getElementById("rnnChart").getContext("2d");
+      const lstmChartCtx = document
+        .getElementById("lstmChart")
+        .getContext("2d");
+      let rnnChart, lstmChart;
+
+      function generateSequence(len = 100) {
+        const data = [];
+        for (let i = 0; i < len; i++) {
+          // A complex wave
+          data.push(Math.sin(i * 0.2) + Math.sin(i * 0.5) * 0.5);
+        }
+        return data;
+      }
+      const sequenceData = generateSequence();
+      const sequenceLabels = Array.from({ length: 100 }, (_, i) => i + 1);
+
+      function simulateRNN(data, memory) {
+        const prediction = [];
+        for (let i = 0; i < data.length; i++) {
+          if (i < memory) {
+            prediction.push(null);
+            continue;
+          }
+          // Simple prediction based on the average of last 'memory' points
+          const lookback = data.slice(i - memory, i);
+          const avg = lookback.reduce((a, b) => a + b, 0) / memory;
+          // RNNs tend to drift
+          const drift = (i / data.length - 0.5) * 0.2;
+          prediction.push(avg + drift);
+        }
+        return prediction;
+      }
+
+      function simulateLSTM(data, memory) {
+        const prediction = [];
+        for (let i = 0; i < data.length; i++) {
+          if (i < memory) {
+            prediction.push(null);
+            continue;
+          }
+          // LSTMs are better at capturing patterns
+          const lookback_short = data.slice(i - 5, i);
+          const trend_short =
+            lookback_short.length > 1
+              ? (lookback_short[lookback_short.length - 1] -
+                  lookback_short[0]) /
+                lookback_short.length
+              : 0;
+
+          const lookback_long = data.slice(i - memory, i);
+          const trend_long =
+            lookback_long.length > 1
+              ? (lookback_long[lookback_long.length - 1] - lookback_long[0]) /
+                lookback_long.length
+              : 0;
+
+          prediction.push(data[i - 1] + (trend_short * 0.7 + trend_long * 0.3));
+        }
+        return prediction;
+      }
+
+      function updateRNNChart() {
+        const memory = parseInt(rnnMemorySlider.value);
+        rnnMemoryValue.textContent = memory;
+        if (rnnChart) rnnChart.destroy();
+
+        const predictionData = simulateRNN(sequenceData, memory);
+        const displayLength = 70;
+
+        rnnChart = new Chart(rnnChartCtx, {
+          type: "line",
+          data: {
+            labels: sequenceLabels.slice(0, displayLength),
+            datasets: [
+              {
+                label: "Serie Real",
+                data: sequenceData.slice(0, displayLength),
+                borderColor: "rgba(255,255,255,0.4)",
+                tension: 0.1,
+                pointRadius: 0,
+              },
+              {
+                label: "Predicción RNN",
+                data: predictionData.slice(0, displayLength),
+                borderColor: colors[0],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.1,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Valor"),
+        });
+      }
+
+      function updateLSTMChart() {
+        const memory = parseInt(lstmMemorySlider.value);
+        lstmMemoryValue.textContent = memory;
+        if (lstmChart) lstmChart.destroy();
+
+        const predictionData = simulateLSTM(sequenceData, memory);
+        const displayLength = 70;
+
+        lstmChart = new Chart(lstmChartCtx, {
+          type: "line",
+          data: {
+            labels: sequenceLabels.slice(0, displayLength),
+            datasets: [
+              {
+                label: "Serie Real",
+                data: sequenceData.slice(0, displayLength),
+                borderColor: "rgba(255,255,255,0.4)",
+                tension: 0.1,
+                pointRadius: 0,
+              },
+              {
+                label: "Predicción LSTM",
+                data: predictionData.slice(0, displayLength),
+                borderColor: colors[1],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.1,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: chartOptions("Tiempo", "Valor"),
+        });
+      }
+
+      rnnMemorySlider.addEventListener("input", updateRNNChart);
+      lstmMemorySlider.addEventListener("input", updateLSTMChart);
+
+      // --- INITIAL LOAD ---
+      window.addEventListener("load", () => {
+        updateRNNChart();
+        updateLSTMChart();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Modelos Cripto-Fundamentales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+      .btn {
+        transition: all 0.2s;
+      }
+      .btn:hover {
+        transform: scale(1.05);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #f97316;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      .chart-container {
+        position: relative;
+        height: 400px;
+      }
+      .gauge-container {
+        position: relative;
+        width: 100%;
+        height: 150px;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-gray-200">
+    <div class="container mx-auto p-4 md:p-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-6xl font-black text-white">
+          Laboratorio de Modelos
+          <span class="text-orange-500">Cripto-Fundamentales</span>
+        </h1>
+        <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+          Acá nos olvidamos de los balances y nos metemos a analizar la
+          blockchain. Jugá con los datos "on-chain" y descubrí si una
+          criptomoneda está para el despegue o para el subsuelo.
+        </p>
+      </header>
+
+      <main class="space-y-16">
+        <!-- Sección 1: NVT Ratio -->
+        <section id="nvt">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            📡 1. Ratio NVT (El P/E de las Cripto)
+          </h2>
+          <div class="card rounded-lg p-6">
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div>
+                <h3 class="text-2xl font-bold text-orange-400 mb-2">
+                  Network Value to Transactions
+                </h3>
+                <p class="text-gray-400 mb-6">
+                  Este bicho es como el Ratio P/E de las acciones. Compara el
+                  valor total de la red (Market Cap) con cuánta guita se está
+                  moviendo adentro (Volumen de Transacciones). Si el valor es
+                  altísimo pero nadie usa la red, es una señal de alerta. ¿Mucho
+                  ruido y pocas nueces?
+                </p>
+
+                <div class="space-y-4 mb-6">
+                  <div>
+                    <label for="marketCapSlider" class="block font-medium"
+                      >Valor de la Red (Market Cap): $<span
+                        id="marketCapValue"
+                        class="font-bold text-orange-400"
+                        >1,000</span
+                      >
+                      M</label
+                    >
+                    <input
+                      id="marketCapSlider"
+                      type="range"
+                      min="100"
+                      max="10000"
+                      value="1000"
+                      step="100"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label for="txVolumeSlider" class="block font-medium"
+                      >Volumen de Transacciones (24h): $<span
+                        id="txVolumeValue"
+                        class="font-bold text-orange-400"
+                        >50</span
+                      >
+                      M</label
+                    >
+                    <input
+                      id="txVolumeSlider"
+                      type="range"
+                      min="1"
+                      max="500"
+                      value="50"
+                      step="1"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="bg-gray-900 p-4 rounded-lg text-center mb-6">
+                  <p class="text-lg">Ratio NVT Calculado:</p>
+                  <p class="text-4xl font-black text-white">
+                    <span id="nvtValue">20.0</span>
+                  </p>
+                  <p
+                    id="nvtVerdict"
+                    class="mt-2 text-xl font-bold text-yellow-400"
+                  >
+                    🤔 Zona Neutra
+                  </p>
+                </div>
+                <div class="chart-container" style="height: 250px">
+                  <canvas id="nvtChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sección 2: MVRV Ratio -->
+        <section id="mvrv">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            🤑 2. Ratio MVRV (El Termómetro del Mercado)
+          </h2>
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              Market Value to Realized Value
+            </h3>
+            <p class="text-gray-400 mb-6">
+              Este es un capo para detectar picos y pisos de mercado. Compara el
+              **precio actual** de todas las monedas (Market Value) con el
+              **precio promedio al que se compraron** (Realized Value). Si el
+              MVRV es alto, significa que la mayoría de los tenedores están
+              recontra en ganancia y podrían vender. Si es bajo, están en
+              pérdida y el pánico puede ser una oportunidad.
+            </p>
+
+            <div class="space-y-4 mb-8">
+              <label for="mvrvSlider" class="block font-medium text-xl"
+                >Ratio MVRV Simulado:
+                <span id="mvrvValue" class="font-bold text-orange-400"
+                  >1.5</span
+                ></label
+              >
+              <input
+                id="mvrvSlider"
+                type="range"
+                min="0.5"
+                max="4"
+                value="1.5"
+                step="0.1"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+
+            <div class="gauge-container">
+              <canvas id="mvrvGauge"></canvas>
+            </div>
+            <div class="text-center mt-4">
+              <p id="mvrvVerdict" class="text-2xl font-bold text-yellow-400">
+                🟡 Zona de Acumulación
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sección 3: Ley de Metcalfe -->
+        <section id="metcalfe">
+          <h2 class="text-3xl font-bold border-b-2 border-orange-500 pb-2 mb-8">
+            🚀 3. Ley de Metcalfe (El Poder de la Red)
+          </h2>
+          <div class="card rounded-lg p-6">
+            <h3 class="text-2xl font-bold text-orange-400 mb-2">
+              El Valor de Estar Conectado
+            </h3>
+            <p class="text-gray-400 mb-6">
+              Esta ley es simple pero demoledora: el valor de una red es
+              proporcional al **cuadrado del número de sus usuarios**. Dos
+              teléfonos pueden hacer una conexión. Cuatro teléfonos pueden hacer
+              seis conexiones. El valor crece exponencialmente. Para las cripto,
+              se mide con la cantidad de wallets activas. ¡Mirá cómo se dispara
+              el valor a medida que más gente entra al boliche!
+            </p>
+            <div class="space-y-4 mb-6">
+              <label for="usersSlider" class="block font-medium"
+                >Número de Usuarios Activos:
+                <span id="usersValue" class="font-bold text-orange-400"
+                  >50,000</span
+                ></label
+              >
+              <input
+                id="usersSlider"
+                type="range"
+                min="1000"
+                max="1000000"
+                value="50000"
+                step="1000"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+            <div class="chart-container">
+              <canvas id="metcalfeChart"></canvas>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="text-center mt-16 text-gray-500">
+        <p>
+          Hecho con 🧉 y ciencia de datos. Laboratorio de Modelos
+          Cripto-Fundamentales.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // --- UTILS ---
+      const formatNumber = (num) => {
+        if (num >= 1000000) return `${(num / 1000000).toFixed(1)} M`;
+        if (num >= 1000) return `${(num / 1000).toFixed(0)} K`;
+        return num;
+      };
+
+      // --- 1. NVT RATIO ---
+      const marketCapSlider = document.getElementById("marketCapSlider");
+      const txVolumeSlider = document.getElementById("txVolumeSlider");
+      const marketCapValue = document.getElementById("marketCapValue");
+      const txVolumeValue = document.getElementById("txVolumeValue");
+      const nvtValue = document.getElementById("nvtValue");
+      const nvtVerdict = document.getElementById("nvtVerdict");
+      const nvtChartCtx = document.getElementById("nvtChart").getContext("2d");
+      let nvtChart;
+
+      function calculateNVT() {
+        const mc = parseFloat(marketCapSlider.value);
+        const tv = parseFloat(txVolumeSlider.value);
+        const nvt = tv > 0 ? mc / tv : 0;
+
+        marketCapValue.textContent = `${formatNumber(mc * 1000000)}`;
+        txVolumeValue.textContent = `${formatNumber(tv * 1000000)}`;
+        nvtValue.textContent = nvt.toFixed(1);
+
+        if (nvt > 90) {
+          nvtVerdict.textContent = "📈 Cara (Sobrevaluada)";
+          nvtVerdict.className = "mt-2 text-xl font-bold text-red-400";
+        } else if (nvt < 45) {
+          nvtVerdict.textContent = "📉 Barata (Subvaluada)";
+          nvtVerdict.className = "mt-2 text-xl font-bold text-green-400";
+        } else {
+          nvtVerdict.textContent = "🤔 Zona Neutra";
+          nvtVerdict.className = "mt-2 text-xl font-bold text-yellow-400";
+        }
+        updateNVTChart(nvt);
+      }
+
+      function updateNVTChart(nvt) {
+        if (nvtChart) nvtChart.destroy();
+        nvtChart = new Chart(nvtChartCtx, {
+          type: "bar",
+          data: {
+            labels: ["NVT Ratio"],
+            datasets: [
+              {
+                label: "Ratio NVT",
+                data: [nvt],
+                backgroundColor: (ctx) => {
+                  const value = ctx.raw;
+                  if (value > 90) return "#ef4444";
+                  if (value < 45) return "#22c55e";
+                  return "#f59e0b";
+                },
+                borderColor: "#111827",
+                borderWidth: 2,
+                borderRadius: 5,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            scales: {
+              x: {
+                min: 0,
+                max: 150,
+                title: {
+                  display: true,
+                  text: "Nivel del Ratio",
+                  color: "#9ca3af",
+                },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: { display: false },
+            },
+            plugins: { legend: { display: false } },
+          },
+        });
+      }
+      [marketCapSlider, txVolumeSlider].forEach((s) =>
+        s.addEventListener("input", calculateNVT)
+      );
+
+      // --- 2. MVRV GAUGE ---
+      const mvrvSlider = document.getElementById("mvrvSlider");
+      const mvrvValue = document.getElementById("mvrvValue");
+      const mvrvVerdict = document.getElementById("mvrvVerdict");
+      const mvrvGaugeCtx = document
+        .getElementById("mvrvGauge")
+        .getContext("2d");
+      let mvrvGauge;
+
+      function updateMVRV() {
+        const mvrv = parseFloat(mvrvSlider.value);
+        mvrvValue.textContent = mvrv.toFixed(1);
+
+        if (mvrv > 3.0) {
+          mvrvVerdict.textContent = "🔴 Zona de Euforia (Pico de Mercado)";
+          mvrvVerdict.className = "text-2xl font-bold text-red-400";
+        } else if (mvrv < 1.0) {
+          mvrvVerdict.textContent = "🟢 Zona de Oportunidad (Piso de Mercado)";
+          mvrvVerdict.className = "text-2xl font-bold text-green-400";
+        } else {
+          mvrvVerdict.textContent = "🟡 Zona de Acumulación";
+          mvrvVerdict.className = "text-2xl font-bold text-yellow-400";
+        }
+
+        drawMVRVGauge(mvrv);
+      }
+
+      function drawMVRVGauge(value) {
+        if (mvrvGauge) mvrvGauge.destroy();
+        mvrvGauge = new Chart(mvrvGaugeCtx, {
+          type: "doughnut",
+          data: {
+            labels: ["Zona", "Resto"],
+            datasets: [
+              {
+                data: [value, 4 - value],
+                backgroundColor: [
+                  value > 3.0 ? "#ef4444" : value < 1.0 ? "#22c55e" : "#f59e0b",
+                  "#374151", // Gray background for the rest
+                ],
+                borderColor: "#1a1a1a",
+                borderWidth: 5,
+                circumference: 180,
+                rotation: 270,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 2,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false },
+            },
+            cutout: "70%",
+          },
+        });
+      }
+      mvrvSlider.addEventListener("input", updateMVRV);
+
+      // --- 3. METCALFE'S LAW ---
+      const usersSlider = document.getElementById("usersSlider");
+      const usersValue = document.getElementById("usersValue");
+      const metcalfeChartCtx = document
+        .getElementById("metcalfeChart")
+        .getContext("2d");
+      let metcalfeChart;
+
+      function calculateMetcalfe() {
+        const users = parseFloat(usersSlider.value);
+        usersValue.textContent = formatNumber(users);
+
+        const constant = 0.00000001; // Just for visualization
+        const labels = [];
+        const values = [];
+
+        for (let i = 1000; i <= 1000000; i += 25000) {
+          labels.push(i);
+          values.push(constant * Math.pow(i, 2));
+        }
+
+        if (metcalfeChart) metcalfeChart.destroy();
+        metcalfeChart = new Chart(metcalfeChartCtx, {
+          type: "line",
+          data: {
+            labels: labels.map((l) => formatNumber(l)),
+            datasets: [
+              {
+                label: "Valor de la Red",
+                data: values,
+                borderColor: "#f97316",
+                backgroundColor: "rgba(249, 115, 22, 0.2)",
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+              },
+              {
+                label: "Tu Simulación",
+                data: [{ x: users, y: constant * Math.pow(users, 2) }],
+                type: "scatter",
+                backgroundColor: "#fbbf24",
+                pointRadius: 8,
+                pointHoverRadius: 10,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Número de Usuarios Activos",
+                  color: "#9ca3af",
+                },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: { color: "#9ca3af" },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Valor Intrínseco de la Red",
+                  color: "#9ca3af",
+                },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                ticks: {
+                  color: "#9ca3af",
+                  callback: (value) => formatNumber(value),
+                },
+              },
+            },
+            plugins: { legend: { labels: { color: "#9ca3af" } } },
+          },
+        });
+      }
+      usersSlider.addEventListener("input", calculateMetcalfe);
+
+      // --- INITIAL LOAD ---
+      window.addEventListener("load", () => {
+        calculateNVT();
+        updateMVRV();
+        calculateMetcalfe();
+      });
+    </script>
+  </body>
+</html>
